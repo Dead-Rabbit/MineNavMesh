@@ -4,6 +4,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MineNavMesh", "MineNavMesh.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A_TriangulationByEarClipping", "A_TriangulationByEarClipping\A_TriangulationByEarClipping.vcxproj", "{0441420F-F016-4DF2-AFD0-9E908EC50D8E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Base", "Base\Base.vcxproj", "{C1CB6449-454D-4F08-B369-1C6D8694431F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -28,5 +30,13 @@ Global
 		{0441420F-F016-4DF2-AFD0-9E908EC50D8E}.Release|Win32.Build.0 = Release|Win32
 		{0441420F-F016-4DF2-AFD0-9E908EC50D8E}.Release|x64.ActiveCfg = Release|x64
 		{0441420F-F016-4DF2-AFD0-9E908EC50D8E}.Release|x64.Build.0 = Release|x64
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Debug|Win32.Build.0 = Debug|Win32
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Debug|x64.ActiveCfg = Debug|x64
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Debug|x64.Build.0 = Debug|x64
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Release|Win32.ActiveCfg = Release|Win32
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Release|Win32.Build.0 = Release|Win32
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Release|x64.ActiveCfg = Release|x64
+		{C1CB6449-454D-4F08-B369-1C6D8694431F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal
