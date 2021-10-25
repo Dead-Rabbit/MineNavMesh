@@ -154,7 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="A_TriangulationByEarClipping.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Sources\PolygonTriangulation.cpp" />
   </ItemGroup>
   <ItemGroup>
