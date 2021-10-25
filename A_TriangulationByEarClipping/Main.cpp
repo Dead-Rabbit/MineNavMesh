@@ -27,7 +27,6 @@ int main()
     initgraph(640, 480);    // 创建绘图窗口，大小为 640x480 像素
     
     // 绘制或输出测试
-    // setfillstyle(SOLID_FILL, RED);
     setcolor(RED);
     setfillcolor(RED);
     for (Vector2 point : edgePoints)
