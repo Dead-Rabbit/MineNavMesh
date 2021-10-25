@@ -1,3 +1,7 @@
+/**
+ * 学习自： https://www.cnblogs.com/xignzou/p/3721494.html
+*/
+
 #define USE_EASYX_GTAPHICS      // 定义是否使用 EasyX 来进行输出
 
 #include <vector>
@@ -22,6 +26,8 @@ int main()
     edgePoints.push_back(Vector2(379,132));
     edgePoints.push_back(Vector2(400,288));
     edgePoints.push_back(Vector2(293,325));
+
+    // 生成链表
     
 #ifdef USE_EASYX_GTAPHICS
     initgraph(640, 480);    // 创建绘图窗口，大小为 640x480 像素
@@ -31,7 +37,7 @@ int main()
     // 绘制或输出测试
     setlinecolor(BLACK);
     setfillcolor(RED);
-    int pointSize = edgePoints.size();
+    const int pointSize = edgePoints.size();
     for (int i = 0; i < pointSize; i++)
     {
         const auto point = edgePoints[i];
