@@ -155,10 +155,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="A_TriangulationByEarClipping.cpp" />
-    <ClCompile Include="Sources\PolygonTrangulation.cpp" />
+    <ClCompile Include="Sources\PolygonTriangulation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\PolygonTrangulation.h" />
+    <ClInclude Include="Sources\PolygonTriangulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

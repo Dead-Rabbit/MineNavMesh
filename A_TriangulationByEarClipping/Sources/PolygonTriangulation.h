@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class PolygonTrangulation
+class PolygonTriangulation
 {
 public:
     
