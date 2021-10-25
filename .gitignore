@@ -36,4 +36,5 @@
 /Debug
 /Debug
 /x64
-*/x64
+./*/x64
+A_TriangulationByEarClipping/x64/
