@@ -32,5 +32,7 @@
 *.app
 
 /.vs
+/.idea
 /Debug
 /MineNavMesh/Debug
+/x64
