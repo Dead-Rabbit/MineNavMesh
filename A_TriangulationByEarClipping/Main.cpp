@@ -25,13 +25,19 @@ int main()
     
 #ifdef USE_EASYX_GTAPHICS
     initgraph(640, 480);    // 创建绘图窗口，大小为 640x480 像素
+    setfillcolor(WHITE);
+    solidrectangle(0, 0, 640, 480);
     
     // 绘制或输出测试
-    setcolor(RED);
+    setlinecolor(BLACK);
     setfillcolor(RED);
-    for (Vector2 point : edgePoints)
+    int pointSize = edgePoints.size();
+    for (int i = 0; i < pointSize; i++)
     {
+        const auto point = edgePoints[i];
         fillcircle(point.x, point.y, 3);
+        const auto nextPoint = edgePoints[i + 1 == pointSize ? 0 : i + 1];
+        line(point.x, point.y, nextPoint.x, nextPoint.y);
     }
 #endif
 
