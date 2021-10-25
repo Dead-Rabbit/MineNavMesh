@@ -34,5 +34,6 @@
 /.vs
 /.idea
 /Debug
-/MineNavMesh/Debug
+/Debug
 /x64
+./*/x64
