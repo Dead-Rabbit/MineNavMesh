@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cassert>
 
-namespace JZ
+namespace ZXNavMesh
 {
 	class Vector2
 	{
