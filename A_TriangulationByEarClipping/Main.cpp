@@ -1,5 +1,13 @@
 /**
  * 学习自： https://www.cnblogs.com/xignzou/p/3721494.html
+ *
+ * 备注：输出文字的用法
+ * setbkmode(TRANSPARENT);     // 去掉文字背景颜色
+ * settextstyle(20, 0, L"微软雅黑");
+ * setcolor(BLACK);
+ * TCHAR str[25];
+ * _stprintf_s(str, _T("%d(%.1f,%.1f)"), outCurNode->num, point.x, point.y);
+ * outtextxy(point.x - 5, point.y - 20, str);
 */
 
 #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
