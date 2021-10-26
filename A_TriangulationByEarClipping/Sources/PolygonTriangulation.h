@@ -65,6 +65,8 @@ namespace ZXNavMesh
         // 设置外部节点下的内部空洞节点
         void SetPolygonInsidePoints(vector<Vector3> innerPoints);
 
+        void ApplyInsidePolygonPoints();
+
         // 判断当前点是否为耳尖
         bool IsPointEar(PointLinkNode* checkNode);
         
@@ -99,12 +101,15 @@ namespace ZXNavMesh
         }
         
     private:
-        // 记录所有输入点中的最右点
-        PointLinkNode* rightEdgeNode = nullptr;
         // 记录原始点，逆时针顺序输入
         vector<Vector3> edgePoints;
-        // 链表的起点
+        // 外节点链表的起点
         PointLinkNode* firstNode = nullptr;
+        // 记录所有输入点中的最右点
+        PointLinkNode* rightEdgeNode = nullptr;
+        // 记录所有内部岛洞的头结点，为方便后续进行比较
+        // 此处的first为firstNode，second为当前Node链下，最靠右的点
+        vector<std::pair<PointLinkNode*, PointLinkNode*>> insideFirstNodes;
         // 分割形成的三角形集合
         vector<Triangle> triangles;
     };

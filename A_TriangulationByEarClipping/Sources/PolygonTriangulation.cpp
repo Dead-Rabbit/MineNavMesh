@@ -51,6 +51,7 @@ void PolygonTriangulation::SetPolygonInsidePoints(vector<Vector3> innerPoints)
     PointLinkNode* firstInsideNode = nullptr;
     PointLinkNode* curInsideNode = firstInsideNode;
     PointLinkNode* preInsideNode = firstInsideNode;
+    PointLinkNode* rightNode = nullptr;
     for (int i = 0; i < pointSize; i++)
     {
         auto point = innerPoints[i];
@@ -60,6 +61,7 @@ void PolygonTriangulation::SetPolygonInsidePoints(vector<Vector3> innerPoints)
         {
             firstInsideNode = new PointLinkNode(point.x, point.y, point.z);
             curInsideNode = firstInsideNode;
+            rightNode = firstInsideNode;
             continue;
         }
         
@@ -67,96 +69,128 @@ void PolygonTriangulation::SetPolygonInsidePoints(vector<Vector3> innerPoints)
         preInsideNode = curInsideNode;
         curInsideNode = curInsideNode->nextNode;
         curInsideNode->preNode = preInsideNode;
+
+        // 比较查出当前最右点
+        if (curInsideNode->point.x > rightNode->point.x)
+            rightNode = curInsideNode;
     }
     curInsideNode->nextNode = firstInsideNode;
     firstInsideNode->preNode = curInsideNode;
 
-    // 寻找最靠右的 Inside 点
-    curInsideNode = firstInsideNode;
-    PointLinkNode* rightInsideNode = nullptr;
-    do
+    // 考虑使用最右点进行排序，将右侧点x值最大的放到前面
+    auto nodesIt = insideFirstNodes.begin();
+    bool isInsert = false;
+    while(nodesIt != insideFirstNodes.end())
     {
-        if (rightInsideNode == nullptr)
-            rightInsideNode = curInsideNode;
-        else if (curInsideNode->point.x > rightInsideNode->point.x)
-            rightInsideNode = curInsideNode;
-        
-        curInsideNode = curInsideNode->nextNode;
-    }
-    while (curInsideNode != firstInsideNode);
-    
-    // 获取从inner右点触发向x轴正方向走的最大线段
-    Line compareLine = Line(rightInsideNode->point, Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0));
-    // 判断靠右内部节点与哪个线段的相交点最靠近y轴
-    PointLinkNode* curNode = firstNode;
-    PointLinkNode* suitNode = nullptr;
-    Vector3 suitCrossPoint;
-    if (curNode == nullptr)
-        return ;
-    do
-    {
-        Line curLine = Line(curNode->point, curNode->nextNode->point);
-        Vector3 crossPoint;
-        if (NavMath::GetSegmentLinesIntersection(compareLine.start, compareLine.end,
-            curLine.start, curLine.end, crossPoint))
+        if (nodesIt->second->point.x < rightNode->point.x)
         {
-            if (suitNode == nullptr)
+            nodesIt = insideFirstNodes.insert(nodesIt, pair<PointLinkNode*, PointLinkNode*>(firstInsideNode, rightNode));
+            isInsert = true;
+            break;
+        }
+        ++nodesIt;
+    }
+    if (!isInsert)
+        insideFirstNodes.push_back(pair<PointLinkNode*, PointLinkNode*>(firstInsideNode, rightNode));
+}
+
+void PolygonTriangulation::ApplyInsidePolygonPoints()
+{
+    for (const std::pair<PointLinkNode*, PointLinkNode*> firstInsideNodePair : insideFirstNodes)
+    {
+        // 寻找最靠右的 Inside 点
+        PointLinkNode* firstInsideNode = firstInsideNodePair.first;
+            
+        PointLinkNode* rightInsideNode = firstInsideNodePair.second;
+        // PointLinkNode* curInsideNode = firstInsideNode;
+        // curInsideNode = firstInsideNode;
+        // do
+        // {
+        //     if (rightInsideNode == nullptr)
+        //         rightInsideNode = curInsideNode;
+        //     else if (curInsideNode->point.x > rightInsideNode->point.x)
+        //         rightInsideNode = curInsideNode;
+        //     
+        //     curInsideNode = curInsideNode->nextNode;
+        // }
+        // while (curInsideNode != firstInsideNode);
+        
+        // 获取从inner右点触发向x轴正方向走的最大线段
+        Line compareLine = Line(rightInsideNode->point, Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0));
+
+        // 检查当前所有其他岛洞是否于其有“相互可见”
+        PointLinkNode* curNode = nullptr;
+        PointLinkNode* suitNode = nullptr;
+        Vector3 suitCrossPoint;
+        // 判断靠右内部节点与哪个线段的相交点最靠近y轴
+        curNode = firstNode;
+        if (curNode == nullptr)
+            return ;
+        do
+        {
+            Line curLine = Line(curNode->point, curNode->nextNode->point);
+            Vector3 crossPoint;
+            if (NavMath::GetSegmentLinesIntersection(compareLine.start, compareLine.end,
+                curLine.start, curLine.end, crossPoint))
             {
-                suitNode = curNode;
-                suitCrossPoint = crossPoint;
-            } else
-            {
-                if (crossPoint.x < suitCrossPoint.x)
+                if (suitNode == nullptr)
                 {
                     suitNode = curNode;
                     suitCrossPoint = crossPoint;
+                } else
+                {
+                    if (crossPoint.x < suitCrossPoint.x)
+                    {
+                        suitNode = curNode;
+                        suitCrossPoint = crossPoint;
+                    }
                 }
             }
-        }
         
-        curNode = curNode->nextNode;
-    }
-    while (curNode != firstNode);
-    
-    // 找到最近的线段，检查 形成的三角形内是否有其他点
-    curNode = firstNode;
-    Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
-    PointLinkNode* cutNode = nullptr;  // 裁剪位置
-    do
-    {
-        // 排除当前需要检查的点
-        if (curNode != suitNode)
-        {
-            // 判断当前点是否在形成的三角形中，如果在，则取出一个最靠近x轴，即y最小的
-            if (NavMath::IsPointInTriangle(A, B, C, curNode->point))
-            {
-                if (cutNode == nullptr)
-                    cutNode = curNode;
-                else if (NavMath::Abs(curNode->point.y - rightInsideNode->point.y)
-                    < NavMath::Abs(cutNode->point.y - rightInsideNode->point.y))
-                    cutNode = curNode;
-            }
+            curNode = curNode->nextNode;
         }
-        curNode = curNode->nextNode;
-    }
-    while (curNode != firstNode);
-    
-    if (cutNode == nullptr)
-        cutNode = suitNode;
+        while (curNode != firstNode);
+        
+        // 找到最近的线段，检查 形成的三角形内是否有其他点
+        curNode = firstNode;
+        Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
+        PointLinkNode* cutNode = nullptr;  // 裁剪位置
+        do
+        {
+            // 排除当前需要检查的点
+            if (curNode != suitNode)
+            {
+                // 判断当前点是否在形成的三角形中，如果在，则取出一个最靠近x轴，即y最小的
+                if (NavMath::IsPointInTriangle(A, B, C, curNode->point))
+                {
+                    if (cutNode == nullptr)
+                        cutNode = curNode;
+                    else if (NavMath::Abs(curNode->point.y - rightInsideNode->point.y)
+                        < NavMath::Abs(cutNode->point.y - rightInsideNode->point.y))
+                        cutNode = curNode;
+                }
+            }
+            curNode = curNode->nextNode;
+        }
+        while (curNode != firstNode);
+        
+        if (cutNode == nullptr)
+            cutNode = suitNode;
 
-    // 拷贝 对应的Inside节点插入到当前链表中
-    PointLinkNode* copyCutPoint = new PointLinkNode(cutNode->point.x, cutNode->point.y, cutNode->point.z);
-    PointLinkNode* copyRightInsidePoint = new PointLinkNode(rightInsideNode->point.x, rightInsideNode->point.y, rightInsideNode->point.z);
-    PointLinkNode* cutNextNode = cutNode->nextNode;  // 裁剪的下一个位置，用来接收新的洞的最后一个点
-    PointLinkNode* insidePreNode = rightInsideNode->preNode;
-    cutNode->nextNode = rightInsideNode;
-    rightInsideNode->preNode = cutNode;
-    insidePreNode->nextNode = copyRightInsidePoint;
-    copyRightInsidePoint->preNode = insidePreNode;
-    copyRightInsidePoint->nextNode = copyCutPoint;
-    copyCutPoint->preNode = copyRightInsidePoint;
-    copyCutPoint->nextNode = cutNextNode;
-    cutNextNode->preNode = copyCutPoint;
+        // 拷贝 对应的Inside节点插入到当前链表中
+        PointLinkNode* copyCutPoint = new PointLinkNode(cutNode->point.x, cutNode->point.y, cutNode->point.z);
+        PointLinkNode* copyRightInsidePoint = new PointLinkNode(rightInsideNode->point.x, rightInsideNode->point.y, rightInsideNode->point.z);
+        PointLinkNode* cutNextNode = cutNode->nextNode;  // 裁剪的下一个位置，用来接收新的洞的最后一个点
+        PointLinkNode* insidePreNode = rightInsideNode->preNode;
+        cutNode->nextNode = rightInsideNode;
+        rightInsideNode->preNode = cutNode;
+        insidePreNode->nextNode = copyRightInsidePoint;
+        copyRightInsidePoint->preNode = insidePreNode;
+        copyRightInsidePoint->nextNode = copyCutPoint;
+        copyCutPoint->preNode = copyRightInsidePoint;
+        copyCutPoint->nextNode = cutNextNode;
+        cutNextNode->preNode = copyCutPoint;
+    }
 }
 
 bool PolygonTriangulation::IsPointEar(PointLinkNode* checkNode)

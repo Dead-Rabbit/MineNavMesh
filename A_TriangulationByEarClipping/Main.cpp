@@ -10,8 +10,8 @@
  * outtextxy(point.x - 5, point.y - 20, str);
 */
 
-// #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
-// #define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
+#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
 
 #include <vector>
 
@@ -19,7 +19,7 @@
 #include "Sources/PolygonTriangulation.h"
 
 #ifdef USE_EASYX_GTAPHICS
-#include <graphics.h>
+#include <graphics.h>   // 如果此处出现了错误，请安装 EasyX 库，如果不想安装，注释掉13行的 #define USE_EASYX_GTAPHICS 即可
 #include <conio.h>      //为了使用_getch()
 #endif
 
@@ -47,6 +47,7 @@ int main()
     
     // 定义多边形的点，介于 EasyX 使用的是整型，此处尽量使用整型来测试
     vector<Vector3> edgePoints;
+    edgePoints.clear();
     edgePoints.push_back(Vector3(43, 257, 0));
     edgePoints.push_back(Vector3(160, 391, 0));
     edgePoints.push_back(Vector3(349, 380, 0));
@@ -60,8 +61,10 @@ int main()
     triangulationTool.SetPolygonOutPoints(edgePoints);
 
     vector<Vector3> insidePoints;
+    
+    insidePoints.clear();
     insidePoints.push_back(Vector3(304, 219, 0));
-    insidePoints.push_back(Vector3(316, 255, 0));
+    insidePoints.push_back(Vector3(345, 234, 0));
     insidePoints.push_back(Vector3(261, 307, 0));
     insidePoints.push_back(Vector3(312, 355, 0));
     insidePoints.push_back(Vector3(223, 364, 0));
@@ -69,6 +72,30 @@ int main()
     insidePoints.push_back(Vector3(173, 273, 0));
     insidePoints.push_back(Vector3(235, 218, 0));
     triangulationTool.SetPolygonInsidePoints(insidePoints);
+    
+    insidePoints.clear();
+    insidePoints.push_back(Vector3(416, 216, 0));
+    insidePoints.push_back(Vector3(421, 272, 0));
+    insidePoints.push_back(Vector3(362, 263, 0));
+    insidePoints.push_back(Vector3(375, 220, 0));
+    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    
+    insidePoints.clear();
+    insidePoints.push_back(Vector3(335, 312, 0));
+    insidePoints.push_back(Vector3(301, 329, 0));
+    insidePoints.push_back(Vector3(285, 302, 0));
+    insidePoints.push_back(Vector3(311, 281, 0));
+    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    
+    insidePoints.clear();
+    insidePoints.push_back(Vector3(419, 301, 0));
+    insidePoints.push_back(Vector3(439, 264, 0));
+    insidePoints.push_back(Vector3(428, 218, 0));
+    insidePoints.push_back(Vector3(429, 191, 0));
+    insidePoints.push_back(Vector3(498, 244, 0));
+    triangulationTool.SetPolygonInsidePoints(insidePoints);
+
+    triangulationTool.ApplyInsidePolygonPoints();
     
 #ifdef USE_EASYX_GTAPHICS
     
@@ -211,10 +238,11 @@ void DrawClippingBoard()
     // 绘制提示内容
     DrawOptionHelper();
     
-    // 绘制点和线
-    DrawPointAndLine();
     // 绘制三角形
     DrawTriangles();
+    
+    // 绘制点和线
+    DrawPointAndLine();
 }
 
 #endif
