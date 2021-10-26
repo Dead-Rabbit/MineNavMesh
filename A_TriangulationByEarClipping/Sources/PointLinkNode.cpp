@@ -1,15 +1,14 @@
 ﻿#include "PointLinkNode.h"
 
-Line* PointLinkNode::GetPreLine()
-{
-	if (preLine == nullptr)
-		preLine = new Line(preNode->point, point);
-	return preLine;
-}
+#include "../../Base/NavMath.h"
 
-Line* PointLinkNode::getNextLine()
+bool PointLinkNode::IsPointConvex() const
 {
-	if (nextLine == nullptr)
-		nextLine = new Line(point, nextNode->point);
-	return nextLine;
+	Vector3 prePoint = preNode->point;
+	Vector3 nextPoint = nextNode->point;
+	Vector3 preVector = point - prePoint;
+	Vector3 nextVector = point - nextPoint;
+	return NavMath::Cross(
+		Vector3(preVector), Vector3(nextVector)
+	).z > 0;
 }

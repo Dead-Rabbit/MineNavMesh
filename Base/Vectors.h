@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <easyx.h>
 
 namespace ZXNavMesh
 {
@@ -166,6 +167,12 @@ namespace ZXNavMesh
                 z *= fInvLength;
             }
             return fLength;
+        }
+
+		inline Vector3 normalized()
+        {
+        	normalise();
+        	return Vector3(x, y, z);
         }
 
         inline void makeFloor( const Vector3& cmp )

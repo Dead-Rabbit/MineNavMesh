@@ -13,14 +13,14 @@ namespace ZXNavMesh
 	class Line
 	{
 	public:
-		Line(Vector2 start, Vector2 end)
+		Line(Vector3 start, Vector3 end)
 		{
 			this->start = start;
 			this->end = end;
 		}
 		
-		Vector2 start;
-		Vector2 end;
+		Vector3 start;
+		Vector3 end;
 	};
 	
 }
