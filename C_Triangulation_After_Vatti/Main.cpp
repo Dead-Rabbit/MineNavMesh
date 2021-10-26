@@ -92,62 +92,12 @@ int main(int argc, char* argv[])
     clipperD->AddPath(clipPath5, PathType::Clip, false);
     outputClipPaths.push_back(clipPath5);
     
-#ifdef USE_EASYX_GTAPHICS
-    // 绘制裁剪前的图形
-    initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
-    setbkmode(TRANSPARENT);     // 去掉文字背景颜色
-    settextstyle(20, 0, L"微软雅黑");
-
-    // 绘制当前调试用
-    ClearDrawBoard();
-    int outputNum = 0;
-    for (int i = 0; i < outputSubjectPaths.size(); i++)
-    {
-        auto path = outputSubjectPaths[i];
-        outputNum++;
-        DrawPath(outputNum, path, BLUE);
-    }
+    std::vector<Path<double>> resultPaths = DoClipTest(clipperD);
     
-    for (int i = 0; i < outputClipPaths.size(); i++)
-    {
-        auto path = outputClipPaths[i];
-        outputNum++;
-        DrawPath(outputNum, path, RED);
-    }
-    
-    ExMessage m;		// Define a message variable
-    while(true)
-    {
-        // Get a mouse message or a key message
-        m = getmessage(EM_MOUSE | EM_KEY);
-        switch(m.message)
-        {
-        case WM_LBUTTONDOWN:
-        {
-            ClearDrawBoard();
-            std::vector<Path<double>> resultPaths = DoClipTest(clipperD);
-            for (int i = 0; i < resultPaths.size(); i++)
-            {
-                auto path = resultPaths[i];
-                DrawPath(i+1, path, GREEN);
-            }
-        }break;
-        case WM_RBUTTONDOWN:
-            std::cout << "(" << m.x << ", " << m.y << ")" << endl;
-            break;
-        case WM_KEYDOWN:
-            if (m.vkcode == VK_ESCAPE)
-                return 0;	// Press ESC key to exit
-        default: break;
-        }
-    }
-#else
-    DoClipTest();
-#endif
-
     return 0;
 }
 
+// 进行裁剪
 std::vector<Path<double>> DoClipTest(ClipperD* clipperD)
 {
     PathsD resultPaths = PathsD();

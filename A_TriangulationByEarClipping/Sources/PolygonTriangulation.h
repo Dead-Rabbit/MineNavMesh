@@ -28,10 +28,10 @@ namespace ZXNavMesh
     class PointLinkNode
     {
     public:
-        PointLinkNode(int num, Vector3 point)
+        PointLinkNode(double x, double y, double z)
         {
-            this->num = num;
-            this->point = point;
+            this->point = Vector3(x, y, z);
+            this->num = ++pointNum;
         }
 
         int num;
@@ -50,6 +50,7 @@ namespace ZXNavMesh
             ).z > 0;
         };
     private:
+        static int pointNum;
         Line* preLine = nullptr;
         Line* nextLine = nullptr;
     };
@@ -58,14 +59,18 @@ namespace ZXNavMesh
     class PolygonTriangulation
     {
     public:
-        // 设置需要进行计算的节点
-        void SetPolygonPoints(vector<Vector3> edgePoints);
+        // 设置需要进行计算的外部节点
+        void SetPolygonOutPoints(vector<Vector3> edgePoints);
+
+        // 设置外部节点下的内部空洞节点
+        void SetPolygonInsidePoints(vector<Vector3> innerPoints);
 
         // 判断当前点是否为耳尖
         bool IsPointEar(PointLinkNode* checkNode);
         
         // 执行单步耳切法
         bool OneStepEarClipping();
+        PointLinkNode* GetValidFirstPoint() const;
 
         // 执行耳切法
         vector<Triangle> EarClipping()
@@ -82,7 +87,10 @@ namespace ZXNavMesh
         }
 
         // 获取当前未切割的点
-        vector<Vector3> GetValidPoints() const;
+        PointLinkNode* GetValidFirstPoint()
+        {
+            return firstNode;
+        }
 
         // 获取当前所有生成的三角形
         vector<Triangle> GetGenTriangles()
@@ -91,6 +99,8 @@ namespace ZXNavMesh
         }
         
     private:
+        // 记录所有输入点中的最右点
+        PointLinkNode* rightEdgeNode = nullptr;
         // 记录原始点，逆时针顺序输入
         vector<Vector3> edgePoints;
         // 链表的起点

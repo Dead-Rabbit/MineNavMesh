@@ -148,6 +148,11 @@ namespace ZXNavMesh
             z *= fInv;
             return *this;
         }
+		
+		friend std::ostream &operator<<(std::ostream &os, const Vector3 point) {
+        	os << "(" << point.x << "," << point.y << ")";
+        	return os;
+        }
 
         inline double length () const { return std::sqrt( x * x + y * y + z * z ); }
         inline double squaredLength () const { return x * x + y * y + z * z; }
