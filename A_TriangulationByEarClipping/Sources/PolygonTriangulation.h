@@ -1,7 +1,101 @@
 ﻿#pragma once
 
-class PolygonTriangulation
+#include <vector>
+
+#include "../../Base/Graphes.h"
+#include "../../Base/Vectors.h"
+#include "../../Base/NavMath.h"
+
+using namespace std;
+
+namespace ZXNavMesh
 {
-public:
     
-};
+    // 耳切法最终生成的三角形
+    class Triangle
+    {
+    public:
+        Vector3 A, B, C;
+        Triangle(Vector3 A, Vector3 B, Vector3 C)
+        {
+            this->A = A;
+            this->B = B;
+            this->C = C; 
+        }
+    };
+    
+    // 耳切法使用点链表节点
+    class PointLinkNode
+    {
+    public:
+        PointLinkNode(int num, Vector3 point)
+        {
+            this->num = num;
+            this->point = point;
+        }
+
+        int num;
+	
+        // 当前点
+        Vector3 point;
+        // 双向链
+        PointLinkNode* preNode = nullptr;
+        PointLinkNode* nextNode = nullptr;
+
+        // 计算当前角是否为凸角
+        bool IsPointConvex()
+        {
+            return NavMath::Cross(
+                Vector3(point - preNode->point), Vector3(point - nextNode->point)
+            ).z > 0;
+        };
+    private:
+        Line* preLine = nullptr;
+        Line* nextLine = nullptr;
+    };
+
+    // 耳切法类
+    class PolygonTriangulation
+    {
+    public:
+        // 设置需要进行计算的节点
+        void SetPolygonPoints(vector<Vector3> edgePoints);
+
+        // 判断当前点是否为耳尖
+        bool IsPointEar(PointLinkNode* checkNode);
+        
+        // 执行单步耳切法
+        bool OneStepEarClipping();
+
+        // 执行耳切法
+        vector<Triangle> EarClipping()
+        {
+            while(OneStepEarClipping()){}
+            
+            return GetGenTriangles();
+        }
+
+        // 获取所有输入的点
+        vector<Vector3> GetEdgePoints()
+        {
+            return edgePoints;
+        }
+
+        // 获取当前未切割的点
+        vector<Vector3> GetValidPoints() const;
+
+        // 获取当前所有生成的三角形
+        vector<Triangle> GetGenTriangles()
+        {
+            return triangles;
+        }
+        
+    private:
+        // 记录原始点，逆时针顺序输入
+        vector<Vector3> edgePoints;
+        // 链表的起点
+        PointLinkNode* firstNode = nullptr;
+        // 分割形成的三角形集合
+        vector<Triangle> triangles;
+    };
+}
