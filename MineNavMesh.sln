@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Base", "Base\Base.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "B_Vatti_Clipping", "B_Vatti_Clipping\B_Vatti_Clipping.vcxproj", "{79AFD0C5-99BC-4958-A9FB-379EA27FC47B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C_Triangulation_After_Vatti", "C_Triangulation_After_Vatti\C_Triangulation_After_Vatti.vcxproj", "{8492DC1F-A81E-47EB-8093-D516314BFB27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -48,5 +50,13 @@ Global
 		{79AFD0C5-99BC-4958-A9FB-379EA27FC47B}.Release|Win32.Build.0 = Release|Win32
 		{79AFD0C5-99BC-4958-A9FB-379EA27FC47B}.Release|x64.ActiveCfg = Release|x64
 		{79AFD0C5-99BC-4958-A9FB-379EA27FC47B}.Release|x64.Build.0 = Release|x64
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Debug|Win32.Build.0 = Debug|Win32
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Debug|x64.ActiveCfg = Debug|x64
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Debug|x64.Build.0 = Debug|x64
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Release|Win32.ActiveCfg = Release|Win32
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Release|Win32.Build.0 = Release|Win32
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Release|x64.ActiveCfg = Release|x64
+		{8492DC1F-A81E-47EB-8093-D516314BFB27}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal
