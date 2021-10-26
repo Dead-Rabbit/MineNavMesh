@@ -7,7 +7,6 @@
 
 #include <vector>
 
-#include "../Base/NavMath.h"
 #include "../Base/Vectors.h"
 #include "Sources/PolygonTriangulation.h"
 
