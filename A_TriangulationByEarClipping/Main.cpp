@@ -60,6 +60,7 @@ int main()
     edgePoints.push_back(Vector3(128, 99, 0));
     triangulationTool.SetPolygonOutPoints(edgePoints);
 
+    // 测试新增岛洞输入
     vector<Vector3> insidePoints;
     
     insidePoints.clear();
