@@ -22,5 +22,17 @@ namespace ZXNavMesh
 		Vector3 start;
 		Vector3 end;
 	};
+
+	class Triangle
+	{
+	public:
+		Vector3 A, B, C;
+		Triangle(Vector3 A, Vector3 B, Vector3 C)
+		{
+			this->A = A;
+			this->B = B;
+			this->C = C; 
+		}
+	};
 	
 }

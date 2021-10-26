@@ -25,25 +25,28 @@ namespace ZXNavMesh
 				);
 		}
 
-		// 点是否在三角形内
-		static bool IsInTrigon(Vector3 _target, Vector3 _center, Vector3 _left, Vector3 _right){
-			Vector3 Ctl= _left - _center;
-			Vector3 Ctr= _right - _center;
-			Vector3 Ctt= _target - _center;
-			Vector3 Ltr= _right - _left;
-			Vector3 Ltc= _right - _center;
-			Vector3 Ltt= _left - _target;
-			Vector3 Rtl= _left - _right;
-			Vector3 Rtc= _center - _right;
-			Vector3 Rtt= _target - _right;
-			if(
-				Ctl.crossProduct(Ctr).normalized().dotProduct(Ctl.crossProduct(Ctt).normalized())==1&&
-				Ltr.crossProduct(Ltc).normalized().dotProduct(Ltr.crossProduct(Ltt).normalized())==1&&
-				Rtc.crossProduct(Rtl).normalized().dotProduct(Rtc.crossProduct(Rtt).normalized())==1
-			)
-				return true;
-			
-			return false;
+		/**
+		 * 判断点 P 是否在三角形ABC内
+		 */
+		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
+		{
+			return SameSide(A, B, C, P) &&
+				SameSide(B, C, A, P) &&
+				SameSide(C, A, B, P) ;
 		}
+		
+	private:
+		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
+		{
+			Vector3 AB = B - A ;
+			Vector3 AC = C - A ;
+			Vector3 AP = P - A ;
+
+			Vector3 v1 = AB.crossProduct(AC) ;
+			Vector3 v2 = AB.crossProduct(AP) ;
+
+			return v1.dotProduct(v2) >= 0 ;
+		}
+
 	};
 }

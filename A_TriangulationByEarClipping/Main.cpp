@@ -2,9 +2,8 @@
  * 学习自： https://www.cnblogs.com/xignzou/p/3721494.html
 */
 
-// 定义是否使用 EasyX 来进行输出
-// 仅限Windows使用，mac或其他系统请注释掉当前定义
-#define USE_EASYX_GTAPHICS
+#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
 
 #include <vector>
 
@@ -24,23 +23,40 @@ using namespace ZXNavMesh;
 std::vector<Vector3> edgePoints;
 // 链表的起点
 PointLinkNode* firstNode = nullptr;
+// 分割形成的三角形集合
+std::vector<Triangle> triangles;
+
+#ifdef USE_EASYX_GTAPHICS
+// 屏幕大小
+Vector2* graphSize = new Vector2(640, 480);
+
+// 重新绘制
+void DrawClippingBoard();
+
+#endif
 
 // 判断当前点是否为耳尖
 bool IsPointEar(PointLinkNode* checkNode);
 
+// 单步耳切法
+bool EarClipping();
+
 int main()
 {
     // 定义多边形的点，介于 EasyX 使用的是整型，此处尽量使用整型来测试
-    edgePoints.push_back(Vector3(55, 87, 0));
-    edgePoints.push_back(Vector3(85, 355, 0));
-    edgePoints.push_back(Vector3(305, 388, 0));
-    edgePoints.push_back(Vector3(162, 319, 0));
-    edgePoints.push_back(Vector3(414, 298, 0));
-    edgePoints.push_back(Vector3(445, 381, 0));
-    edgePoints.push_back(Vector3(454, 233, 0));
-    edgePoints.push_back(Vector3(531, 154, 0));
-    edgePoints.push_back(Vector3(440, 163, 0));
-    edgePoints.push_back(Vector3(552, 69, 0));
+    edgePoints.push_back(Vector3(43, 257, 0));
+    edgePoints.push_back(Vector3(160, 391, 0));
+    edgePoints.push_back(Vector3(378, 199, 0));
+    
+    edgePoints.push_back(Vector3(520, 358, 0));
+    edgePoints.push_back(Vector3(602, 234, 0));
+    edgePoints.push_back(Vector3(482, 223, 0));
+    
+    edgePoints.push_back(Vector3(383, 101, 0));
+    edgePoints.push_back(Vector3(242, 248, 0));
+    edgePoints.push_back(Vector3(116, 249, 0));
+    
+    edgePoints.push_back(Vector3(128, 99, 0));
     const int pointSize = edgePoints.size();
 
     // 生成链表
@@ -65,17 +81,76 @@ int main()
     firstNode->preNode = curNode;
     
 #ifdef USE_EASYX_GTAPHICS
-    Vector2* graphSize = new Vector2(640, 480);
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
+    setbkmode(TRANSPARENT);     // 去掉文字背景颜色
+
+#ifdef DEBUG_STEP
+    // 绘制内容
+    DrawClippingBoard();
+    
+    ExMessage m;		// Define a message variable
+    while(true)
+    {
+        // Get a mouse message or a key message
+        m = getmessage(EM_MOUSE | EM_KEY);
+        switch(m.message)
+        {
+        case WM_LBUTTONDOWN:
+            if (EarClipping())
+                std::cout << "成功" << endl;
+            else
+                std::cout << "失败" << endl;
+
+            DrawClippingBoard();
+            break;
+        case WM_RBUTTONDOWN:
+            std::cout << "(" << m.x << ", " << m.y << ")" << endl;
+            break;
+        case WM_KEYDOWN:
+            if (m.vkcode == VK_ESCAPE)
+                return 0;	// Press ESC key to exit
+        default: break;
+        }
+    }
+#else
+    while(EarClipping()){}
+#endif
+    
+    // 绘制分割的三角形
+    DrawClippingBoard();
+    // 无输出，多次执行分割直至完毕
+    _getch();
+    closegraph();          // 关闭绘图窗口
+#else
+    // 当前不使用 EasyX 进行绘制
+    while(EarClipping()){}
+    // 输出分割三角形内容
+    for (Triangle triangle : triangles)
+    {
+        std::cout << "三角形：A(" << triangle.A.x << ", " << triangle.A.y
+            << ")-B(" << triangle.B.x << ", " << triangle.B.y
+            << ")-C(" << triangle.C.x << ", " << triangle.C.y << ")" << endl;
+    }
+#endif
+    
+    return 0;
+}
+
+#ifdef USE_EASYX_GTAPHICS
+
+void ClearDrawBoard()
+{
+    cleardevice();
     setfillcolor(WHITE);
     solidrectangle(0, 0, graphSize->x, graphSize->y); // 填充背景色
-    setbkmode(TRANSPARENT);     // 去掉文字背景颜色
-    
-    // 测试生成的链表
+}
+
+// 使用EasyX 输出点和线
+void DrawPointAndLine()
+{
     PointLinkNode* outCurNode = firstNode;
     if (outCurNode != nullptr)
-        do
-        {
+        do {
             // std::cout<< "点" << outCurNode->num << "->" << outCurNode->nextNode->num << endl;
             // 绘制点
             const auto point = outCurNode->point;
@@ -85,10 +160,12 @@ int main()
             // 黄色代表为凸角，但不是耳尖
             // 绿色代表耳尖
             if (IsPointEar(outCurNode))
-                setfillcolor(YELLOW);
+            {
+                setfillcolor(GREEN);
+            }
             else
                 if (outCurNode->IsPointConvex())
-                    setfillcolor(GREEN);
+                    setfillcolor(YELLOW);
                 else
                     setfillcolor(RED);
             
@@ -107,33 +184,33 @@ int main()
             line(point.x, point.y, nextPoint.x, nextPoint.y);
             outCurNode = outCurNode->nextNode;
         } while(outCurNode != firstNode);
-#endif
-
-    // 三角化
-    
-#ifdef USE_EASYX_GTAPHICS
-    
-    ExMessage m;		// Define a message variable
-    while(true)
-    {
-        // Get a mouse message or a key message
-        m = getmessage(EM_MOUSE | EM_KEY);
-        switch(m.message)
-        {
-            case WM_LBUTTONDOWN:
-                std::cout << "(" << m.x << ", " << m.y << ")" << endl;
-                break;
-            case WM_KEYDOWN:
-                if (m.vkcode == VK_ESCAPE)
-                    return 0;	// Press ESC key to exit
-            default: break;
-        }
-    }
-    
-    closegraph();          // 关闭绘图窗口
-#endif
-    return 0;
 }
+
+void DrawTriangles()
+{
+    if (triangles.size() == 0)
+        return;
+
+    setlinecolor(GREEN);
+    for (Triangle triangle : triangles)
+    {
+        line(triangle.A.x, triangle.A.y, triangle.B.x, triangle.B.y);
+        line(triangle.B.x, triangle.B.y, triangle.C.x, triangle.C.y);
+        line(triangle.C.x, triangle.C.y, triangle.A.x, triangle.A.y);
+    }
+}
+
+void DrawClippingBoard()
+{
+    // 清屏
+    ClearDrawBoard();
+    // 绘制点和线
+    DrawPointAndLine();
+    // 绘制三角形
+    DrawTriangles();
+}
+
+#endif
 
 // 判断这个点是否为耳尖
 bool IsPointEar(PointLinkNode* checkNode)
@@ -144,18 +221,21 @@ bool IsPointEar(PointLinkNode* checkNode)
     
     // 检查当前三角形内是否包含其他点
     PointLinkNode* curNode = firstNode;
+    if (curNode == nullptr)
+        return false;
+    
     do
     {
         // 检查当前点是否在需要检查的三角形内
         // 首先排除当前需要检查三角形的三个顶点
-        if (checkNode != curNode && checkNode->preNode != curNode && checkNode->preNode != curNode)
+        if (checkNode != curNode && checkNode->preNode != curNode && checkNode->nextNode != curNode)
         {
             // 存在点在当前三角形内，当前不是耳尖
-            if (NavMath::IsInTrigon(
-                curNode->point,
-                checkNode->point,
-                checkNode->preNode->point,
-                checkNode->nextNode->point
+            if (NavMath::IsPointInTriangle(
+                 checkNode->point,
+                 checkNode->nextNode->point,
+                 checkNode->preNode->point,
+                 curNode->point
                 ))
                     return false;
         }
@@ -165,4 +245,40 @@ bool IsPointEar(PointLinkNode* checkNode)
     while (curNode != firstNode);
     
     return true;
+}
+
+bool EarClipping()
+{
+    // 判断当前情况是否可以进行剪裁
+    // 检查链表深度
+    if (firstNode == nullptr)
+        return false;
+
+    // 收入最后一个三角形
+    if (firstNode->nextNode->nextNode->nextNode == firstNode)
+    {
+        triangles.push_back(Triangle(firstNode->point, firstNode->preNode->point, firstNode->nextNode->point));
+        firstNode = nullptr;
+        return false;
+    }
+    
+    // 取当前第一个耳尖，进行剪裁
+    PointLinkNode* curNode = firstNode;
+    do
+    {
+        // 针对当前行为进行剪裁
+        if (IsPointEar(curNode))
+        {
+            // 在链表中去除当前点
+            curNode->preNode->nextNode = curNode->nextNode;
+            curNode->nextNode->preNode = curNode->preNode;
+            // 追加分割好的三角形
+            triangles.push_back(Triangle(curNode->point, curNode->preNode->point, curNode->nextNode->point));
+            return true;
+        }
+        
+        curNode = curNode->nextNode;
+    } while(curNode != firstNode);
+    
+    return false;
 }
