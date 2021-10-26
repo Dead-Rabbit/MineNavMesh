@@ -19,6 +19,7 @@ using namespace std;
 using namespace ZXNavMesh;
 
 #ifdef USE_EASYX_GTAPHICS
+
 // 屏幕大小
 Vector2* graphSize = new Vector2(640, 480);
 
