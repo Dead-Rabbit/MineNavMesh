@@ -4,6 +4,9 @@ int PointLinkNode::pointNum = 0;
 
 void PolygonTriangulation::SetPolygonOutPoints(vector<Vector3> edgePoints)
 {
+    // 设置边框时，重置所有内容
+    Reset();
+    
     this->edgePoints = edgePoints;
     // 生成链表
     const int pointSize = edgePoints.size();
@@ -96,6 +99,10 @@ void PolygonTriangulation::AddPolygonInsidePoints(vector<Vector3> innerPoints)
 
 void PolygonTriangulation::ApplyInsidePolygonPoints()
 {
+    if (_beginEarClipping)
+        return;
+    
+    _beginEarClipping = true;
     for (const std::pair<PointLinkNode*, PointLinkNode*> firstInsideNodePair : insideFirstNodes)
     {
         // 寻找最靠右的 Inside 点
@@ -217,6 +224,10 @@ bool PolygonTriangulation::IsPointEar(PointLinkNode* checkNode)
 
 bool PolygonTriangulation::OneStepEarClipping()
 {
+    // 进行岛洞排序
+    if (!_beginEarClipping)
+        ApplyInsidePolygonPoints();
+    
     // 判断当前情况是否可以进行剪裁
     // 检查链表深度
     if (firstNode == nullptr)

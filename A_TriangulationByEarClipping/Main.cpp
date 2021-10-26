@@ -96,17 +96,16 @@ int main()
     insidePoints.push_back(Vector3(498, 244, 0));
     triangulationTool.AddPolygonInsidePoints(insidePoints);
 
-    triangulationTool.ApplyInsidePolygonPoints();
-    
 #ifdef USE_EASYX_GTAPHICS
     
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
 
 #ifdef DEBUG_STEP
+    // 此处仅为调试用，不建议在别的地方手动执行
+    triangulationTool.ApplyInsidePolygonPoints();
     // 绘制内容
     DrawClippingBoard();
-    
     ExMessage m;		// Define a message variable
     while(true)
     {

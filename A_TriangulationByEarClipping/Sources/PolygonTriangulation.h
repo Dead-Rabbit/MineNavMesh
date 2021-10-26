@@ -10,7 +10,6 @@ using namespace std;
 
 namespace ZXNavMesh
 {
-    
     // 耳切法最终生成的三角形
     class Triangle
     {
@@ -64,7 +63,8 @@ namespace ZXNavMesh
 
         // 设置外部节点下的内部空洞节点
         void AddPolygonInsidePoints(vector<Vector3> innerPoints);
-
+        
+        // 生效所有岛洞，目前在单步耳切中有执行，不建议手动执行
         void ApplyInsidePolygonPoints();
 
         // 判断当前点是否为耳尖
@@ -72,8 +72,7 @@ namespace ZXNavMesh
         
         // 执行单步耳切法
         bool OneStepEarClipping();
-        PointLinkNode* GetValidFirstPoint() const;
-
+        
         // 执行耳切法
         vector<Triangle> EarClipping()
         {
@@ -112,5 +111,14 @@ namespace ZXNavMesh
         vector<std::pair<PointLinkNode*, PointLinkNode*>> insideFirstNodes;
         // 分割形成的三角形集合
         vector<Triangle> triangles;
+        // 标记是否可以开始进行剪裁了
+        bool _beginEarClipping = false;
+        // 重置所有内容
+        void Reset()
+        {
+            _beginEarClipping = false;
+            edgePoints.clear();
+            firstNode = nullptr;
+        }
     };
 }
