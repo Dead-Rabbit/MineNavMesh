@@ -2,8 +2,8 @@
  * 学习自： https://www.cnblogs.com/xignzou/p/3721494.html
 */
 
-// #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
-// #define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
+#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
 
 #include <vector>
 
