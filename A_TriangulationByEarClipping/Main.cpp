@@ -193,10 +193,12 @@ void DrawOptionHelper()
     settextstyle(25, 0, L"微软雅黑");
     setcolor(BLACK);
     TCHAR str[25];
-    if (ifFinishClipping)
-        _stprintf_s(str, _T("当前已完成"));
-    else
+#ifdef DEBUG_STEP
+    if (!ifFinishClipping)
         _stprintf_s(str, _T("点击左键继续"));
+    else
+#endif
+        _stprintf_s(str, _T("当前已完成"));
     
     outtextxy(0, 0, str);
 }
