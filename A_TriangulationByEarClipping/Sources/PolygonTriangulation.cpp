@@ -99,21 +99,7 @@ void PolygonTriangulation::ApplyInsidePolygonPoints()
     for (const std::pair<PointLinkNode*, PointLinkNode*> firstInsideNodePair : insideFirstNodes)
     {
         // 寻找最靠右的 Inside 点
-        PointLinkNode* firstInsideNode = firstInsideNodePair.first;
-            
         PointLinkNode* rightInsideNode = firstInsideNodePair.second;
-        // PointLinkNode* curInsideNode = firstInsideNode;
-        // curInsideNode = firstInsideNode;
-        // do
-        // {
-        //     if (rightInsideNode == nullptr)
-        //         rightInsideNode = curInsideNode;
-        //     else if (curInsideNode->point.x > rightInsideNode->point.x)
-        //         rightInsideNode = curInsideNode;
-        //     
-        //     curInsideNode = curInsideNode->nextNode;
-        // }
-        // while (curInsideNode != firstInsideNode);
         
         // 获取从inner右点触发向x轴正方向走的最大线段
         Line compareLine = Line(rightInsideNode->point, Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0));
