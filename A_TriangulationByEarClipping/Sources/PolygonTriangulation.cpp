@@ -43,7 +43,7 @@ void PolygonTriangulation::SetPolygonOutPoints(vector<Vector3> edgePoints)
     while (curNode != firstNode);
 }
 
-void PolygonTriangulation::SetPolygonInsidePoints(vector<Vector3> innerPoints)
+void PolygonTriangulation::AddPolygonInsidePoints(vector<Vector3> innerPoints)
 {
     // 生成新的链表
     const int pointSize = innerPoints.size();

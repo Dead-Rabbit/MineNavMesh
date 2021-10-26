@@ -63,7 +63,7 @@ namespace ZXNavMesh
         void SetPolygonOutPoints(vector<Vector3> edgePoints);
 
         // 设置外部节点下的内部空洞节点
-        void SetPolygonInsidePoints(vector<Vector3> innerPoints);
+        void AddPolygonInsidePoints(vector<Vector3> innerPoints);
 
         void ApplyInsidePolygonPoints();
 

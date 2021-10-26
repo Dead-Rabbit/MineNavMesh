@@ -71,21 +71,21 @@ int main()
     insidePoints.push_back(Vector3(153, 337, 0));
     insidePoints.push_back(Vector3(173, 273, 0));
     insidePoints.push_back(Vector3(235, 218, 0));
-    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    triangulationTool.AddPolygonInsidePoints(insidePoints);
     
     insidePoints.clear();
     insidePoints.push_back(Vector3(416, 216, 0));
     insidePoints.push_back(Vector3(421, 272, 0));
     insidePoints.push_back(Vector3(362, 263, 0));
     insidePoints.push_back(Vector3(375, 220, 0));
-    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    triangulationTool.AddPolygonInsidePoints(insidePoints);
     
     insidePoints.clear();
     insidePoints.push_back(Vector3(335, 312, 0));
     insidePoints.push_back(Vector3(301, 329, 0));
     insidePoints.push_back(Vector3(285, 302, 0));
     insidePoints.push_back(Vector3(311, 281, 0));
-    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    triangulationTool.AddPolygonInsidePoints(insidePoints);
     
     insidePoints.clear();
     insidePoints.push_back(Vector3(419, 301, 0));
@@ -93,7 +93,7 @@ int main()
     insidePoints.push_back(Vector3(428, 218, 0));
     insidePoints.push_back(Vector3(429, 191, 0));
     insidePoints.push_back(Vector3(498, 244, 0));
-    triangulationTool.SetPolygonInsidePoints(insidePoints);
+    triangulationTool.AddPolygonInsidePoints(insidePoints);
 
     triangulationTool.ApplyInsidePolygonPoints();
     
