@@ -90,24 +90,11 @@ namespace ZXNavMesh
         vector<Triangle> EarClipping()
         {
             while(OneStepEarClipping()){}
-            
             return GetGenTriangles();
         }
 
-        // 获取所有输入的点
-        vector<Vector3> GetEdgePoints()
-        {
-            return edgePoints;
-        }
-
-        // 获取当前未切割的点
-        PointLinkNode* GetValidFirstPoint()
-        {
-            return firstNode;
-        }
-
         // 获取当前所有生成的三角形
-        vector<Triangle> GetGenTriangles()
+        vector<Triangle> GetGenTriangles() const
         {
             return triangles;
         }
