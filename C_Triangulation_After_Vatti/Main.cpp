@@ -145,7 +145,6 @@ int main(int argc, char* argv[])
                     for(int i = 0; i < resultPaths.size(); i++)
                     {
                         auto path = resultPaths[i];
-                        std::cout << "开始处理路线：" << i + 1 << endl;
                         path.Reverse();
                     
                         vector<Vector3> pathNodes;
@@ -179,7 +178,6 @@ int main(int argc, char* argv[])
     for(int i = 0; i < resultPaths.size(); i++)
     {
         auto path = resultPaths[i];
-        std::cout << "开始处理路线：" << i + 1 << endl;
         path.Reverse();
                     
         vector<Vector3> pathNodes;
@@ -229,6 +227,13 @@ void ReDrawBoard()
     setfillcolor(WHITE);
     solidrectangle(0, 0, graphSize->x, graphSize->y); // 填充背景色
     
+    settextstyle(25, 0, L"微软雅黑");
+    setcolor(BLACK);
+    TCHAR str[25];
+    _stprintf_s(str, _T("点击左键继续"));
+    outtextxy(0, 0, str);
+    
+    settextstyle(20, 0, L"微软雅黑");
     DrawTriangles();
     
     for (int i = 0; i < resultPaths.size(); i++)
