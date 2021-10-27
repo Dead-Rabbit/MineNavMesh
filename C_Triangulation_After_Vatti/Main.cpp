@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() != 0)
-            for (Triangle triangle : triangles)
+            for (ClipTriangle triangle : triangles)
             {
                 std::cout << "三角形"<< ++outTriangleNum << ": A(" << triangle.A.x << ", " << triangle.A.y
                     << ") - B(" << triangle.B.x << ", " << triangle.B.y
@@ -280,7 +280,7 @@ void DrawTriangles()
         if (triangles.size() == 0)
             return;
         
-        for (const Triangle* triangle : triangles)
+        for (const ClipTriangle* triangle : triangles)
         {
             line(triangle->A.x, triangle->A.y, triangle->B.x, triangle->B.y);
             line(triangle->B.x, triangle->B.y, triangle->C.x, triangle->C.y);

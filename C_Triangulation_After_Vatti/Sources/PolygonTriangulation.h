@@ -12,7 +12,7 @@ using namespace std;
 namespace ZXNavMesh
 {
     class PointLinkNode;
-    class Triangle;
+    class ClipTriangle;
     class OutsidePolygon;
 
     /**
@@ -87,14 +87,14 @@ namespace ZXNavMesh
         bool OneStepEarClipping();
         
         // 执行耳切法
-        vector<Triangle*> EarClipping()
+        vector<ClipTriangle*> EarClipping()
         {
             while(OneStepEarClipping()){}
             return GetGenTriangles();
         }
 
         // 获取当前所有生成的三角形
-        vector<Triangle*> GetGenTriangles() const
+        vector<ClipTriangle*> GetGenTriangles() const
         {
             return triangles;
         }
@@ -115,7 +115,7 @@ namespace ZXNavMesh
         // 生效所有岛洞，目前在单步耳切中有执行
         void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
-        vector<Triangle*> triangles;
+        vector<ClipTriangle*> triangles;
         // 标记是否可以开始进行剪裁了
         bool _beginEarClipping = false;
         // 重置所有内容
@@ -129,11 +129,11 @@ namespace ZXNavMesh
     };
     
     // 耳切法最终生成的三角形
-    class Triangle
+    class ClipTriangle
     {
     public:
         Vector3 A, B, C;
-        Triangle(Vector3 A, Vector3 B, Vector3 C)
+        ClipTriangle(Vector3 A, Vector3 B, Vector3 C)
         {
             this->A = A;
             this->B = B;
