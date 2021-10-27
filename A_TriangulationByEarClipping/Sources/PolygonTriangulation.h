@@ -64,9 +64,6 @@ namespace ZXNavMesh
         // 设置外部节点下的内部空洞节点
         void AddPolygonInsidePoints(vector<Vector3> innerPoints);
         
-        // 生效所有岛洞，目前在单步耳切中有执行，不建议手动执行
-        void ApplyInsidePolygonPoints();
-
         // 判断当前点是否为耳尖
         bool IsPointEar(PointLinkNode* checkNode);
         
@@ -106,9 +103,10 @@ namespace ZXNavMesh
         PointLinkNode* firstNode = nullptr;
         // 记录所有输入点中的最右点
         PointLinkNode* rightEdgeNode = nullptr;
-        // 记录所有内部岛洞的头结点，为方便后续进行比较
         // 此处的first为firstNode，second为当前Node链下，最靠右的点
         vector<std::pair<PointLinkNode*, PointLinkNode*>> insideFirstNodes;
+        // 生效所有岛洞，目前在单步耳切中有执行
+        void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
         vector<Triangle> triangles;
         // 标记是否可以开始进行剪裁了

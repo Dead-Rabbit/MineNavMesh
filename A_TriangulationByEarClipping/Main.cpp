@@ -102,8 +102,6 @@ int main()
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
 
 #ifdef DEBUG_STEP
-    // 此处仅为调试用，不建议在别的地方手动执行
-    triangulationTool.ApplyInsidePolygonPoints();
     // 绘制内容
     DrawClippingBoard();
     ExMessage m;		// Define a message variable
