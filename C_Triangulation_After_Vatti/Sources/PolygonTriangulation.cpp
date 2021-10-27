@@ -1,11 +1,11 @@
 ﻿#include "PolygonTriangulation.h"
 
-namespace ZLNavMesh{
+namespace ZXNavMesh{
     
     int PointLinkNode::pointNum = 0;
     int OutsidePolygon::polygonNum = 0;
 
-    OutsidePolygon* PolygonTriangulation::AddPolygonOutPoints(vector<Vector3> edgePoints)
+    void PolygonTriangulation::AddPolygonOutPoints(vector<Vector3> edgePoints)
     {
         // 检查当前是否为轮廓
         OutsidePolygon* newPolygon = new OutsidePolygon(edgePoints);
@@ -25,7 +25,6 @@ namespace ZLNavMesh{
             ++insidePathIt;
         }
         polygons.push_back(newPolygon);
-        return newPolygon;
     }
 
     void PolygonTriangulation::AddPolygonInsidePoints(vector<Vector3> insidePoints)

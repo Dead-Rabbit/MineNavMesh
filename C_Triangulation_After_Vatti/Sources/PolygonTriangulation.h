@@ -5,10 +5,11 @@
 #include "../../Base/Graphes.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
+#include "../../Base/NavMeshHelper.h"
 
 using namespace std;
 
-namespace ZLNavMesh
+namespace ZXNavMesh
 {
     class PointLinkNode;
     class Triangle;
@@ -29,8 +30,17 @@ namespace ZLNavMesh
     class PolygonTriangulation
     {
     public:
+        void AddPolygonPoints(vector<Vector3> points)
+        {
+            // 判断当前线段是否为外边框和岛洞
+            if (!contourClockwise && NavMeshHelper::IsTriangleOutside(points))
+                AddPolygonOutPoints(points);
+            else
+                AddPolygonInsidePoints(points);
+        }
+        
         // 设置需要进行计算的外部节点
-        OutsidePolygon* AddPolygonOutPoints(vector<Vector3> edgePoints);
+        void AddPolygonOutPoints(vector<Vector3> edgePoints);
 
         // 设置外部节点下的内部空洞节点
         void AddPolygonInsidePoints(vector<Vector3> innerPoints);
@@ -39,9 +49,9 @@ namespace ZLNavMesh
         bool OneStepEarClipping();
         
         // 执行耳切法
-        vector<Triangle> EarClipping()
+        void EarClipping()
         {
-            
+            while (OneStepEarClipping()){}
         }
 
         vector<OutsidePolygon*> GetOutsidePolygons() const
@@ -50,6 +60,8 @@ namespace ZLNavMesh
         }
 
     private:
+        bool contourClockwise = false;  // 外边框是否为顺时针；默认为逆时针
+
         // 记录当前所有轮廓列表
         vector<OutsidePolygon*> polygons;
         // 记录当前未被分配的岛洞列表，每个岛洞必然在一个轮廓里

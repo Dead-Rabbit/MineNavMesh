@@ -12,7 +12,7 @@
 
 using namespace std;
 using namespace clipperlib;
-using namespace ZLNavMesh;
+using namespace ZXNavMesh;
 
 #ifdef USE_EASYX_GTAPHICS
 
@@ -154,22 +154,12 @@ int main(int argc, char* argv[])
                             pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
                         }
 
-                        vector<vector<Vector3>> outsidePathNodes;
-                        vector<vector<Vector3>> insidePathNodes;
-                        
                         // 判断当前线段是否为外边框和岛洞
-                        if (NavMeshHelper::IsTriangleOutside(pathNodes))
-                        {
-                            triangulationTool.AddPolygonOutPoints(pathNodes);
-                        }
-                        else
-                        {
-                            triangulationTool.AddPolygonInsidePoints(pathNodes);
-                        }
+                        triangulationTool.AddPolygonPoints(pathNodes);
                     }
                 } else
                 {
-                    triangulationTool.OneStepEarClipping();
+                    triangulationTool.EarClipping();
                 }
                 ReDrawBoard();
             }break;
@@ -209,13 +199,13 @@ void ReDrawBoard()
     setfillcolor(WHITE);
     solidrectangle(0, 0, graphSize->x, graphSize->y); // 填充背景色
     
+    DrawTriangles();
+    
     for (int i = 0; i < resultPaths.size(); i++)
     {
         auto path = resultPaths[i];
         DrawPath(i+1, path, GREEN);
     }
-    
-    DrawTriangles();
 }
 
 void DrawPath(int pathNum, Path<double> path, COLORREF color)
