@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="Graphes.h" />
     <ClInclude Include="NavMath.h" />
+    <ClInclude Include="NavMeshHelper.h" />
     <ClInclude Include="Vectors.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Graphes.cpp" />
     <ClCompile Include="NavMath.cpp" />
+    <ClCompile Include="NavMeshHelper.cpp" />
     <ClCompile Include="Vectors.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

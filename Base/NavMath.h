@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <vector>
+
 #include "Graphes.h"
 
 namespace ZXNavMesh
@@ -74,6 +76,30 @@ namespace ZXNavMesh
 			}
 
 			return false;
+		}
+
+		// 检查点是否在多边形内
+		static bool IsPointInPolygonByRayCast(const std::vector<Vector3> quadPoints, const Vector3 p0)
+		{
+			int pNum = quadPoints.size();
+			Vector3 pt_1, pt_2;
+			int itJunctionCount = 0;
+			for (int i = 0; i < pNum; i++) {
+				int ni = (i + 1) % pNum;
+				pt_1 = quadPoints[i];
+				pt_2 = quadPoints[ni];
+				if (p0.y >= pt_1.y && p0.y <= pt_2.y || p0.y >= pt_2.y && p0.y <= pt_1.y) {
+					double duT = (p0.y - pt_1.y) / (pt_2.y - pt_1.y);
+					double duXT = pt_1.x + duT * (pt_2.x - pt_1.x);
+				
+					if (p0.x == duXT)
+						return true;		// 在线段上表明为True
+				
+					if (p0.x > duXT)
+						itJunctionCount++;
+				}
+			}
+			return itJunctionCount % 2 == 1;
 		}
 		
 	private:

@@ -1,5 +1,7 @@
 #include "Sources/clipper.h"
 #include "../Base/Graphes.h"
+#include "../Base/NavMeshHelper.h"
+#include "Sources/PolygonTriangulation.h"
 
 #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
@@ -9,8 +11,8 @@
 #endif
 
 using namespace std;
-using namespace ZXNavMesh;
 using namespace clipperlib;
+using namespace ZLNavMesh;
 
 #ifdef USE_EASYX_GTAPHICS
 
@@ -18,7 +20,8 @@ using namespace clipperlib;
 Vector2* graphSize = new Vector2(640, 480);
 
 // 绘制
-void ClearDrawBoard();
+void ReDrawBoard();
+void DrawTriangles();
 void DrawPath(int pathNum, Path<double> path, COLORREF color);
 
 #endif
@@ -27,10 +30,16 @@ std::vector<Path<double>> DoClipTest();
 std::vector<Path<double>> outputSubjectPaths;
 std::vector<Path<double>> outputClipPaths;
 
+bool finishedFindPath = false;
+std::vector<Path<double>> resultPaths;
+
 ClipperD clipperD = ClipperD();
+PolygonTriangulation triangulationTool;
 
 int main(int argc, char* argv[])
 {
+    triangulationTool = PolygonTriangulation();
+    
     Path<double> subjectPath1 = Path<double>();
     subjectPath1.push_back(Point<double>(100, 100));
     subjectPath1.push_back(Point<double>(100, 300));
@@ -92,13 +101,14 @@ int main(int argc, char* argv[])
     outputClipPaths.push_back(clipPath5);
     
 #ifdef USE_EASYX_GTAPHICS
+    
     // 绘制裁剪前的图形
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
     settextstyle(20, 0, L"微软雅黑");
 
     // 绘制当前调试用
-    ClearDrawBoard();
+    ReDrawBoard();
     int outputNum = 0;
     for (int i = 0; i < outputSubjectPaths.size(); i++)
     {
@@ -113,7 +123,7 @@ int main(int argc, char* argv[])
         outputNum++;
         DrawPath(outputNum, path, RED);
     }
-    
+
     ExMessage m;		// Define a message variable
     while(true)
     {
@@ -122,15 +132,47 @@ int main(int argc, char* argv[])
         switch(m.message)
         {
         case WM_LBUTTONDOWN:
-        {
-            ClearDrawBoard();
-            std::vector<Path<double>> resultPaths = DoClipTest();
-            for (int i = 0; i < resultPaths.size(); i++)
             {
-                auto path = resultPaths[i];
-                DrawPath(i+1, path, GREEN);
-            }
-        }break;
+                ReDrawBoard();
+                if (!finishedFindPath)
+                {
+                    finishedFindPath = true;
+                    resultPaths = DoClipTest();
+                    // 将resultPaths 加入到三角化程序中
+                    // 获取所有路径点和对应的岛洞
+
+                    setcolor(RED);
+                    for(int i = 0; i < resultPaths.size(); i++)
+                    {
+                        auto path = resultPaths[i];
+                        std::cout << "开始处理路线：" << i + 1 << endl;
+                        path.Reverse();
+                    
+                        vector<Vector3> pathNodes;
+                        for (auto pathNode : path.data)
+                        {
+                            pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
+                        }
+
+                        vector<vector<Vector3>> outsidePathNodes;
+                        vector<vector<Vector3>> insidePathNodes;
+                        
+                        // 判断当前线段是否为外边框和岛洞
+                        if (NavMeshHelper::IsTriangleOutside(pathNodes))
+                        {
+                            triangulationTool.AddPolygonOutPoints(pathNodes);
+                        }
+                        else
+                        {
+                            triangulationTool.AddPolygonInsidePoints(pathNodes);
+                        }
+                    }
+                } else
+                {
+                    triangulationTool.OneStepEarClipping();
+                }
+                ReDrawBoard();
+            }break;
         case WM_RBUTTONDOWN:
             std::cout << "(" << m.x << ", " << m.y << ")" << endl;
             break;
@@ -161,11 +203,19 @@ std::vector<Path<double>> DoClipTest()
 
 #ifdef USE_EASYX_GTAPHICS
 
-void ClearDrawBoard()
+void ReDrawBoard()
 {
     cleardevice();
     setfillcolor(WHITE);
     solidrectangle(0, 0, graphSize->x, graphSize->y); // 填充背景色
+    
+    for (int i = 0; i < resultPaths.size(); i++)
+    {
+        auto path = resultPaths[i];
+        DrawPath(i+1, path, GREEN);
+    }
+    
+    DrawTriangles();
 }
 
 void DrawPath(int pathNum, Path<double> path, COLORREF color)
@@ -192,6 +242,27 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color)
             outtextxy(point.x - 5, point.y - 20, str);
         }
         
+    }
+}
+
+void DrawTriangles()
+{
+    setfillcolor(0xF0FFF0);
+    setlinecolor(GREEN);
+    for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    {
+        const auto triangles = polygon->GetGenTriangles();
+        if (triangles.size() == 0)
+            return;
+        
+        for (const Triangle triangle : triangles)
+        {
+            line(triangle.A.x, triangle.A.y, triangle.B.x, triangle.B.y);
+            line(triangle.B.x, triangle.B.y, triangle.C.x, triangle.C.y);
+            line(triangle.C.x, triangle.C.y, triangle.A.x, triangle.A.y);
+            int points[] = {triangle.A.x, triangle.A.y, triangle.B.x, triangle.B.y, triangle.C.x, triangle.C.y};
+            fillpoly(3, points);
+        }
     }
 }
 
