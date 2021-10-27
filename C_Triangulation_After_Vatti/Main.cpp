@@ -1,5 +1,4 @@
 #include "Sources/clipper.h"
-#include "Sources/clipper_core.hpp"
 #include "../Base/Graphes.h"
 
 #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
@@ -24,20 +23,20 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color);
 
 #endif
 
-std::vector<Path<double>> DoClipTest(ClipperD* clipperD);
+std::vector<Path<double>> DoClipTest();
 std::vector<Path<double>> outputSubjectPaths;
 std::vector<Path<double>> outputClipPaths;
 
+ClipperD clipperD = ClipperD();
+
 int main(int argc, char* argv[])
 {
-    ClipperD* clipperD = new ClipperD();
-
     Path<double> subjectPath1 = Path<double>();
     subjectPath1.push_back(Point<double>(100, 100));
     subjectPath1.push_back(Point<double>(100, 300));
     subjectPath1.push_back(Point<double>(300, 300));
     subjectPath1.push_back(Point<double>(300, 100));
-    clipperD->AddPath(subjectPath1, PathType::Subject, false);
+    clipperD.AddPath(subjectPath1, PathType::Subject, false);
     outputSubjectPaths.push_back(subjectPath1);
     
     Path<double> subjectPath2 = Path<double>();
@@ -45,7 +44,7 @@ int main(int argc, char* argv[])
     subjectPath2.push_back(Point<double>(310, 300));
     subjectPath2.push_back(Point<double>(600, 200));
     subjectPath2.push_back(Point<double>(600, 100));
-    clipperD->AddPath(subjectPath2, PathType::Subject, false);
+    clipperD.AddPath(subjectPath2, PathType::Subject, false);
     outputSubjectPaths.push_back(subjectPath2);
     
     Path<double> clipPath1 = Path<double>();
@@ -53,7 +52,7 @@ int main(int argc, char* argv[])
     clipPath1.push_back(Point<double>(281, 324));
     clipPath1.push_back(Point<double>(324, 317));
     clipPath1.push_back(Point<double>(292, 120));
-    clipperD->AddPath(clipPath1, PathType::Clip, false);
+    clipperD.AddPath(clipPath1, PathType::Clip, false);
     outputClipPaths.push_back(clipPath1);
     
     Path<double> clipPath2 = Path<double>();
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
     clipPath2.push_back(Point<double>(421, 208));
     clipPath2.push_back(Point<double>(458, 161));
     clipPath2.push_back(Point<double>(436, 142));
-    clipperD->AddPath(clipPath2, PathType::Clip, false);
+    clipperD.AddPath(clipPath2, PathType::Clip, false);
     outputClipPaths.push_back(clipPath2);
     
     Path<double> clipPath3 = Path<double>();
@@ -71,7 +70,7 @@ int main(int argc, char* argv[])
     clipPath3.push_back(Point<double>(508, 197));
     clipPath3.push_back(Point<double>(528, 158));
     clipPath3.push_back(Point<double>(516, 134));
-    clipperD->AddPath(clipPath3, PathType::Clip, false);
+    clipperD.AddPath(clipPath3, PathType::Clip, false);
     outputClipPaths.push_back(clipPath3);
     
     Path<double> clipPath4 = Path<double>();
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
     clipPath4.push_back(Point<double>(190, 241));
     clipPath4.push_back(Point<double>(212, 200));
     clipPath4.push_back(Point<double>(194, 173));
-    clipperD->AddPath(clipPath4, PathType::Clip, false);
+    clipperD.AddPath(clipPath4, PathType::Clip, false);
     outputClipPaths.push_back(clipPath4);
     
     Path<double> clipPath5 = Path<double>();
@@ -89,20 +88,70 @@ int main(int argc, char* argv[])
     clipPath5.push_back(Point<double>(223, 342));
     clipPath5.push_back(Point<double>(310, 348));
     clipPath5.push_back(Point<double>(365, 309));
-    clipperD->AddPath(clipPath5, PathType::Clip, false);
+    clipperD.AddPath(clipPath5, PathType::Clip, false);
     outputClipPaths.push_back(clipPath5);
     
-    std::vector<Path<double>> resultPaths = DoClipTest(clipperD);
+#ifdef USE_EASYX_GTAPHICS
+    // 绘制裁剪前的图形
+    initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
+    setbkmode(TRANSPARENT);     // 去掉文字背景颜色
+    settextstyle(20, 0, L"微软雅黑");
+
+    // 绘制当前调试用
+    ClearDrawBoard();
+    int outputNum = 0;
+    for (int i = 0; i < outputSubjectPaths.size(); i++)
+    {
+        auto path = outputSubjectPaths[i];
+        outputNum++;
+        DrawPath(outputNum, path, BLUE);
+    }
     
+    for (int i = 0; i < outputClipPaths.size(); i++)
+    {
+        auto path = outputClipPaths[i];
+        outputNum++;
+        DrawPath(outputNum, path, RED);
+    }
+    
+    ExMessage m;		// Define a message variable
+    while(true)
+    {
+        // Get a mouse message or a key message
+        m = getmessage(EM_MOUSE | EM_KEY);
+        switch(m.message)
+        {
+        case WM_LBUTTONDOWN:
+        {
+            ClearDrawBoard();
+            std::vector<Path<double>> resultPaths = DoClipTest();
+            for (int i = 0; i < resultPaths.size(); i++)
+            {
+                auto path = resultPaths[i];
+                DrawPath(i+1, path, GREEN);
+            }
+        }break;
+        case WM_RBUTTONDOWN:
+            std::cout << "(" << m.x << ", " << m.y << ")" << endl;
+            break;
+        case WM_KEYDOWN:
+            if (m.vkcode == VK_ESCAPE)
+                return 0;	// Press ESC key to exit
+        default: break;
+        }
+    }
+#else
+    DoClipTest();
+#endif
+
     return 0;
 }
 
-// 进行裁剪
-std::vector<Path<double>> DoClipTest(ClipperD* clipperD)
+std::vector<Path<double>> DoClipTest()
 {
     PathsD resultPaths = PathsD();
     // 获取最后输出path
-    if (clipperD->Execute(ClipType::Difference, FillRule::Negative, resultPaths))
+    if (clipperD.Execute(ClipType::Difference, FillRule::Negative, resultPaths))
     {
         return resultPaths.data;
     }
