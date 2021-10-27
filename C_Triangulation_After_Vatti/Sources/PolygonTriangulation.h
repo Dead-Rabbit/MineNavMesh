@@ -61,7 +61,6 @@ namespace ZXNavMesh
 
     private:
         bool contourClockwise = false;  // 外边框是否为顺时针；默认为逆时针
-
         // 记录当前所有轮廓列表
         vector<OutsidePolygon*> polygons;
         // 记录当前未被分配的岛洞列表，每个岛洞必然在一个轮廓里
