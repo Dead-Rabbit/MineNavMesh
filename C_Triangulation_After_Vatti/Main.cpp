@@ -3,7 +3,7 @@
 #include "../Base/NavMeshHelper.h"
 #include "Sources/PolygonTriangulation.h"
 
-#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+// #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
 #ifdef USE_EASYX_GTAPHICS
 #include <graphics.h>
@@ -173,7 +173,37 @@ int main(int argc, char* argv[])
         }
     }
 #else
-    DoClipTest();
+    resultPaths = DoClipTest();
+    // 将resultPaths 加入到三角化程序中
+    // 获取所有路径点和对应的岛洞
+    for(int i = 0; i < resultPaths.size(); i++)
+    {
+        auto path = resultPaths[i];
+        std::cout << "开始处理路线：" << i + 1 << endl;
+        path.Reverse();
+                    
+        vector<Vector3> pathNodes;
+        for (auto pathNode : path.data)
+        {
+            pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
+        }
+
+        // 判断当前线段是否为外边框和岛洞
+        triangulationTool.AddPolygonPoints(pathNodes);
+    }
+    triangulationTool.EarClipping();
+    int outTriangleNum = 1;
+    for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    {
+        const auto triangles = polygon->GetGenTriangles();
+        if (triangles.size() != 0)
+            for (Triangle triangle : triangles)
+            {
+                std::cout << "三角形"<< ++outTriangleNum << ": A(" << triangle.A.x << ", " << triangle.A.y
+                    << ") - B(" << triangle.B.x << ", " << triangle.B.y
+                    << ") - C(" << triangle.C.x << ", " << triangle.C.y << ")" << endl;
+            }
+    }
 #endif
 
     return 0;
