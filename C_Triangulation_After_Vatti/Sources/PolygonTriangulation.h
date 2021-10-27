@@ -100,7 +100,7 @@ namespace ZXNavMesh
         }
 
         // 检查点是否在当前轮廓内
-        bool IsPointInPolygon(Vector3 point);
+        bool IsPointInPolygon(Vector3 point) const;
         
     private:
         static int polygonNum;

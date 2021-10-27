@@ -9,7 +9,7 @@ namespace ZXNavMesh{
     {
         // 检查当前是否为轮廓
         OutsidePolygon* newPolygon = new OutsidePolygon(edgePoints);
-        std::cout << "新增外边框" << newPolygon->num << endl;
+        // std::cout << "新增外边框" << newPolygon->num << endl;
         // 循环未归位岛洞，检查是否所属当前轮廓
         auto insidePathIt = insidePolygons.begin();
         while(insidePathIt != insidePolygons.end())
@@ -36,7 +36,7 @@ namespace ZXNavMesh{
             if (outsidePolygon->IsPointInPolygon(insidePoints[0]))
             {
                 outsidePolygon->AddPolygonInsidePoints(insidePoints);
-                std::cout << "追加内点到外边框" << outsidePolygon->num << "中" << endl;
+                // std::cout << "追加内点到外边框" << outsidePolygon->num << "中" << endl;
                 return;
             }
         }
@@ -325,7 +325,7 @@ namespace ZXNavMesh{
         return false;
     }
 
-    bool OutsidePolygon::IsPointInPolygon(Vector3 point)
+    bool OutsidePolygon::IsPointInPolygon(Vector3 point) const
     {
         return NavMath::IsPointInPolygonByRayCast(edgePoints, point);
     }
