@@ -293,7 +293,7 @@ namespace ZXNavMesh{
         // 收入最后一个三角形
         if (firstNode->nextNode->nextNode->nextNode == firstNode)
         {
-            triangles.push_back(Triangle(firstNode->point, firstNode->preNode->point, firstNode->nextNode->point));
+            triangles.push_back(new Triangle(firstNode->point, firstNode->preNode->point, firstNode->nextNode->point));
             firstNode = nullptr;
             return false;
         }
@@ -314,7 +314,7 @@ namespace ZXNavMesh{
                 curNode->nextNode->preNode = curNode->preNode;
                 
                 // 追加分割好的三角形
-                triangles.push_back(Triangle(curNode->point, curNode->preNode->point, curNode->nextNode->point));
+                triangles.push_back(new Triangle(curNode->point, curNode->preNode->point, curNode->nextNode->point));
                 
                 return true;
             }

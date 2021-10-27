@@ -280,12 +280,12 @@ void DrawTriangles()
         if (triangles.size() == 0)
             return;
         
-        for (const Triangle triangle : triangles)
+        for (const Triangle* triangle : triangles)
         {
-            line(triangle.A.x, triangle.A.y, triangle.B.x, triangle.B.y);
-            line(triangle.B.x, triangle.B.y, triangle.C.x, triangle.C.y);
-            line(triangle.C.x, triangle.C.y, triangle.A.x, triangle.A.y);
-            int points[] = {triangle.A.x, triangle.A.y, triangle.B.x, triangle.B.y, triangle.C.x, triangle.C.y};
+            line(triangle->A.x, triangle->A.y, triangle->B.x, triangle->B.y);
+            line(triangle->B.x, triangle->B.y, triangle->C.x, triangle->C.y);
+            line(triangle->C.x, triangle->C.y, triangle->A.x, triangle->A.y);
+            int points[] = {triangle->A.x, triangle->A.y, triangle->B.x, triangle->B.y, triangle->C.x, triangle->C.y};
             fillpoly(3, points);
         }
     }

@@ -87,14 +87,14 @@ namespace ZXNavMesh
         bool OneStepEarClipping();
         
         // 执行耳切法
-        vector<Triangle> EarClipping()
+        vector<Triangle*> EarClipping()
         {
             while(OneStepEarClipping()){}
             return GetGenTriangles();
         }
 
         // 获取当前所有生成的三角形
-        vector<Triangle> GetGenTriangles() const
+        vector<Triangle*> GetGenTriangles() const
         {
             return triangles;
         }
@@ -115,7 +115,7 @@ namespace ZXNavMesh
         // 生效所有岛洞，目前在单步耳切中有执行
         void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
-        vector<Triangle> triangles;
+        vector<Triangle*> triangles;
         // 标记是否可以开始进行剪裁了
         bool _beginEarClipping = false;
         // 重置所有内容
