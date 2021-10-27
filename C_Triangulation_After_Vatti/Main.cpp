@@ -3,7 +3,7 @@
 #include "../Base/NavMeshHelper.h"
 #include "Sources/PolygonTriangulation.h"
 
-// #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
 #ifdef USE_EASYX_GTAPHICS
 #include <graphics.h>
