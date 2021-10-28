@@ -1,6 +1,8 @@
 ﻿#include "PolygonTriangulation.h"
 
-namespace ZXNavMesh{
+using namespace NavMeshBase;
+
+namespace PolygonNavMesh{
 
     int ClipTriangle::triangleNum = 0;
     int PointLinkNode::pointNum = 0;
@@ -25,6 +27,16 @@ namespace ZXNavMesh{
             ++insidePathIt;
         }
         polygons.push_back(newPolygon);
+    }
+
+    vector<vector<ClipTriangle*>> PolygonTriangulation::GetGenTriangles() const
+    {
+        vector<vector<ClipTriangle*>> triangleGroups;
+        for (const auto polygon : polygons)
+        {
+            triangleGroups.push_back(polygon->GetGenTriangles());
+        }
+        return triangleGroups;
     }
 
     void PolygonTriangulation::AddPolygonInsidePoints(vector<Vector3> insidePoints)
@@ -205,7 +217,7 @@ namespace ZXNavMesh{
                 if (curNode != suitNode)
                 {
                     // 判断当前点是否在形成的三角形中，如果在，则取出一个最靠近x轴，即y最小的
-                    if (NavMath::IsPointInTriangle(A, B, C, curNode->point))
+                    if (NavMath::IsPointInTriangle(A, B, C, curNode->point, false))
                     {
                         if (cutNode == nullptr)
                             cutNode = curNode;
@@ -259,17 +271,21 @@ namespace ZXNavMesh{
 
     vector<ClipTriangle*> ClipTriangle::GetLinkedClipTriangles()
     {
-        vector<ClipTriangle*> result;
-        // 遍历获取当前所有点及其影子点的链接三角形，处当前三角形外
-        for (PointLinkNode* edgePoint : points)
+        if (!InitLinkedTriangle)
         {
-            // 检查轮廓节点
-            GetLinkedClipTrianglesByPoint(result, edgePoint);
-            // 检查影子节点
-            if (edgePoint->linkNode)
-                GetLinkedClipTrianglesByPoint(result, edgePoint->linkNode);
+            // 遍历获取当前所有点及其影子点的链接三角形，处当前三角形外
+            for (PointLinkNode* edgePoint : points)
+            {
+                // 检查轮廓节点
+                GetLinkedClipTrianglesByPoint(linkedTriangles, edgePoint);
+                // 检查影子节点
+                if (edgePoint->linkNode)
+                    GetLinkedClipTrianglesByPoint(linkedTriangles, edgePoint->linkNode);
+            }
+            InitLinkedTriangle = false;
         }
-        return result;
+        
+        return linkedTriangles;
     }
 
     void ClipTriangle::GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point)
@@ -311,6 +327,11 @@ namespace ZXNavMesh{
         return connectPointNum >= 2;
     }
 
+    bool ClipTriangle::IsPointInTriangle(Vector3 point)
+    {
+        return NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true);
+    }
+
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
     {
         // 首先排除当前不是一个凸边的情况
@@ -333,7 +354,7 @@ namespace ZXNavMesh{
                      checkNode->point,
                      checkNode->nextNode->point,
                      checkNode->preNode->point,
-                     curNode->point
+                     curNode->point, false
                     ))
                 {
                     return false;

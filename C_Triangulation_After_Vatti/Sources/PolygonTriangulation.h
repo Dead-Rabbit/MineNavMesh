@@ -11,6 +11,7 @@
 #include "../../Base/NavMeshHelper.h"
 
 using namespace std;
+using namespace NavMeshBase;
 
 namespace ZXNavMesh
 {

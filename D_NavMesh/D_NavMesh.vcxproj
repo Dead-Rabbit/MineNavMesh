@@ -157,12 +157,14 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Sources\clipper.cpp" />
     <ClCompile Include="Sources\clipper_offset.cpp" />
+    <ClCompile Include="Sources\PolygonNavMeshTool.cpp" />
     <ClCompile Include="Sources\PolygonTriangulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\clipper.h" />
     <ClInclude Include="Sources\clipper_core.hpp" />
     <ClInclude Include="Sources\clipper_offset.h" />
+    <ClInclude Include="Sources\PolygonNavMeshTool.h" />
     <ClInclude Include="Sources\PolygonTriangulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

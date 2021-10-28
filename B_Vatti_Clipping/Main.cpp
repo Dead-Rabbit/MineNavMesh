@@ -11,7 +11,7 @@
 
 using namespace std;
 using namespace clipperlib;
-using namespace ZXNavMesh;
+using namespace NavMeshBase;
 
 #ifdef USE_EASYX_GRAPHICS
 

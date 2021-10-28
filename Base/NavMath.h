@@ -4,6 +4,8 @@
 
 #include "Vectors.h"
 
+using namespace NavMeshBase;
+
 namespace ZXNavMesh
 {
 	class NavMath
@@ -54,11 +56,11 @@ namespace ZXNavMesh
 		/**
 		 * 判断点 P 是否在三角形ABC内
 		 */
-		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
+		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool pointInSide = true)
 		{
-			return SameSide(A, B, C, P) &&
-				SameSide(B, C, A, P) &&
-				SameSide(C, A, B, P) ;
+			return SameSide(A, B, C, P, pointInSide) &&
+				SameSide(B, C, A, P, pointInSide) &&
+				SameSide(C, A, B, P, pointInSide) ;
 		}
 		
 		static bool GetSegmentLinesIntersection(const Vector3 p1, const Vector3 p2, const Vector3 p3, const Vector3 p4, Vector3& crossPoint)
@@ -144,7 +146,7 @@ namespace ZXNavMesh
 		}
 
 	private:
-		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
+		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide)
 		{
 			Vector3 AB = B - A ;
 			Vector3 AC = C - A ;
@@ -153,7 +155,10 @@ namespace ZXNavMesh
 			Vector3 v1 = AB.crossProduct(AC) ;
 			Vector3 v2 = AB.crossProduct(AP) ;
 
-			return v1.dotProduct(v2) > 0 ;
+			if (isPointOnSide)
+				return v1.dotProduct(v2) >= 0 ;
+			else
+				return v1.dotProduct(v2) > 0 ;
 		}
 
 	};

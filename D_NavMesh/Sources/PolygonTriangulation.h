@@ -11,8 +11,10 @@
 #include "../../Base/NavMeshHelper.h"
 
 using namespace std;
+using namespace NavMeshBase;
+using namespace ZXNavMesh;
 
-namespace ZXNavMesh
+namespace PolygonNavMesh
 {
     class PointLinkNode;
     class ClipTriangle;
@@ -56,10 +58,14 @@ namespace ZXNavMesh
             while (OneStepEarClipping()){}
         }
 
+        // 获取所有外边框形状
         vector<OutsidePolygon*> GetOutsidePolygons() const
         {
             return polygons;
         }
+
+        // 获取所有生成三角形列表
+        vector<vector<ClipTriangle*>> GetGenTriangles() const;
 
     private:
         bool contourClockwise = false;  // 外边框是否为顺时针；默认为逆时针
@@ -123,7 +129,7 @@ namespace ZXNavMesh
         // 记录所有输入点中的最右点
         PointLinkNode* rightEdgeNode = nullptr;
         // 此处为firstNode，存的值为当前岛洞的最右点
-        vector<PointLinkNode*> insideFirstNodes;
+        vector<PointLinkNode*> insideFirstNodes = vector<PointLinkNode*>();
         // 生效所有岛洞，目前在单步耳切中有执行
         void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
@@ -165,10 +171,17 @@ namespace ZXNavMesh
          *  <param name="otherTriangle">检查的其他三角形</param>
          */
         bool IsTriangleLink(const ClipTriangle* otherTriangle);
+
+        /**
+         *  <summary>检查点是否在当前三角形内</summary>
+         *  <param name="point">其他点</param>
+         */
+        bool IsPointInTriangle(Vector3 point);
         
     private:
         static int triangleNum;
-        
+        bool InitLinkedTriangle = false;
+        vector<ClipTriangle*> linkedTriangles;
         // 获取相连通的其他三角形
         void GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point);
     };

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <easyx.h>
 
-namespace ZXNavMesh
+namespace NavMeshBase
 {
 	class Vector2
 	{

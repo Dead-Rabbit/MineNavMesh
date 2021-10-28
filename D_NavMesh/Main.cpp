@@ -1,4 +1,5 @@
 #include "Sources/clipper.h"
+#include "Sources/PolygonNavMeshTool.h"
 #include "Sources/PolygonTriangulation.h"
 
 #define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
@@ -10,7 +11,8 @@
 
 using namespace std;
 using namespace clipperlib;
-using namespace ZXNavMesh;
+using namespace PolygonNavMesh;
+using namespace NavMeshBase;
 
 #ifdef USE_EASYX_GRAPHICS
 
@@ -22,77 +24,90 @@ void ReDrawBoard();
 void DrawTriangles();
 void DrawPolygonsPoints();
 void DrawPoints(PointLinkNode* firstNode);
-void DrawPath(int pathNum, Path<double> path, COLORREF color);
+void DrawPath(int pathNum, vector<Vector3> path, COLORREF color);
 
 #endif
 
-// 裁剪行为
-void DoPolygonVatti();
-
-bool finishedFindPath = false;
 std::vector<Path<double>> resultPaths;
 
 // 裁剪用工具
-ClipperD clipperD = ClipperD();
+// ClipperD clipperD = ClipperD();
 // 耳切法三角化工具
-PolygonTriangulation triangulationTool;
+
+PolygonNavMeshTool polygonNavMeshTool;
 
 int main(int argc, char* argv[])
 {
-    triangulationTool = PolygonTriangulation();
+    polygonNavMeshTool = PolygonNavMeshTool();
     
-    vector<Path<double>> outputSubjectPaths;    // 外边框路径
-    vector<Path<double>> outputClipPaths;       // 裁剪用路径
-    Path<double> subjectPath1 = Path<double>();
-    subjectPath1.push_back(Point<double>(100, 100));
-    subjectPath1.push_back(Point<double>(100, 300));
-    subjectPath1.push_back(Point<double>(300, 300));
-    subjectPath1.push_back(Point<double>(300, 100));
-    clipperD.AddPath(subjectPath1, PathType::Subject, false);
-    outputSubjectPaths.push_back(subjectPath1);
+    vector<vector<Vector3>> outputSubjectPaths;    // 外边框路径
+    vector<vector<Vector3>> outputClipPaths;       // 裁剪用路径
     
-    Path<double> subjectPath2 = Path<double>();
-    subjectPath2.push_back(Point<double>(240, 100));
-    subjectPath2.push_back(Point<double>(240, 300));
-    subjectPath2.push_back(Point<double>(600, 200));
-    subjectPath2.push_back(Point<double>(600, 100));
-    clipperD.AddPath(subjectPath2, PathType::Subject, false);
-    outputSubjectPaths.push_back(subjectPath2);
+    vector<Vector3> subjectPath = vector<Vector3>();
+    subjectPath.push_back(Vector3(100, 100, 0));
+    subjectPath.push_back(Vector3(100, 300, 0));
+    subjectPath.push_back(Vector3(300, 300, 0));
+    subjectPath.push_back(Vector3(300, 100, 0));
+    polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    outputSubjectPaths.push_back(subjectPath);
     
-    Path<double> clipPath1 = Path<double>();
-    clipPath1.push_back(Point<double>(258, 151));
-    clipPath1.push_back(Point<double>(281, 324));
-    clipPath1.push_back(Point<double>(324, 317));
-    clipPath1.push_back(Point<double>(297, 148));
-    clipperD.AddPath(clipPath1, PathType::Clip, false);
-    outputClipPaths.push_back(clipPath1);
+    subjectPath = vector<Vector3>();
+    subjectPath.push_back(Vector3(240, 100, 0));
+    subjectPath.push_back(Vector3(240, 300, 0));
+    subjectPath.push_back(Vector3(600, 200, 0));
+    subjectPath.push_back(Vector3(600, 100, 0));
+    polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    outputSubjectPaths.push_back(subjectPath);
     
-    Path<double> clipPath2 = Path<double>();
-    clipPath2.push_back(Point<double>(387, 158));
-    clipPath2.push_back(Point<double>(368, 190));
-    clipPath2.push_back(Point<double>(421, 208));
-    clipPath2.push_back(Point<double>(458, 161));
-    clipPath2.push_back(Point<double>(436, 142));
-    clipperD.AddPath(clipPath2, PathType::Clip, false);
-    outputClipPaths.push_back(clipPath2);
+    vector<Vector3> clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(258, 151, 0));
+    clipPath.push_back(Vector3(281, 324, 0));
+    clipPath.push_back(Vector3(324, 317, 0));
+    clipPath.push_back(Vector3(297, 148, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
     
-    Path<double> clipPath3 = Path<double>();
-    clipPath3.push_back(Point<double>(489, 139));
-    clipPath3.push_back(Point<double>(478, 185));
-    clipPath3.push_back(Point<double>(508, 197));
-    clipPath3.push_back(Point<double>(528, 158));
-    clipPath3.push_back(Point<double>(516, 134));
-    clipperD.AddPath(clipPath3, PathType::Clip, false);
-    outputClipPaths.push_back(clipPath3);
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(387, 158, 0));
+    clipPath.push_back(Vector3(368, 190, 0));
+    clipPath.push_back(Vector3(421, 208, 0));
+    clipPath.push_back(Vector3(458, 161, 0));
+    clipPath.push_back(Vector3(436, 142, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(489, 139, 0));
+    clipPath.push_back(Vector3(478, 185, 0));
+    clipPath.push_back(Vector3(508, 197, 0));
+    clipPath.push_back(Vector3(528, 158, 0));
+    clipPath.push_back(Vector3(516, 134, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(158, 174, 0));
+    clipPath.push_back(Vector3(145, 230, 0));
+    clipPath.push_back(Vector3(190, 241, 0));
+    clipPath.push_back(Vector3(212, 200, 0));
+    clipPath.push_back(Vector3(194, 173, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
     
-    Path<double> clipPath4 = Path<double>();
-    clipPath4.push_back(Point<double>(158, 174));
-    clipPath4.push_back(Point<double>(145, 230));
-    clipPath4.push_back(Point<double>(190, 241));
-    clipPath4.push_back(Point<double>(212, 200));
-    clipPath4.push_back(Point<double>(194, 173));
-    clipperD.AddPath(clipPath4, PathType::Clip, false);
-    outputClipPaths.push_back(clipPath4);
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(288, 131, 0));
+    clipPath.push_back(Vector3(402, 167, 0));
+    clipPath.push_back(Vector3(372, 75,  0));
+    clipPath.push_back(Vector3(302, 62, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(190, 83,0));
+    clipPath.push_back(Vector3(174, 185, 0));
+    clipPath.push_back(Vector3(240, 67, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
     
 #ifdef USE_EASYX_GRAPHICS
     
@@ -118,6 +133,7 @@ int main(int argc, char* argv[])
         DrawPath(outputNum, path, RED);
     }
 
+    bool finishedFindPath = false;
     ExMessage m;		// Define a message variable
     while(true)
     {
@@ -128,19 +144,55 @@ int main(int argc, char* argv[])
         case WM_LBUTTONDOWN:
             {
                 ReDrawBoard();
+                std::cout << "Left => (" << m.x << ", " << m.y << ")" << endl;
                 if (!finishedFindPath)
                 {
                     finishedFindPath = true;
-                    DoPolygonVatti();
-                    triangulationTool.EarClipping();
+                    std::vector<Path<double>> paths = polygonNavMeshTool.GenFinalTriangles();
+
+                    for (Path<double> path : paths)
+                    {
+                        setcolor(BLACK);
+                        Point<double> preP = path.data[0];
+                        for (int j = 0; j < path.data.size(); j++)
+                        {
+                            auto point = path.data[j];
+                            line(preP.x, preP.y, point.x, point.y);
+                            preP = point;   
+                        }
+                        line(path.data[path.data.size() - 1].x, path.data[path.data.size() - 1].y,
+                            path.data[0].x, path.data[0].y);
+                    }
                 } else
                 {
-                    
+                    // 生成路径后，输入开始、结束点，生成路径
+                    Vector3 startPoint = Vector3(201, 286, 0);
+                    Vector3 endPoint = Vector3(433, 219, 0);
+                    vector<ClipTriangle*> pathTriangles = polygonNavMeshTool.FindPath(startPoint, endPoint);
+                    if (pathTriangles.size() > 0)
+                    {
+                        setfillcolor(YELLOW);
+                        for (int i = 0; i < pathTriangles.size(); i++)
+                        {
+                            auto triangle = pathTriangles[i];
+                            Vector3 A = triangle->A->point;
+                            Vector3 B = triangle->B->point;
+                            Vector3 C = triangle->C->point;
+                            const int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
+                            fillpoly(3, points);
+                            // line(pathNodes[i].x, pathNodes[i].y, pathNodes[i + 1].x, pathNodes[i + 1].y);
+                        }
+                    }
+                    setfillcolor(BLUE);
+                    fillcircle(startPoint.x, startPoint.y, 3);
+                    setfillcolor(RED);
+                    fillcircle(endPoint.x, endPoint.y, 3);
                 }
-                ReDrawBoard();
             }break;
         case WM_RBUTTONDOWN:
-            std::cout << "(" << m.x << ", " << m.y << ")" << endl;
+            {
+                std::cout << "Right => (" << m.x << ", " << m.y << ")" << endl;
+            }
             break;
         case WM_KEYDOWN:
             if (m.vkcode == VK_ESCAPE)
@@ -149,10 +201,9 @@ int main(int argc, char* argv[])
         }
     }
 #else
-    DoPolygonVatti();
-    triangulationTool.EarClipping();
+    polygonNavMeshTool.GenFinalTriangles();
     int outTriangleNum = 1;
-    for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    for (OutsidePolygon* polygon : polygonNavMeshTool.GetOutsidePolygons())
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() != 0)
@@ -166,32 +217,6 @@ int main(int argc, char* argv[])
 #endif
 
     return 0;
-}
-
-void DoPolygonVatti()
-{
-    // 裁剪后输出的Path数据
-    PathsD pathsD = PathsD();
-    // 获取最后输出path
-    if (clipperD.Execute(ClipType::Difference, FillRule::Negative, pathsD))
-    {
-        resultPaths = pathsD.data;
-        // 将resultPaths 加入到三角化程序中
-        // 获取所有路径点和对应的岛洞
-        for(int i = 0; i < resultPaths.size(); i++)
-        {
-            auto path = resultPaths[i];
-            path.Reverse();
-            
-            vector<Vector3> pathNodes;
-            for (auto pathNode : path.data)
-            {
-                pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
-            }
-            // 判断当前线段是否为外边框和岛洞
-            triangulationTool.AddPolygonPoints(pathNodes);
-        }
-    }
 }
 
 #ifdef USE_EASYX_GRAPHICS
@@ -211,20 +236,10 @@ void ReDrawBoard()
     settextstyle(20, 0, L"微软雅黑");
     DrawTriangles();
     DrawPolygonsPoints();
-    
-    for (int i = 0; i < resultPaths.size(); i++)
-    {
-        auto path = resultPaths[i];
-        DrawPath(i+1, path, GREEN);
-    }
 }
 
-void DrawPath(int pathNum, Path<double> path, COLORREF color)
+void DrawPath(int pathNum, vector<Vector3> points, COLORREF color)
 {
-    if (finishedFindPath)
-        return;
-    
-    auto points = path.data;
     for (int i = 0; i < points.size(); i++)
     {
         const auto point = points[i];
@@ -252,9 +267,9 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color)
 // 使用EasyX 输出点和线
 void DrawPolygonsPoints()
 {
-    for (const OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    for (const OutsidePolygon* polygon : polygonNavMeshTool.GetOutsidePolygons())
     {
-        auto firstNode = polygon->GetFirstNode();
+        const auto firstNode = polygon->GetFirstNode();
         DrawPoints(firstNode);
     }
 }
@@ -294,7 +309,7 @@ void DrawPoints(PointLinkNode* firstNode)
 
 void DrawTriangles()
 {
-    for (const OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    for (const OutsidePolygon* polygon : polygonNavMeshTool.GetOutsidePolygons())
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() == 0)

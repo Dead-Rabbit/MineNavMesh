@@ -1,5 +1,7 @@
 ﻿#include "PolygonTriangulation.h"
 
+using namespace NavMeshBase;
+
 namespace ZXNavMesh{
 
     int ClipTriangle::triangleNum = 0;

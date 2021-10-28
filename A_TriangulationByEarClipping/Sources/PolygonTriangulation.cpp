@@ -1,6 +1,8 @@
 ﻿#include "PolygonTriangulation.h"
 
-namespace ZXNavMesh
+using namespace NavMeshBase;
+
+namespace PolygonNavMesh
 {
     int PointLinkNode::pointNum = 0;
 

@@ -3,6 +3,8 @@
 
 #include "Vectors.h"
 
+using namespace NavMeshBase;
+
 namespace ZXNavMesh
 {
     class NavMeshHelper

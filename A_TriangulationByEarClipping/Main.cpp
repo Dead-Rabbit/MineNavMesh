@@ -24,7 +24,7 @@
 #endif
 
 using namespace std;
-using namespace ZXNavMesh;
+using namespace PolygonNavMesh;
 
 #ifdef USE_EASYX_GRAPHICS
 

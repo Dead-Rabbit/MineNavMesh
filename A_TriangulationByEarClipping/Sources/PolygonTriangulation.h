@@ -6,8 +6,10 @@
 #include "../../Base/NavMath.h"
 
 using namespace std;
+using namespace NavMeshBase;
+using namespace ZXNavMesh;
 
-namespace ZXNavMesh
+namespace PolygonNavMesh
 {
     // 耳切法最终生成的三角形
     class Triangle
