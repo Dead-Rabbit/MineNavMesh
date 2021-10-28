@@ -2,9 +2,9 @@
 #include "../Base/NavMeshHelper.h"
 #include "Sources/PolygonTriangulation.h"
 
-#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
 #include <graphics.h>
 #include <conio.h>      //为了使用_getch()
 #endif
@@ -13,7 +13,7 @@ using namespace std;
 using namespace clipperlib;
 using namespace ZXNavMesh;
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
 
 // 屏幕大小
 Vector2* graphSize = new Vector2(640, 480);
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     clipperD.AddPath(clipPath5, PathType::Clip, false);
     outputClipPaths.push_back(clipPath5);
     
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
     
     // 绘制裁剪前的图形
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
@@ -218,7 +218,7 @@ std::vector<Path<double>> DoClipTest()
     return {};
 }
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
 
 void ReDrawBoard()
 {

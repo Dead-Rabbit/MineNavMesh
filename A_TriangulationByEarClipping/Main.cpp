@@ -10,7 +10,7 @@
  * outtextxy(point.x - 5, point.y - 20, str);
 */
 
-#define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+#define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 #define DEBUG_STEP   // 是否分步骤调试，前提是开启了 USE_EASYX_GRAPHICS
 
 #include <vector>
@@ -18,15 +18,15 @@
 #include "../Base/Vectors.h"
 #include "Sources/PolygonTriangulation.h"
 
-#ifdef USE_EASYX_GTAPHICS
-#include <graphics.h>   // 如果此处出现了错误，请安装 EasyX 库，如果不想安装，注释掉13行的 #define USE_EASYX_GTAPHICS 即可
+#ifdef USE_EASYX_GRAPHICS
+#include <graphics.h>   // 如果此处出现了错误，请安装 EasyX 库，如果不想安装，注释掉13行的 #define USE_EASYX_GRAPHICS 即可
 #include <conio.h>      //为了使用_getch()
 #endif
 
 using namespace std;
 using namespace ZXNavMesh;
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
 
 // 屏幕大小
 Vector2* graphSize = new Vector2(640, 480);
@@ -96,7 +96,7 @@ int main()
     insidePoints.push_back(Vector3(498, 244, 0));
     triangulationTool.AddPolygonInsidePoints(insidePoints);
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
     
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
@@ -148,7 +148,7 @@ int main()
     return 0;
 }
 
-#ifdef USE_EASYX_GTAPHICS
+#ifdef USE_EASYX_GRAPHICS
 
 void ClearDrawBoard()
 {
