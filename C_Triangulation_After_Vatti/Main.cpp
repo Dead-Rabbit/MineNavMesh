@@ -27,8 +27,6 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color);
 
 // 裁剪行为
 std::vector<Path<double>> DoClipTest();
-std::vector<Path<double>> outputSubjectPaths;
-std::vector<Path<double>> outputClipPaths;
 
 bool finishedFindPath = false;
 std::vector<Path<double>> resultPaths;
@@ -42,6 +40,8 @@ int main(int argc, char* argv[])
 {
     triangulationTool = PolygonTriangulation();
     
+    vector<Path<double>> outputSubjectPaths;    // 外边框路径
+    vector<Path<double>> outputClipPaths;       // 裁剪用路径
     Path<double> subjectPath1 = Path<double>();
     subjectPath1.push_back(Point<double>(100, 100));
     subjectPath1.push_back(Point<double>(100, 300));
@@ -51,18 +51,20 @@ int main(int argc, char* argv[])
     outputSubjectPaths.push_back(subjectPath1);
     
     Path<double> subjectPath2 = Path<double>();
-    subjectPath2.push_back(Point<double>(310, 100));
-    subjectPath2.push_back(Point<double>(310, 300));
+    // subjectPath2.push_back(Point<double>(310, 100));
+    // subjectPath2.push_back(Point<double>(310, 300));
+    subjectPath2.push_back(Point<double>(240, 100));
+    subjectPath2.push_back(Point<double>(240, 300));
     subjectPath2.push_back(Point<double>(600, 200));
     subjectPath2.push_back(Point<double>(600, 100));
     clipperD.AddPath(subjectPath2, PathType::Subject, false);
     outputSubjectPaths.push_back(subjectPath2);
     
     Path<double> clipPath1 = Path<double>();
-    clipPath1.push_back(Point<double>(250, 90));
+    clipPath1.push_back(Point<double>(258, 151));
     clipPath1.push_back(Point<double>(281, 324));
     clipPath1.push_back(Point<double>(324, 317));
-    clipPath1.push_back(Point<double>(292, 120));
+    clipPath1.push_back(Point<double>(297, 148));
     clipperD.AddPath(clipPath1, PathType::Clip, false);
     outputClipPaths.push_back(clipPath1);
     
