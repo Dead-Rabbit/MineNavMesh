@@ -2,7 +2,6 @@
 
 namespace ZXNavMesh{
 
-    int ClipLine::lineNum = 0;
     int ClipTriangle::triangleNum = 0;
     int PointLinkNode::pointNum = 0;
     int OutsidePolygon::polygonNum = 0;
@@ -244,48 +243,73 @@ namespace ZXNavMesh{
         this->B = B;
         this->C = C;
         this->num = ++triangleNum;
+        
+        this->points.push_back(this->A);
+        this->points.push_back(this->B);
+        this->points.push_back(this->C);
 
+        // 计算当前内心
         centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
 
-        // // 查找对应点的线段，如果不存在则创建
-        // CreateTriangleLine(this->A, this->B);
-        // CreateTriangleLine(this->B, this->C);
-        // CreateTriangleLine(this->C, this->A);
+        // 将三角形push到三个点中
+        this->A->AddLinkTriangle(this);
+        this->B->AddLinkTriangle(this);
+        this->C->AddLinkTriangle(this);
     }
 
-    // ClipLine* ClipTriangle::CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB)
-    // {
-    //     // 寻找两点构成的直线
-    //     ClipLine* lineAB = pA->GetLineByOtherNode(pB);
-    //     if (lineAB == nullptr)
-    //     {
-    //         lineAB = new ClipLine(pA, pB);
-    //         
-    //         // 创建并放到各自的点上
-    //         std::cout << "创建线段" << lineAB->num << " " << pA->num << "-" << pB->num << endl;
-    //         
-    //         pA->AddLine(lineAB);
-    //         pB->AddLine(lineAB);
-    //         // 将直线追加到当前三角形记录的line中
-    //         lines.push_back(lineAB);
-    //     }
-    //     
-    //     // 新增记录在Line中当前三角形的指针
-    //     auto lineTriangles = lineAB->triangles;
-    //     const auto findIt = std::find_if(lineTriangles.begin(), lineTriangles.end(),
-    //         [this](ClipTriangle* triangle)
-    //         {
-    //             return this == triangle;
-    //         });
-    //     // 没有找到，则在线上新增当前三角形
-    //     if (findIt == lineTriangles.end())
-    //     {
-    //         std::cout << "追加三角形" << this->num << " 到线段" << lineAB->num << "上" << endl;
-    //         lineAB->triangles.push_back(this);
-    //     }
-    //     
-    //     return lineAB;
-    // }
+    vector<ClipTriangle*> ClipTriangle::GetLinkedClipTriangles()
+    {
+        vector<ClipTriangle*> result;
+        // 遍历获取当前所有点及其影子点的链接三角形，处当前三角形外
+        for (PointLinkNode* edgePoint : points)
+        {
+            // 检查轮廓节点
+            GetLinkedClipTrianglesByPoint(result, edgePoint);
+            // 检查影子节点
+            if (edgePoint->linkNode)
+                GetLinkedClipTrianglesByPoint(result, edgePoint->linkNode);
+        }
+        return result;
+    }
+
+    void ClipTriangle::GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point)
+    {
+        for (ClipTriangle* otherTriangle : point->linkTriangles)
+        {
+            // 检查其他的三角形是否与当前三角形相交
+            if (otherTriangle != this && IsTriangleLink(otherTriangle))
+            {
+                // 将三角形push到结果中，检查当前三角形是否已放入
+                auto it = std::find_if(result.begin(), result.end(),
+                    [otherTriangle](ClipTriangle* contentTri)
+                    {
+                        return contentTri == otherTriangle;
+                    });
+                if (it == result.end())
+                    result.push_back(otherTriangle);
+            }
+        }
+    }
+
+    bool ClipTriangle::IsTriangleLink(const ClipTriangle* otherTriangle)
+    {
+        // 两个三角形相连接的点的数量
+        int connectPointNum = 0;
+        for (PointLinkNode* otherEdgePoint : otherTriangle->points)
+        {
+            // otherPoint 为其他三角形的边框点
+            for(int i = 0; i < points.size(); i++)
+            {
+                PointLinkNode* edgePoint = points[i];
+                if (edgePoint == otherEdgePoint || edgePoint == otherEdgePoint->linkNode)
+                {
+                    connectPointNum++;
+                    break;
+                }
+            }
+        }
+        return connectPointNum >= 2;
+    }
 
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
     {

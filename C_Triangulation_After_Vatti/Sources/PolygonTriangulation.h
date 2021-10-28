@@ -15,7 +15,6 @@ using namespace std;
 namespace ZXNavMesh
 {
     class PointLinkNode;
-    class ClipLine;
     class ClipTriangle;
     class OutsidePolygon;
 
@@ -142,30 +141,6 @@ namespace ZXNavMesh
     };
 
     /**
-     *  裁剪线
-     */
-    class ClipLine
-    {
-    public:
-        inline ClipLine(PointLinkNode* start, PointLinkNode* end)
-        {
-            A = start;
-            B = end;
-            num = ++lineNum;
-        }
-
-        int num;
-		
-        PointLinkNode* A;
-        PointLinkNode* B;
-
-        // 一个线连接的两个三角形，在裁剪的时候生成
-        vector<ClipTriangle*> triangles;
-    private:
-        static int lineNum;
-    };
-    
-    /**
      *  耳切法最终生成的三角形
      */
     class ClipTriangle
@@ -177,14 +152,25 @@ namespace ZXNavMesh
         PointLinkNode* B = nullptr;
         PointLinkNode* C = nullptr;
 
+        vector<PointLinkNode*> points;  // 记录A B C；方便后续遍历用
+
         int num;
         Vector3 centerPos;
 
-        // 三角形对应三个线
-        // vector<ClipLine*> lines;
+        // 获取相连通的其他三角形
+        vector<ClipTriangle*> GetLinkedClipTriangles();
+
+        /**
+         *  <summary>检查点是否为当前的轮廓点，包括轮廓点的影子点</summary>
+         *  <param name="otherTriangle">检查的其他三角形</param>
+         */
+        bool IsTriangleLink(const ClipTriangle* otherTriangle);
+        
     private:
         static int triangleNum;
-        // ClipLine* CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB);
+        
+        // 获取相连通的其他三角形
+        void GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point);
     };
     
     // 耳切法使用点链表节点
@@ -207,6 +193,9 @@ namespace ZXNavMesh
         PointLinkNode* preNode = nullptr;
         PointLinkNode* nextNode = nullptr;
 
+        // 影子节点 - 从当前点拷贝或拷贝自其他点，表示连通;LinkNode 只可能有一个
+        PointLinkNode* linkNode = nullptr;
+        
         PointLinkNode* CopyNode()
         {
             PointLinkNode* otherNode = new PointLinkNode(point.x, point.y, point.z);
@@ -223,32 +212,30 @@ namespace ZXNavMesh
             ).z > 0;
         };
 
-        // // 根据另外一个点获取当前点对应的线段
-        // ClipLine* GetLineByOtherNode(PointLinkNode* otherNode)
-        // {
-        //     for (int i = 0; i < lines.size(); ++i)
-        //     {
-        //         ClipLine* line = lines[i];
-        //         if (line->B == otherNode || line->A == otherNode)
-        //             return line;
-        //     }
-        //
-        //     return nullptr;
-        // }
+        // 相连接的三角形
+        vector<ClipTriangle*> linkTriangles;
+        
+        // 将三角形插入到当前点的链接记录中
+        void AddLinkTriangle(ClipTriangle* triangle)
+        {
+            linkTriangles.push_back(triangle);
+        }
 
-        // void AddLine(ClipLine* newLine)
-        // {
-        //     lines.push_back(newLine);
-        // }
+        // 获取所有点相连接的三角形，包括影子点的链接三角形
+        vector<ClipTriangle*> GetLinkTriangles()
+        {
+            vector<ClipTriangle*> result;
+            if (linkNode != nullptr)
+            {
+                auto linkNodeTriangles = linkNode->linkTriangles;
+                result.insert(result.end(), linkNodeTriangles.begin(), linkNodeTriangles.end());
+            }
+            result.insert(result.end(), linkTriangles.begin(), linkTriangles.end());
+            return result;
+        }
         
     private:
         static int pointNum;
-        
-        // 影子节点 - 从当前点拷贝或拷贝自其他点，表示连通
-        PointLinkNode* linkNode = nullptr;
-
-        // 点的所有连线，在三角形裁剪的时候生成
-        // vector<ClipLine*> lines;
     };
 
 }

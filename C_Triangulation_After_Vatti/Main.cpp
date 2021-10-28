@@ -321,7 +321,7 @@ void DrawTriangles()
         if (triangles.size() == 0)
             return;
         
-        for (const ClipTriangle* triangle : triangles)
+        for (ClipTriangle* triangle : triangles)
         {
             setlinecolor(GREEN);
             setfillcolor(0xF0FFF0);
@@ -340,17 +340,15 @@ void DrawTriangles()
             setfillcolor(RED);
             const auto centerPos = triangle->centerPos;
             fillcircle(centerPos.x, centerPos.y, 2);
+            
+            setlinecolor(BLUE);
+            const auto firstPos = triangle->centerPos;
+            for (const ClipTriangle* otherTriangle : triangle->GetLinkedClipTriangles())
+            {
+                const auto secondPos = otherTriangle->centerPos;
+                line(firstPos.x, firstPos.y, secondPos.x, secondPos.y);
+            }
         }
-        
-    //     // 测试绘制第一个三角形的链接情况
-    //     const auto triangle = polygon->GetGenTriangles()[0];
-    //     const auto lines = triangle->lines;
-    //     std::cout << "=====" << endl;
-    //     for (ClipLine* line : lines)
-    //     {
-    //         // 绘制两个三角形之间的连线
-    //         std::cout << "line's triangle's length:" << line->triangles.size() << endl;
-    //     }
     }
 }
 
