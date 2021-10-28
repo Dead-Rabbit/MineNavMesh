@@ -166,7 +166,8 @@ namespace ZXNavMesh{
             PointLinkNode* rightInsideNode = insideFirstNodes[nodePairIndex];
             
             // 获取从inner右点触发向x轴正方向走的最大线段
-            const Line compareLine = Line(rightInsideNode->point, Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0));
+            const Vector3 compareLineStart = rightInsideNode->point;
+            const Vector3 compareLineEnd = Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0);
 
             // 检查当前所有其他岛洞是否于其有“相互可见”
             PointLinkNode* curNode = nullptr;
@@ -178,10 +179,9 @@ namespace ZXNavMesh{
                 return ;
             do
             {
-                Line curLine = Line(curNode->point, curNode->nextNode->point);
                 Vector3 crossPoint;
-                if (NavMath::GetSegmentLinesIntersection(compareLine.start, compareLine.end,
-                    curLine.start, curLine.end, crossPoint))
+                if (NavMath::GetSegmentLinesIntersection(compareLineStart, compareLineEnd,
+                    curNode->point, curNode->nextNode->point, crossPoint))
                 {
                     if (suitNode == nullptr)
                     {
@@ -293,7 +293,7 @@ namespace ZXNavMesh{
         // 收入最后一个三角形
         if (firstNode->nextNode->nextNode->nextNode == firstNode)
         {
-            triangles.push_back(new ClipTriangle(firstNode->point, firstNode->preNode->point, firstNode->nextNode->point));
+            triangles.push_back(new ClipTriangle(firstNode, firstNode->preNode, firstNode->nextNode));
             firstNode = nullptr;
             return false;
         }
@@ -314,7 +314,7 @@ namespace ZXNavMesh{
                 curNode->nextNode->preNode = curNode->preNode;
                 
                 // 追加分割好的三角形
-                triangles.push_back(new ClipTriangle(curNode->point, curNode->preNode->point, curNode->nextNode->point));
+                triangles.push_back(new ClipTriangle(curNode, curNode->preNode, curNode->nextNode));
                 
                 return true;
             }

@@ -282,10 +282,14 @@ void DrawTriangles()
         
         for (const ClipTriangle* triangle : triangles)
         {
-            line(triangle->A.x, triangle->A.y, triangle->B.x, triangle->B.y);
-            line(triangle->B.x, triangle->B.y, triangle->C.x, triangle->C.y);
-            line(triangle->C.x, triangle->C.y, triangle->A.x, triangle->A.y);
-            int points[] = {triangle->A.x, triangle->A.y, triangle->B.x, triangle->B.y, triangle->C.x, triangle->C.y};
+            Vector3 A = triangle->A->point;
+            Vector3 B = triangle->B->point;
+            Vector3 C = triangle->C->point;
+            
+            line(A.x, A.y, B.x, B.y);
+            line(B.x, B.y, C.x, C.y);
+            line(C.x, C.y, A.x, A.y);
+            int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
             fillpoly(3, points);
         }
     }

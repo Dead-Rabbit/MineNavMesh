@@ -11,6 +11,7 @@ using namespace std;
 
 namespace ZXNavMesh
 {
+    class ClipLine;
     class PointLinkNode;
     class ClipTriangle;
     class OutsidePolygon;
@@ -128,17 +129,33 @@ namespace ZXNavMesh
         }
     };
     
+    class ClipLine
+    {
+    public:
+        ClipLine(PointLinkNode* start, PointLinkNode* end)
+        {
+            this->startNode = start;
+            this->endNode = end;
+        }
+		
+        PointLinkNode* startNode;
+        PointLinkNode* endNode;
+    };
+    
     // 耳切法最终生成的三角形
     class ClipTriangle
     {
     public:
-        Vector3 A, B, C;
-        ClipTriangle(Vector3 A, Vector3 B, Vector3 C)
+        ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C)
         {
             this->A = A;
             this->B = B;
             this->C = C; 
         }
+        
+        PointLinkNode* A = nullptr;
+        PointLinkNode* B = nullptr;
+        PointLinkNode* C = nullptr;
     };
     
     // 耳切法使用点链表节点
@@ -168,8 +185,6 @@ namespace ZXNavMesh
         };
     private:
         static int pointNum;
-        Line* preLine = nullptr;
-        Line* nextLine = nullptr;
     };
 
 }
