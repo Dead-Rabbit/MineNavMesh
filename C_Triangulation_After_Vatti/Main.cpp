@@ -1,5 +1,4 @@
 #include "Sources/clipper.h"
-#include "../Base/NavMeshHelper.h"
 #include "Sources/PolygonTriangulation.h"
 
 #define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
@@ -28,7 +27,7 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color);
 #endif
 
 // 裁剪行为
-std::vector<Path<double>> DoClipTest();
+void DoPolygonVatti();
 
 bool finishedFindPath = false;
 std::vector<Path<double>> resultPaths;
@@ -132,29 +131,11 @@ int main(int argc, char* argv[])
                 if (!finishedFindPath)
                 {
                     finishedFindPath = true;
-                    resultPaths = DoClipTest();
-                    // 将resultPaths 加入到三角化程序中
-                    // 获取所有路径点和对应的岛洞
-
-                    setcolor(RED);
-                    for(int i = 0; i < resultPaths.size(); i++)
-                    {
-                        auto path = resultPaths[i];
-                        path.Reverse();
-                    
-                        vector<Vector3> pathNodes;
-                        for (auto pathNode : path.data)
-                        {
-                            pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
-                        }
-
-                        // 判断当前线段是否为外边框和岛洞
-                        triangulationTool.AddPolygonPoints(pathNodes);
-                    }
+                    DoPolygonVatti();
                 } else
                 {
-                    triangulationTool.OneStepEarClipping();
-                    // triangulationTool.EarClipping();
+                    // triangulationTool.OneStepEarClipping();
+                    triangulationTool.EarClipping();
                 }
                 ReDrawBoard();
             }break;
@@ -168,34 +149,35 @@ int main(int argc, char* argv[])
         }
     }
 #else
-    resultPaths = DoClipTest();
+    DoPolygonVatti();
     // 将resultPaths 加入到三角化程序中
     // 获取所有路径点和对应的岛洞
-    for(int i = 0; i < resultPaths.size(); i++)
-    {
-        auto path = resultPaths[i];
-        path.Reverse();
-                    
-        vector<Vector3> pathNodes;
-        for (auto pathNode : path.data)
-        {
-            pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
-        }
-
-        // 判断当前线段是否为外边框和岛洞
-        triangulationTool.AddPolygonPoints(pathNodes);
-    }
+    // for(int i = 0; i < resultPaths.size(); i++)
+    // {
+    //     auto path = resultPaths[i];
+    //     path.Reverse();
+    //                 
+    //     vector<Vector3> pathNodes;
+    //     for (auto pathNode : path.data)
+    //     {
+    //         pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
+    //     }
+    //
+    //     // 判断当前线段是否为外边框和岛洞
+    //     triangulationTool.AddPolygonPoints(pathNodes);
+    // }
+    
     triangulationTool.EarClipping();
     int outTriangleNum = 1;
     for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() != 0)
-            for (ClipTriangle triangle : triangles)
+            for (ClipTriangle* triangle : triangles)
             {
-                std::cout << "三角形"<< ++outTriangleNum << ": A(" << triangle.A.x << ", " << triangle.A.y
-                    << ") - B(" << triangle.B.x << ", " << triangle.B.y
-                    << ") - C(" << triangle.C.x << ", " << triangle.C.y << ")" << endl;
+                std::cout << "三角形"<< ++outTriangleNum << ": A(" << triangle->A->point.x << ", " << triangle->A->point.y
+                    << ") - B(" << triangle->B->point.x << ", " << triangle->B->point.y
+                    << ") - C(" << triangle->C->point.x << ", " << triangle->C->point.y << ")" << endl;
             }
     }
 #endif
@@ -203,16 +185,31 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-std::vector<Path<double>> DoClipTest()
+void DoPolygonVatti()
 {
-    PathsD resultPaths = PathsD();
+    PathsD pathsD = PathsD();
     // 获取最后输出path
-    if (clipperD.Execute(ClipType::Difference, FillRule::Negative, resultPaths))
+    if (clipperD.Execute(ClipType::Difference, FillRule::Negative, pathsD))
     {
-        return resultPaths.data;
+        resultPaths = pathsD.data;
+
+        // 将resultPaths 加入到三角化程序中
+        // 获取所有路径点和对应的岛洞
+        for(int i = 0; i < resultPaths.size(); i++)
+        {
+            auto path = resultPaths[i];
+            path.Reverse();
+                    
+            vector<Vector3> pathNodes;
+            for (auto pathNode : path.data)
+            {
+                pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
+            }
+
+            // 判断当前线段是否为外边框和岛洞
+            triangulationTool.AddPolygonPoints(pathNodes);
+        }
     }
-    
-    return {};
 }
 
 #ifdef USE_EASYX_GRAPHICS
