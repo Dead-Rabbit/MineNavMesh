@@ -25,6 +25,7 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color);
 
 #endif
 
+// 裁剪行为
 std::vector<Path<double>> DoClipTest();
 std::vector<Path<double>> outputSubjectPaths;
 std::vector<Path<double>> outputClipPaths;
@@ -32,7 +33,9 @@ std::vector<Path<double>> outputClipPaths;
 bool finishedFindPath = false;
 std::vector<Path<double>> resultPaths;
 
+// 裁剪用工具
 ClipperD clipperD = ClipperD();
+// 耳切法三角化工具
 PolygonTriangulation triangulationTool;
 
 int main(int argc, char* argv[])
