@@ -132,10 +132,10 @@ int main(int argc, char* argv[])
                 {
                     finishedFindPath = true;
                     DoPolygonVatti();
+                    triangulationTool.EarClipping();
                 } else
                 {
-                    // triangulationTool.OneStepEarClipping();
-                    triangulationTool.EarClipping();
+                    
                 }
                 ReDrawBoard();
             }break;
