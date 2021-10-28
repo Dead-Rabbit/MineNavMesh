@@ -1,5 +1,4 @@
 #include "Sources/clipper.h"
-#include "../Base/Graphes.h"
 
 #define USE_EASYX_GTAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
@@ -8,9 +7,11 @@
 #include <conio.h>      //为了使用_getch()
 #endif
 
+#include "../Base/Vectors.h"
+
 using namespace std;
-using namespace ZXNavMesh;
 using namespace clipperlib;
+using namespace ZXNavMesh;
 
 #ifdef USE_EASYX_GTAPHICS
 

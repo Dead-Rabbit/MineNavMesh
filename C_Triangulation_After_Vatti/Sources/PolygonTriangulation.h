@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "../../Base/Graphes.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 #include "../../Base/NavMeshHelper.h"
@@ -22,7 +21,6 @@ namespace ZXNavMesh
      *
      *  使用方式：
      *  
-     *
      *  注意：
      *  1. 当前轮廓为逆时针输入，岛洞为顺时针输入
      *  2. 每一个轮廓可以拥有多个岛洞
@@ -128,21 +126,29 @@ namespace ZXNavMesh
             insideFirstNodes.clear();
         }
     };
-    
+
+    /**
+     *  裁剪线
+     */
     class ClipLine
     {
     public:
         ClipLine(PointLinkNode* start, PointLinkNode* end)
         {
-            this->startNode = start;
-            this->endNode = end;
+            A = start;
+            B = end;
         }
 		
-        PointLinkNode* startNode;
-        PointLinkNode* endNode;
+        PointLinkNode* A;
+        PointLinkNode* B;
+
+        // 一个线连接的两个三角形
+        vector<ClipTriangle*> triangles;
     };
     
-    // 耳切法最终生成的三角形
+    /**
+     *  耳切法最终生成的三角形
+     */
     class ClipTriangle
     {
     public:
@@ -156,6 +162,9 @@ namespace ZXNavMesh
         PointLinkNode* A = nullptr;
         PointLinkNode* B = nullptr;
         PointLinkNode* C = nullptr;
+
+        // 三角形对应三个线
+        vector<ClipLine*> lines;
     };
     
     // 耳切法使用点链表节点
@@ -168,13 +177,18 @@ namespace ZXNavMesh
             this->num = ++pointNum;
         }
 
+        // 当前节点编号，方便调试
         int num;
 	
         // 当前点
         Vector3 point;
+        
         // 双向链
         PointLinkNode* preNode = nullptr;
         PointLinkNode* nextNode = nullptr;
+
+        // 点对应三个线
+        vector<ClipLine*> lines;
 
         // 计算当前角是否为凸角
         bool IsPointConvex()

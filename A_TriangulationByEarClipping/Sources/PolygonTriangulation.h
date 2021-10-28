@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "../../Base/Graphes.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 
@@ -50,8 +49,6 @@ namespace ZXNavMesh
         };
     private:
         static int pointNum;
-        Line* preLine = nullptr;
-        Line* nextLine = nullptr;
     };
 
     // 耳切法类

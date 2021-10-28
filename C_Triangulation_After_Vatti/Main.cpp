@@ -1,5 +1,4 @@
 #include "Sources/clipper.h"
-#include "../Base/Graphes.h"
 #include "../Base/NavMeshHelper.h"
 #include "Sources/PolygonTriangulation.h"
 

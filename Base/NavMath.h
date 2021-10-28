@@ -11,6 +11,7 @@ namespace ZXNavMesh
 	public:
 		NavMath(){};
 
+		// 绝对值
 		static double Abs(double value)
 		{
 			if (value < 0)
