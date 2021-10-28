@@ -191,7 +191,7 @@ namespace ZXNavMesh
         vector<ClipLine*> lines;
 
         // 计算当前角是否为凸角
-        bool IsPointConvex()
+        bool IsPointConvex() const
         {
             return NavMath::Cross(
                 Vector3(point - preNode->point), Vector3(point - nextNode->point)

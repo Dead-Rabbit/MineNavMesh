@@ -51,8 +51,6 @@ int main(int argc, char* argv[])
     outputSubjectPaths.push_back(subjectPath1);
     
     Path<double> subjectPath2 = Path<double>();
-    // subjectPath2.push_back(Point<double>(310, 100));
-    // subjectPath2.push_back(Point<double>(310, 300));
     subjectPath2.push_back(Point<double>(240, 100));
     subjectPath2.push_back(Point<double>(240, 300));
     subjectPath2.push_back(Point<double>(600, 200));
@@ -94,15 +92,6 @@ int main(int argc, char* argv[])
     clipPath4.push_back(Point<double>(194, 173));
     clipperD.AddPath(clipPath4, PathType::Clip, false);
     outputClipPaths.push_back(clipPath4);
-    
-    Path<double> clipPath5 = Path<double>();
-    clipPath5.push_back(Point<double>(348, 223));
-    clipPath5.push_back(Point<double>(213, 267));
-    clipPath5.push_back(Point<double>(223, 342));
-    clipPath5.push_back(Point<double>(310, 348));
-    clipPath5.push_back(Point<double>(365, 309));
-    clipperD.AddPath(clipPath5, PathType::Clip, false);
-    outputClipPaths.push_back(clipPath5);
     
 #ifdef USE_EASYX_GRAPHICS
     

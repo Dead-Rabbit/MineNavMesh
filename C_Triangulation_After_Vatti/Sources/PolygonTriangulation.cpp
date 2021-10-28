@@ -9,7 +9,6 @@ namespace ZXNavMesh{
     {
         // 检查当前是否为轮廓
         OutsidePolygon* newPolygon = new OutsidePolygon(edgePoints);
-        // std::cout << "新增外边框" << newPolygon->num << endl;
         // 循环未归位岛洞，检查是否所属当前轮廓
         auto insidePathIt = insidePolygons.begin();
         while(insidePathIt != insidePolygons.end())
@@ -36,7 +35,6 @@ namespace ZXNavMesh{
             if (outsidePolygon->IsPointInPolygon(insidePoints[0]))
             {
                 outsidePolygon->AddPolygonInsidePoints(insidePoints);
-                // std::cout << "追加内点到外边框" << outsidePolygon->num << "中" << endl;
                 return;
             }
         }
@@ -64,10 +62,9 @@ namespace ZXNavMesh{
         // 生成链表
         const int pointSize = edgePoints.size();
         PointLinkNode* curNode = firstNode;
-        PointLinkNode* preNode = firstNode;
         for (int i = 0; i < pointSize; i++)
         {
-            auto point = edgePoints[i];
+            const auto point = edgePoints[i];
 
             // 插入链表节点
             if (firstNode == nullptr)
@@ -78,7 +75,7 @@ namespace ZXNavMesh{
             }
             
             curNode->nextNode = new PointLinkNode(point.x, point.y, point.z);
-            preNode = curNode;
+            PointLinkNode* preNode = curNode;
             curNode = curNode->nextNode;
             curNode->preNode = preNode;
         }
@@ -103,10 +100,8 @@ namespace ZXNavMesh{
     {
         // 生成新的链表
         const int pointSize = innerPoints.size();
-        int pointNumOffset = this->edgePoints.size();
         PointLinkNode* firstInsideNode = nullptr;
         PointLinkNode* curInsideNode = firstInsideNode;
-        PointLinkNode* preInsideNode = firstInsideNode;
         PointLinkNode* rightNode = nullptr;
         for (int i = 0; i < pointSize; i++)
         {
@@ -122,7 +117,7 @@ namespace ZXNavMesh{
             }
             
             curInsideNode->nextNode = new PointLinkNode(point.x, point.y, point.z);
-            preInsideNode = curInsideNode;
+            PointLinkNode* preInsideNode = curInsideNode;
             curInsideNode = curInsideNode->nextNode;
             curInsideNode->preNode = preInsideNode;
 
@@ -169,12 +164,10 @@ namespace ZXNavMesh{
             const Vector3 compareLineStart = rightInsideNode->point;
             const Vector3 compareLineEnd = Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0);
 
-            // 检查当前所有其他岛洞是否于其有“相互可见”
-            PointLinkNode* curNode = nullptr;
             PointLinkNode* suitNode = nullptr;
             Vector3 suitCrossPoint;
             // 判断靠右内部节点与哪个线段的相交点最靠近y轴
-            curNode = firstNode;
+            PointLinkNode* curNode = firstNode;
             if (curNode == nullptr)
                 return ;
             do
@@ -203,7 +196,7 @@ namespace ZXNavMesh{
             
             // 找到最近的线段，检查 形成的三角形内是否有其他点
             curNode = firstNode;
-            Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
+            const Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
             PointLinkNode* cutNode = nullptr;  // 裁剪位置
             do
             {
@@ -229,7 +222,8 @@ namespace ZXNavMesh{
 
             // 拷贝 对应的Inside节点插入到当前链表中
             PointLinkNode* copyCutPoint = new PointLinkNode(cutNode->point.x, cutNode->point.y, cutNode->point.z);
-            PointLinkNode* copyRightInsidePoint = new PointLinkNode(rightInsideNode->point.x, rightInsideNode->point.y, rightInsideNode->point.z);
+            PointLinkNode* copyRightInsidePoint = new PointLinkNode(rightInsideNode->point.x, rightInsideNode->point.y,
+                rightInsideNode->point.z);
             PointLinkNode* cutNextNode = cutNode->nextNode;  // 裁剪的下一个位置，用来接收新的洞的最后一个点
             PointLinkNode* insidePreNode = rightInsideNode->preNode;
             cutNode->nextNode = rightInsideNode;
