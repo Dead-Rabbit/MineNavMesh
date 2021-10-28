@@ -237,6 +237,49 @@ namespace ZXNavMesh{
         }
     }
 
+    ClipTriangle::ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C)
+    {
+        this->A = A;
+        this->B = B;
+        this->C = C;
+
+        centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
+
+        // 查找对应点的线段，如果不存在则创建
+        CreateTriangleLine(this->A, this->B);
+        CreateTriangleLine(this->B, this->C);
+        CreateTriangleLine(this->C, this->A);
+    }
+
+    ClipLine* ClipTriangle::CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB)
+    {
+        // 寻找两点构成的直线
+        ClipLine* lineAB = pA->GetLineByOtherNode(pB);
+        if (lineAB == nullptr)
+        {
+            // 创建并放到各自的点上
+            lineAB = new ClipLine(this->A, this->B);
+            this->A->AddLine(lineAB);
+            this->B->AddLine(lineAB);
+            
+            // 将直线追加到当前三角形记录的line中
+            lines.push_back(lineAB);
+        }
+        
+        // 新增记录在Line中当前三角形的指针
+        auto lineTriangles = lineAB->triangles;
+        const auto findIt = std::find_if(lineTriangles.begin(), lineTriangles.end(),
+            [this](ClipTriangle* triangle)
+            {
+                return this == triangle;
+            });
+        // 没有找到，则在线上新增当前三角形
+        if (findIt == lineTriangles.end())
+            lineTriangles.push_back(this);
+        
+        return lineAB;
+    }
+
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
     {
         // 首先排除当前不是一个凸边的情况
@@ -308,7 +351,8 @@ namespace ZXNavMesh{
                 curNode->nextNode->preNode = curNode->preNode;
                 
                 // 追加分割好的三角形
-                triangles.push_back(new ClipTriangle(curNode, curNode->preNode, curNode->nextNode));
+                ClipTriangle* clipTriangle = new ClipTriangle(curNode, curNode->preNode, curNode->nextNode);
+                triangles.push_back(clipTriangle);
                 
                 return true;
             }
@@ -323,5 +367,4 @@ namespace ZXNavMesh{
     {
         return NavMath::IsPointInPolygonByRayCast(edgePoints, point);
     }
-
 }

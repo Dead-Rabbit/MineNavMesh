@@ -151,7 +151,8 @@ int main(int argc, char* argv[])
                     }
                 } else
                 {
-                    triangulationTool.EarClipping();
+                    triangulationTool.OneStepEarClipping();
+                    // triangulationTool.EarClipping();
                 }
                 ReDrawBoard();
             }break;
@@ -265,8 +266,6 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color)
 
 void DrawTriangles()
 {
-    setfillcolor(0xF0FFF0);
-    setlinecolor(GREEN);
     for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
     {
         const auto triangles = polygon->GetGenTriangles();
@@ -275,6 +274,8 @@ void DrawTriangles()
         
         for (const ClipTriangle* triangle : triangles)
         {
+            setlinecolor(GREEN);
+            setfillcolor(0xF0FFF0);
             Vector3 A = triangle->A->point;
             Vector3 B = triangle->B->point;
             Vector3 C = triangle->C->point;
@@ -284,6 +285,12 @@ void DrawTriangles()
             line(C.x, C.y, A.x, A.y);
             int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
             fillpoly(3, points);
+            
+            // 绘制内心
+            setlinecolor(0xF0FFF0);
+            setfillcolor(RED);
+            auto centerPos = triangle->centerPos;
+            fillcircle(centerPos.x, centerPos.y, 2);
         }
     }
 }

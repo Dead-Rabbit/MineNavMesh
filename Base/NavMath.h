@@ -19,6 +19,21 @@ namespace ZXNavMesh
 			
 			return value;
 		}
+
+		static double Acos(double num)
+		{
+			return std::acos(num);
+		}
+
+		static double Sin(double num)
+		{
+			return std::sin(num);
+		}
+
+		static double Cos(double num)
+		{
+			return std::cos(num);
+		}
 		
 		// 点乘
 		static double Dot(Vector3 line1, Vector3 line2)
@@ -102,7 +117,32 @@ namespace ZXNavMesh
 			}
 			return itJunctionCount % 2 == 1;
 		}
-		
+
+		// 获取三角形的内心
+		static Vector3 CalculateInsideCenter(Vector3 A, Vector3 B, Vector3 C)
+		{
+			Vector3 AB = B - A;
+			Vector3 AC = C - A;
+			Vector3 BA = A - B;
+			Vector3 BC = C - B;
+ 
+			Vector3 nBA = BA;
+			nBA.normalise();
+			Vector3 nBC = BC;
+			nBC.normalise();
+
+			float radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
+			float radABC = Acos(BA.dotProduct(BC) / (BA.length() * BC.length()));
+ 
+			float halfRadBAC = radBAC / 2.0f;
+			float halfRadABC = radABC / 2.0f;
+ 
+			float r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
+ 
+			Vector3 P = ((nBA + nBC) / 2.0f).normalized() * r2 + B;
+			return P;
+		}
+
 	private:
 		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
 		{

@@ -2,6 +2,9 @@
 
 #include <vector>
 
+#include "PolygonTriangulation.h"
+#include "PolygonTriangulation.h"
+#include "PolygonTriangulation.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 #include "../../Base/NavMeshHelper.h"
@@ -10,8 +13,8 @@ using namespace std;
 
 namespace ZXNavMesh
 {
-    class ClipLine;
     class PointLinkNode;
+    class ClipLine;
     class ClipTriangle;
     class OutsidePolygon;
 
@@ -142,7 +145,7 @@ namespace ZXNavMesh
         PointLinkNode* A;
         PointLinkNode* B;
 
-        // 一个线连接的两个三角形
+        // 一个线连接的两个三角形，在裁剪的时候生成
         vector<ClipTriangle*> triangles;
     };
     
@@ -152,19 +155,18 @@ namespace ZXNavMesh
     class ClipTriangle
     {
     public:
-        ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C)
-        {
-            this->A = A;
-            this->B = B;
-            this->C = C; 
-        }
-        
+        ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C);
+
         PointLinkNode* A = nullptr;
         PointLinkNode* B = nullptr;
         PointLinkNode* C = nullptr;
 
+        Vector3 centerPos;
+
         // 三角形对应三个线
         vector<ClipLine*> lines;
+    private:
+        ClipLine* CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB);
     };
     
     // 耳切法使用点链表节点
@@ -187,9 +189,6 @@ namespace ZXNavMesh
         PointLinkNode* preNode = nullptr;
         PointLinkNode* nextNode = nullptr;
 
-        // 点对应三个线
-        vector<ClipLine*> lines;
-
         // 计算当前角是否为凸角
         bool IsPointConvex() const
         {
@@ -197,8 +196,29 @@ namespace ZXNavMesh
                 Vector3(point - preNode->point), Vector3(point - nextNode->point)
             ).z > 0;
         };
+
+        // 根据另外一个点获取当前点对应的线段
+        ClipLine* GetLineByOtherNode(PointLinkNode* otherNode)
+        {
+            for (ClipLine* line : lines)
+            {
+                if (line->B == otherNode || line->A == otherNode)
+                    return line;
+            }
+
+            return nullptr;
+        }
+
+        void AddLine(ClipLine* newLine)
+        {
+            lines.push_back(newLine);
+        }
+        
     private:
         static int pointNum;
+        
+        // 点的所有连线，在三角形裁剪的时候生成
+        vector<ClipLine*> lines;
     };
 
 }

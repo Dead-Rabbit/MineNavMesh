@@ -12,6 +12,7 @@ namespace ZXNavMesh
         static bool IsTriangleOutside(std::vector<Vector3> points)
         {
             double S = 0;
+            
             int n = points.size();
             for (int i = 0; i < n - 1; i++) {
                 const Vector3 point = points[i];
