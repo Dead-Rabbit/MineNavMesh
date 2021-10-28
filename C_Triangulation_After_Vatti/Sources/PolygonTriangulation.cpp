@@ -1,7 +1,9 @@
 ﻿#include "PolygonTriangulation.h"
 
 namespace ZXNavMesh{
-    
+
+    int ClipLine::lineNum = 0;
+    int ClipTriangle::triangleNum = 0;
     int PointLinkNode::pointNum = 0;
     int OutsidePolygon::polygonNum = 0;
 
@@ -221,9 +223,8 @@ namespace ZXNavMesh{
                 cutNode = suitNode;
 
             // 拷贝 对应的Inside节点插入到当前链表中
-            PointLinkNode* copyCutPoint = new PointLinkNode(cutNode->point.x, cutNode->point.y, cutNode->point.z);
-            PointLinkNode* copyRightInsidePoint = new PointLinkNode(rightInsideNode->point.x, rightInsideNode->point.y,
-                rightInsideNode->point.z);
+            PointLinkNode* copyCutPoint = cutNode->CopyNode();
+            PointLinkNode* copyRightInsidePoint = rightInsideNode->CopyNode();
             PointLinkNode* cutNextNode = cutNode->nextNode;  // 裁剪的下一个位置，用来接收新的洞的最后一个点
             PointLinkNode* insidePreNode = rightInsideNode->preNode;
             cutNode->nextNode = rightInsideNode;
@@ -242,43 +243,49 @@ namespace ZXNavMesh{
         this->A = A;
         this->B = B;
         this->C = C;
+        this->num = ++triangleNum;
 
         centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
 
-        // 查找对应点的线段，如果不存在则创建
-        CreateTriangleLine(this->A, this->B);
-        CreateTriangleLine(this->B, this->C);
-        CreateTriangleLine(this->C, this->A);
+        // // 查找对应点的线段，如果不存在则创建
+        // CreateTriangleLine(this->A, this->B);
+        // CreateTriangleLine(this->B, this->C);
+        // CreateTriangleLine(this->C, this->A);
     }
 
-    ClipLine* ClipTriangle::CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB)
-    {
-        // 寻找两点构成的直线
-        ClipLine* lineAB = pA->GetLineByOtherNode(pB);
-        if (lineAB == nullptr)
-        {
-            // 创建并放到各自的点上
-            lineAB = new ClipLine(this->A, this->B);
-            this->A->AddLine(lineAB);
-            this->B->AddLine(lineAB);
-            
-            // 将直线追加到当前三角形记录的line中
-            lines.push_back(lineAB);
-        }
-        
-        // 新增记录在Line中当前三角形的指针
-        auto lineTriangles = lineAB->triangles;
-        const auto findIt = std::find_if(lineTriangles.begin(), lineTriangles.end(),
-            [this](ClipTriangle* triangle)
-            {
-                return this == triangle;
-            });
-        // 没有找到，则在线上新增当前三角形
-        if (findIt == lineTriangles.end())
-            lineTriangles.push_back(this);
-        
-        return lineAB;
-    }
+    // ClipLine* ClipTriangle::CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB)
+    // {
+    //     // 寻找两点构成的直线
+    //     ClipLine* lineAB = pA->GetLineByOtherNode(pB);
+    //     if (lineAB == nullptr)
+    //     {
+    //         lineAB = new ClipLine(pA, pB);
+    //         
+    //         // 创建并放到各自的点上
+    //         std::cout << "创建线段" << lineAB->num << " " << pA->num << "-" << pB->num << endl;
+    //         
+    //         pA->AddLine(lineAB);
+    //         pB->AddLine(lineAB);
+    //         // 将直线追加到当前三角形记录的line中
+    //         lines.push_back(lineAB);
+    //     }
+    //     
+    //     // 新增记录在Line中当前三角形的指针
+    //     auto lineTriangles = lineAB->triangles;
+    //     const auto findIt = std::find_if(lineTriangles.begin(), lineTriangles.end(),
+    //         [this](ClipTriangle* triangle)
+    //         {
+    //             return this == triangle;
+    //         });
+    //     // 没有找到，则在线上新增当前三角形
+    //     if (findIt == lineTriangles.end())
+    //     {
+    //         std::cout << "追加三角形" << this->num << " 到线段" << lineAB->num << "上" << endl;
+    //         lineAB->triangles.push_back(this);
+    //     }
+    //     
+    //     return lineAB;
+    // }
 
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
     {

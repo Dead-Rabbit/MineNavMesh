@@ -21,6 +21,8 @@ Vector2* graphSize = new Vector2(640, 480);
 // 绘制
 void ReDrawBoard();
 void DrawTriangles();
+void DrawPolygonsPoints();
+void DrawPoints(PointLinkNode* firstNode);
 void DrawPath(int pathNum, Path<double> path, COLORREF color);
 
 #endif
@@ -229,6 +231,7 @@ void ReDrawBoard()
     
     settextstyle(20, 0, L"微软雅黑");
     DrawTriangles();
+    DrawPolygonsPoints();
     
     for (int i = 0; i < resultPaths.size(); i++)
     {
@@ -239,11 +242,14 @@ void ReDrawBoard()
 
 void DrawPath(int pathNum, Path<double> path, COLORREF color)
 {
+    if (finishedFindPath)
+        return;
+    
     auto points = path.data;
     for (int i = 0; i < points.size(); i++)
     {
-        auto point = points[i];
-        auto nextPoint = points[i == points.size() - 1 ? 0 : i + 1];
+        const auto point = points[i];
+        const auto nextPoint = points[i == points.size() - 1 ? 0 : i + 1];
         
         setlinecolor(color);
         line(point.x, point.y, nextPoint.x, nextPoint.y);
@@ -264,9 +270,52 @@ void DrawPath(int pathNum, Path<double> path, COLORREF color)
     }
 }
 
+// 使用EasyX 输出点和线
+void DrawPolygonsPoints()
+{
+    for (const OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    {
+        auto firstNode = polygon->GetFirstNode();
+        DrawPoints(firstNode);
+    }
+}
+
+void DrawPoints(PointLinkNode* firstNode)
+{
+    PointLinkNode* curNode = firstNode;
+    if (curNode == nullptr)
+        return;
+
+    do
+    {
+        const Vector3 point = curNode->point;
+        const Vector3 nextPoint = curNode->nextNode->point;
+        
+        // 绘制点
+        setlinecolor(BLACK);
+        setfillcolor(RED);
+    
+        fillcircle(point.x, point.y, 3);
+
+        // 绘制点信息
+        setcolor(BLACK);
+        TCHAR str[25];
+        if (curNode == firstNode)
+            _stprintf_s(str, _T("*%d"), curNode->num, point.x, point.y);
+        else
+            _stprintf_s(str, _T("%d"), curNode->num, point.x, point.y);
+        outtextxy(point.x - 5, point.y - 20, str);
+    
+        // 绘制线
+        setlinecolor(BLACK);
+        line(point.x, point.y, nextPoint.x, nextPoint.y);
+        curNode = curNode->nextNode;
+    } while(curNode != firstNode);
+}
+
 void DrawTriangles()
 {
-    for (OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
+    for (const OutsidePolygon* polygon : triangulationTool.GetOutsidePolygons())
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() == 0)
@@ -276,22 +325,32 @@ void DrawTriangles()
         {
             setlinecolor(GREEN);
             setfillcolor(0xF0FFF0);
-            Vector3 A = triangle->A->point;
-            Vector3 B = triangle->B->point;
-            Vector3 C = triangle->C->point;
+            const Vector3 A = triangle->A->point;
+            const Vector3 B = triangle->B->point;
+            const Vector3 C = triangle->C->point;
             
             line(A.x, A.y, B.x, B.y);
             line(B.x, B.y, C.x, C.y);
             line(C.x, C.y, A.x, A.y);
-            int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
+            const int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
             fillpoly(3, points);
             
             // 绘制内心
             setlinecolor(0xF0FFF0);
             setfillcolor(RED);
-            auto centerPos = triangle->centerPos;
+            const auto centerPos = triangle->centerPos;
             fillcircle(centerPos.x, centerPos.y, 2);
         }
+        
+    //     // 测试绘制第一个三角形的链接情况
+    //     const auto triangle = polygon->GetGenTriangles()[0];
+    //     const auto lines = triangle->lines;
+    //     std::cout << "=====" << endl;
+    //     for (ClipLine* line : lines)
+    //     {
+    //         // 绘制两个三角形之间的连线
+    //         std::cout << "line's triangle's length:" << line->triangles.size() << endl;
+    //     }
     }
 }
 

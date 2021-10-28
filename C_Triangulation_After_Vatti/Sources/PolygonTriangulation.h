@@ -5,6 +5,7 @@
 #include "PolygonTriangulation.h"
 #include "PolygonTriangulation.h"
 #include "PolygonTriangulation.h"
+#include "PolygonTriangulation.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 #include "../../Base/NavMeshHelper.h"
@@ -101,6 +102,16 @@ namespace ZXNavMesh
             return triangles;
         }
 
+        PointLinkNode* GetFirstNode() const
+        {
+            return firstNode;
+        }
+
+        vector<PointLinkNode*> GetInsideFirstNodes() const
+        {
+            return insideFirstNodes;
+        }
+
         // 检查点是否在当前轮廓内
         bool IsPointInPolygon(Vector3 point) const;
         
@@ -136,17 +147,22 @@ namespace ZXNavMesh
     class ClipLine
     {
     public:
-        ClipLine(PointLinkNode* start, PointLinkNode* end)
+        inline ClipLine(PointLinkNode* start, PointLinkNode* end)
         {
             A = start;
             B = end;
+            num = ++lineNum;
         }
+
+        int num;
 		
         PointLinkNode* A;
         PointLinkNode* B;
 
         // 一个线连接的两个三角形，在裁剪的时候生成
         vector<ClipTriangle*> triangles;
+    private:
+        static int lineNum;
     };
     
     /**
@@ -161,12 +177,14 @@ namespace ZXNavMesh
         PointLinkNode* B = nullptr;
         PointLinkNode* C = nullptr;
 
+        int num;
         Vector3 centerPos;
 
         // 三角形对应三个线
-        vector<ClipLine*> lines;
+        // vector<ClipLine*> lines;
     private:
-        ClipLine* CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB);
+        static int triangleNum;
+        // ClipLine* CreateTriangleLine(PointLinkNode* pA, PointLinkNode* pB);
     };
     
     // 耳切法使用点链表节点
@@ -189,6 +207,14 @@ namespace ZXNavMesh
         PointLinkNode* preNode = nullptr;
         PointLinkNode* nextNode = nullptr;
 
+        PointLinkNode* CopyNode()
+        {
+            PointLinkNode* otherNode = new PointLinkNode(point.x, point.y, point.z);
+            linkNode = otherNode;
+            otherNode->linkNode = this;
+            return otherNode;
+        }
+
         // 计算当前角是否为凸角
         bool IsPointConvex() const
         {
@@ -197,28 +223,32 @@ namespace ZXNavMesh
             ).z > 0;
         };
 
-        // 根据另外一个点获取当前点对应的线段
-        ClipLine* GetLineByOtherNode(PointLinkNode* otherNode)
-        {
-            for (ClipLine* line : lines)
-            {
-                if (line->B == otherNode || line->A == otherNode)
-                    return line;
-            }
+        // // 根据另外一个点获取当前点对应的线段
+        // ClipLine* GetLineByOtherNode(PointLinkNode* otherNode)
+        // {
+        //     for (int i = 0; i < lines.size(); ++i)
+        //     {
+        //         ClipLine* line = lines[i];
+        //         if (line->B == otherNode || line->A == otherNode)
+        //             return line;
+        //     }
+        //
+        //     return nullptr;
+        // }
 
-            return nullptr;
-        }
-
-        void AddLine(ClipLine* newLine)
-        {
-            lines.push_back(newLine);
-        }
+        // void AddLine(ClipLine* newLine)
+        // {
+        //     lines.push_back(newLine);
+        // }
         
     private:
         static int pointNum;
         
+        // 影子节点 - 从当前点拷贝或拷贝自其他点，表示连通
+        PointLinkNode* linkNode = nullptr;
+
         // 点的所有连线，在三角形裁剪的时候生成
-        vector<ClipLine*> lines;
+        // vector<ClipLine*> lines;
     };
 
 }
