@@ -46,7 +46,7 @@ bool setStart = true;
 
 ClipTriangle* showTriangle = nullptr;
 int step = 0;
-bool CheckTriangleInfoMod = false;
+bool CheckTriangleInfoMod = true;
 
 int main(int argc, char* argv[])
 {

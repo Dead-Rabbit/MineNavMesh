@@ -98,6 +98,7 @@ namespace PolygonNavMesh
     {
         vector<ClipTriangle*> pathTriangles;
         pathTriangles.push_back(startClipTriangle);
+        std::cout << "end value: " << dis[endTriangle->numInPolygon].value << endl;
         for (ClipTriangle* pathTriangle : dis[endTriangle->numInPolygon].pathTriangle)
         {
             pathTriangles.push_back(pathTriangle);
