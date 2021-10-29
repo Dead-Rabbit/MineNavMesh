@@ -249,12 +249,13 @@ namespace PolygonNavMesh{
         }
     }
 
-    ClipTriangle::ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C)
+    ClipTriangle::ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C, int numInPolygon)
     {
         this->A = A;
         this->B = B;
         this->C = C;
         this->num = ++triangleNum;
+        this->numInPolygon = numInPolygon;
         
         this->points.push_back(this->A);
         this->points.push_back(this->B);
@@ -382,7 +383,7 @@ namespace PolygonNavMesh{
         // 收入最后一个三角形
         if (firstNode->nextNode->nextNode->nextNode == firstNode)
         {
-            triangles.push_back(new ClipTriangle(firstNode, firstNode->preNode, firstNode->nextNode));
+            triangles.push_back(new ClipTriangle(firstNode, firstNode->preNode, firstNode->nextNode, triangles.size()));
             firstNode = nullptr;
             return false;
         }
@@ -403,7 +404,7 @@ namespace PolygonNavMesh{
                 curNode->nextNode->preNode = curNode->preNode;
                 
                 // 追加分割好的三角形
-                ClipTriangle* clipTriangle = new ClipTriangle(curNode, curNode->preNode, curNode->nextNode);
+                ClipTriangle* clipTriangle = new ClipTriangle(curNode, curNode->preNode, curNode->nextNode, triangles.size());
                 triangles.push_back(clipTriangle);
                 
                 return true;

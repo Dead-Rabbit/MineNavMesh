@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{8915B814-23B4-4912-9DEC-2F1D7968ECBB}</ProjectGuid>
+    <ProjectGuid>{3500AED3-BB6A-4D7B-803C-253B55E6995B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>D_NavMesh</RootNamespace>
+    <RootNamespace>E_Dijkstra</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -154,20 +154,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Sources\clipper.cpp" />
-    <ClCompile Include="Sources\clipper_offset.cpp" />
-    <ClCompile Include="Sources\Dijkstra.cpp" />
-    <ClCompile Include="Sources\PolygonNavMeshTool.cpp" />
-    <ClCompile Include="Sources\PolygonTriangulation.cpp" />
+    <ClCompile Include="Dijkstra.cpp" />
+    <ClCompile Include="E_Dijkstra.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\clipper.h" />
-    <ClInclude Include="Sources\clipper_core.hpp" />
-    <ClInclude Include="Sources\clipper_offset.h" />
-    <ClInclude Include="Sources\Dijkstra.h" />
-    <ClInclude Include="Sources\PolygonNavMeshTool.h" />
-    <ClInclude Include="Sources\PolygonTriangulation.h" />
+    <ClInclude Include="Dijkstra.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

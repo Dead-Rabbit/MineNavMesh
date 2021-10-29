@@ -1,5 +1,7 @@
 ﻿#include "PolygonNavMeshTool.h"
 
+#include "Dijkstra.h"
+
 namespace PolygonNavMesh
 {
     void PolygonNavMeshTool::AddPolygonOutsideContour(vector<Vector3> contour)
@@ -49,6 +51,8 @@ namespace PolygonNavMesh
 
             // 三角化，并连接三角形之间的联系
             triangulationTool.EarClipping();
+
+            // TODO 考虑三角化后，生成搜索用 图 组
         }
         return pathsD.data;
     }
@@ -63,9 +67,10 @@ namespace PolygonNavMesh
         ClipTriangle* startTriangle = nullptr;
         ClipTriangle* endTriangle = nullptr;
         // 检查起始点和结束点所在的三角形
-        for (vector<ClipTriangle*> triangles : genTriangleGroups)
+        for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
         {
-            for (ClipTriangle* triangle : triangles)
+            // 在一个三角形组合内搜寻
+            for (ClipTriangle* triangle : triangleGroup)
             {
                 if (startTriangle == nullptr && triangle->IsPointInTriangle(start))
                 {
@@ -80,21 +85,23 @@ namespace PolygonNavMesh
                 }
             }
             
-            // 看看起始三角形是否存在
-            if (startTriangle != nullptr && endTriangle != nullptr)
+            // TODO 两个点都不在这个轮廓中
+            if (startTriangle == nullptr && endTriangle == nullptr)
             {
-                break;
+            
+            } else if(startTriangle != nullptr && endTriangle == nullptr)
+            {
+                // TODO 判断起点在轮廓里，终点不在轮廓里的情况
+            
+            } else if (startTriangle != nullptr && endTriangle != nullptr)
+            {
+                // Dijkstra 查找最短路径，构建三角形图
+                Graph_DG graph = Graph_DG();
+                graph.createGraph(triangleGroup);
+                graph.Dijkstra(startTriangle);
+                pathTriangles = graph.find_path_triangles(endTriangle);
             }
         }
-        
-        // 看看起始三角形是否存在
-        if (startTriangle == nullptr && endTriangle == nullptr)
-        {
-            return pathTriangles;
-        }
-
-        // dfs 查找最短路径
-        // startTriangle->GetLinkedClipTriangles()
         
         return pathTriangles;
     }

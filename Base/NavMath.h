@@ -65,8 +65,8 @@ namespace ZXNavMesh
 		
 		static bool GetSegmentLinesIntersection(const Vector3 p1, const Vector3 p2, const Vector3 p3, const Vector3 p4, Vector3& crossPoint)
 		{
-			double z = p1.z;
-			auto denominator = (p2.y - p1.y) * (p4.x - p3.x) - (p1.x - p2.x) * (p3.y - p4.y);
+			const double z = p1.z;
+			const auto denominator = (p2.y - p1.y) * (p4.x - p3.x) - (p1.x - p2.x) * (p3.y - p4.y);
 			// 如果分母为0，则表示平行或共线，不相交
 			if (denominator == 0)
 			{
@@ -74,10 +74,10 @@ namespace ZXNavMesh
 			}
   
 			// 线段所在直线的交点坐标 (x , y)
-			double x = ((p2.x - p1.x) * (p4.x - p3.x) * (p3.y - p1.y)
+			const double x = ((p2.x - p1.x) * (p4.x - p3.x) * (p3.y - p1.y)
 			  + (p2.y - p1.y) * (p4.x - p3.x) * p1.x
 			  - (p4.y - p3.y) * (p2.x - p1.x) * p3.x) / denominator;
-			double y = -((p2.y - p1.y) * (p4.y - p3.y) * (p3.x - p1.x)
+			const double y = -((p2.y - p1.y) * (p4.y - p3.y) * (p3.x - p1.x)
 			  + (p2.x - p1.x) * (p4.y - p3.y) * p1.y
 			  - (p4.x - p3.x) * (p2.y - p1.y) * p3.y) / denominator;
 		
@@ -99,16 +99,15 @@ namespace ZXNavMesh
 		// 检查点是否在多边形内
 		static bool IsPointInPolygonByRayCast(const std::vector<Vector3> quadPoints, const Vector3 p0)
 		{
-			int pNum = quadPoints.size();
-			Vector3 pt_1, pt_2;
+			const size_t pNum = quadPoints.size();
 			int itJunctionCount = 0;
 			for (int i = 0; i < pNum; i++) {
-				int ni = (i + 1) % pNum;
-				pt_1 = quadPoints[i];
-				pt_2 = quadPoints[ni];
+				const int ni = (i + 1) % pNum;
+				const Vector3 pt_1 = quadPoints[i];
+				const Vector3 pt_2 = quadPoints[ni];
 				if (p0.y >= pt_1.y && p0.y <= pt_2.y || p0.y >= pt_2.y && p0.y <= pt_1.y) {
-					double duT = (p0.y - pt_1.y) / (pt_2.y - pt_1.y);
-					double duXT = pt_1.x + duT * (pt_2.x - pt_1.x);
+					const double duT = (p0.y - pt_1.y) / (pt_2.y - pt_1.y);
+					const double duXT = pt_1.x + duT * (pt_2.x - pt_1.x);
 				
 					if (p0.x == duXT)
 						return true;		// 在线段上表明为True
@@ -123,23 +122,23 @@ namespace ZXNavMesh
 		// 获取三角形的内心
 		static Vector3 CalculateInsideCenter(Vector3 A, Vector3 B, Vector3 C)
 		{
-			Vector3 AB = B - A;
-			Vector3 AC = C - A;
-			Vector3 BA = A - B;
-			Vector3 BC = C - B;
+			const Vector3 AB = B - A;
+			const Vector3 AC = C - A;
+			const Vector3 BA = A - B;
+			const Vector3 BC = C - B;
  
 			Vector3 nBA = BA;
 			nBA.normalise();
 			Vector3 nBC = BC;
 			nBC.normalise();
 
-			float radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
-			float radABC = Acos(BA.dotProduct(BC) / (BA.length() * BC.length()));
+			const float radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
+			const float radABC = Acos(BA.dotProduct(BC) / (BA.length() * BC.length()));
  
-			float halfRadBAC = radBAC / 2.0f;
-			float halfRadABC = radABC / 2.0f;
+			const float halfRadBAC = radBAC / 2.0f;
+			const float halfRadABC = radABC / 2.0f;
  
-			float r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
+			const float r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
  
 			Vector3 P = ((nBA + nBC) / 2.0f).normalized() * r2 + B;
 			return P;
@@ -148,12 +147,12 @@ namespace ZXNavMesh
 	private:
 		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide)
 		{
-			Vector3 AB = B - A ;
-			Vector3 AC = C - A ;
-			Vector3 AP = P - A ;
+			const Vector3 AB = B - A ;
+			const Vector3 AC = C - A ;
+			const Vector3 AP = P - A ;
 
-			Vector3 v1 = AB.crossProduct(AC) ;
-			Vector3 v2 = AB.crossProduct(AP) ;
+			const Vector3 v1 = AB.crossProduct(AC) ;
+			const Vector3 v2 = AB.crossProduct(AP) ;
 
 			if (isPointOnSide)
 				return v1.dotProduct(v2) >= 0 ;

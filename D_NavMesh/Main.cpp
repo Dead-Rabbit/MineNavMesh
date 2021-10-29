@@ -166,8 +166,8 @@ int main(int argc, char* argv[])
                 } else
                 {
                     // 生成路径后，输入开始、结束点，生成路径
-                    Vector3 startPoint = Vector3(201, 286, 0);
-                    Vector3 endPoint = Vector3(433, 219, 0);
+                    Vector3 startPoint = Vector3(109, 249, 0);
+                    Vector3 endPoint = Vector3(512, 116, 0);
                     vector<ClipTriangle*> pathTriangles = polygonNavMeshTool.FindPath(startPoint, endPoint);
                     if (pathTriangles.size() > 0)
                     {
@@ -180,7 +180,6 @@ int main(int argc, char* argv[])
                             Vector3 C = triangle->C->point;
                             const int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
                             fillpoly(3, points);
-                            // line(pathNodes[i].x, pathNodes[i].y, pathNodes[i + 1].x, pathNodes[i + 1].y);
                         }
                     }
                     setfillcolor(BLUE);

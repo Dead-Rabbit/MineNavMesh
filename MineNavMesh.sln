@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C_Triangulation_After_Vatti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D_NavMesh", "D_NavMesh\D_NavMesh.vcxproj", "{8915B814-23B4-4912-9DEC-2F1D7968ECBB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E_Dijkstra", "E_Dijkstra\E_Dijkstra.vcxproj", "{3500AED3-BB6A-4D7B-803C-253B55E6995B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -68,5 +70,13 @@ Global
 		{8915B814-23B4-4912-9DEC-2F1D7968ECBB}.Release|Win32.Build.0 = Release|Win32
 		{8915B814-23B4-4912-9DEC-2F1D7968ECBB}.Release|x64.ActiveCfg = Release|x64
 		{8915B814-23B4-4912-9DEC-2F1D7968ECBB}.Release|x64.Build.0 = Release|x64
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Debug|Win32.Build.0 = Debug|Win32
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Debug|x64.ActiveCfg = Debug|x64
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Debug|x64.Build.0 = Debug|x64
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Release|Win32.ActiveCfg = Release|Win32
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Release|Win32.Build.0 = Release|Win32
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Release|x64.ActiveCfg = Release|x64
+		{3500AED3-BB6A-4D7B-803C-253B55E6995B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

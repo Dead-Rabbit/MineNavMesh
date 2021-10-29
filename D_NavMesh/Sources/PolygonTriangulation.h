@@ -152,7 +152,7 @@ namespace PolygonNavMesh
     class ClipTriangle
     {
     public:
-        ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C);
+        ClipTriangle(PointLinkNode* A, PointLinkNode* B, PointLinkNode* C, int numInPolygon);
 
         PointLinkNode* A = nullptr;
         PointLinkNode* B = nullptr;
@@ -161,6 +161,7 @@ namespace PolygonNavMesh
         vector<PointLinkNode*> points;  // 记录A B C；方便后续遍历用
 
         int num;
+        int numInPolygon = 0;   // 当前三角形在一个轮廓中的编号，从0开始，方便后面使用Dijkstra搜索
         Vector3 centerPos;
 
         // 获取相连通的其他三角形
