@@ -33,8 +33,9 @@ namespace PolygonNavMesh
             triangles_[triangle->numInPolygon] = triangle;
             // 拿到当前三角形的所有相邻三角形
             auto linkedTriangles = triangle->GetLinkedClipTriangles();
-            for (const auto linkedTriangle : linkedTriangles)
+            for (const auto linkedTrianglePair : linkedTriangles)
             {
+                const ClipTriangle* linkedTriangle = linkedTrianglePair.first;
                 const int weight = (triangle->centerPos - linkedTriangle->centerPos).squaredLength();
                 //对邻接矩阵对应上的点赋值
                 arc[triangle->numInPolygon][linkedTriangle->numInPolygon] = weight;
@@ -96,6 +97,7 @@ namespace PolygonNavMesh
     vector<ClipTriangle*> Graph_DG::find_path_triangles(const ClipTriangle* endTriangle) const
     {
         vector<ClipTriangle*> pathTriangles;
+        pathTriangles.push_back(startClipTriangle);
         for (ClipTriangle* pathTriangle : dis[endTriangle->numInPolygon].pathTriangle)
         {
             pathTriangles.push_back(pathTriangle);

@@ -256,10 +256,11 @@ namespace PolygonNavMesh{
         this->C = C;
         this->num = ++triangleNum;
         this->numInPolygon = numInPolygon;
-        
+
+        // 按照逆时针顺序存入
         this->points.push_back(this->A);
-        this->points.push_back(this->B);
         this->points.push_back(this->C);
+        this->points.push_back(this->B);
 
         // 计算当前内心
         centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
@@ -270,7 +271,7 @@ namespace PolygonNavMesh{
         this->C->AddLinkTriangle(this);
     }
 
-    vector<ClipTriangle*> ClipTriangle::GetLinkedClipTriangles()
+    vector<pair<ClipTriangle*, ClipLine*>> ClipTriangle::GetLinkedClipTriangles()
     {
         if (!InitLinkedTriangle)
         {
@@ -278,10 +279,10 @@ namespace PolygonNavMesh{
             for (PointLinkNode* edgePoint : points)
             {
                 // 检查轮廓节点
-                GetLinkedClipTrianglesByPoint(linkedTriangles, edgePoint);
+                GetLinkedClipTrianglesByPoint(edgePoint);
                 // 检查影子节点
                 if (edgePoint->linkNode)
-                    GetLinkedClipTrianglesByPoint(linkedTriangles, edgePoint->linkNode);
+                    GetLinkedClipTrianglesByPoint(edgePoint->linkNode);
             }
             InitLinkedTriangle = false;
         }
@@ -289,43 +290,88 @@ namespace PolygonNavMesh{
         return linkedTriangles;
     }
 
-    void ClipTriangle::GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point)
+    void ClipTriangle::GetLinkedClipTrianglesByPoint(PointLinkNode* point)
     {
         for (ClipTriangle* otherTriangle : point->linkTriangles)
         {
             // 检查其他的三角形是否与当前三角形相交
-            if (otherTriangle != this && IsTriangleLink(otherTriangle))
+            ClipLine* clipLine = new ClipLine;
+            if (otherTriangle != this && IsTriangleLink(otherTriangle, clipLine))
             {
                 // 将三角形push到结果中，检查当前三角形是否已放入
-                auto it = std::find_if(result.begin(), result.end(),
-                    [otherTriangle](ClipTriangle* contentTri)
+                auto it = std::find_if(linkedTriangles.begin(), linkedTriangles.end(),
+                    [otherTriangle](pair<ClipTriangle*, ClipLine*> contentTriPair)
                     {
-                        return contentTri == otherTriangle;
+                        return contentTriPair.first == otherTriangle;
                     });
-                if (it == result.end())
-                    result.push_back(otherTriangle);
+                if (it == linkedTriangles.end())
+                {
+                    linkedTriangles.push_back(pair<ClipTriangle*, ClipLine*>(otherTriangle, clipLine));
+                }
             }
         }
     }
 
-    bool ClipTriangle::IsTriangleLink(const ClipTriangle* otherTriangle)
+    bool ClipTriangle::IsTriangleLink(const ClipTriangle* otherTriangle, ClipLine* outputLine)
     {
         // 两个三角形相连接的点的数量
         int connectPointNum = 0;
+        vector<PointLinkNode*> matchedPoints;
         for (PointLinkNode* otherEdgePoint : otherTriangle->points)
         {
+            int interval = 0;
             // otherPoint 为其他三角形的边框点
             for(int i = 0; i < points.size(); i++)
             {
                 PointLinkNode* edgePoint = points[i];
-                if (edgePoint == otherEdgePoint || edgePoint == otherEdgePoint->linkNode)
+                // 计算到“穿出边”时，需要判断两个三角形是怎么形成的临近
+                // 考虑一种情况为 另外一个三角形的两个点和当前三角形的两个点是通过拷贝形成的
+                if (edgePoint == otherEdgePoint)
                 {
+                    // 按照三角形中
+                    matchedPoints.push_back(edgePoint);
                     connectPointNum++;
+                    interval++;
+                    if (outputLine->A == nullptr)
+                    {
+                        outputLine->A = edgePoint;
+                    } else
+                    {
+                        if (interval == 1)
+                            outputLine->B = edgePoint;
+                        else if (interval == 2)
+                        {
+                            outputLine->B = outputLine->A;
+                            outputLine->A = edgePoint;
+                        }
+                    }
+                    break;
+                }
+                if (edgePoint == otherEdgePoint->linkNode)
+                {
+                    // 按照三角形中
+                    matchedPoints.push_back(edgePoint);
+                    connectPointNum++;
+                    interval++;
+                    if (outputLine->B == nullptr)
+                    {
+                        outputLine->B = edgePoint;
+                    } else
+                    {
+                        if (interval == 1)
+                            outputLine->A = edgePoint;
+                        else if (interval == 2)
+                        {
+                            outputLine->A = outputLine->B;
+                            outputLine->B = edgePoint;
+                        }
+                    }
                     break;
                 }
             }
         }
-        return connectPointNum >= 2;
+        
+        return connectPointNum == 2;
     }
 
     bool ClipTriangle::IsPointInTriangle(Vector3 point)

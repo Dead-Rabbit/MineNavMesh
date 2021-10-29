@@ -20,6 +20,7 @@ using namespace NavMeshBase;
 Vector2* graphSize = new Vector2(640, 480);
 
 // 绘制
+void ClearBoard();
 void ReDrawBoard();
 void DrawTriangles();
 void DrawPolygonsPoints();
@@ -35,6 +36,17 @@ std::vector<Path<double>> resultPaths;
 // 耳切法三角化工具
 
 PolygonNavMeshTool polygonNavMeshTool;
+vector<Vector3> finalPathNodes;
+vector<Vector3> pathBeforeSmooth;
+
+Vector3 startPoint  = Vector3(119, 304, 0);
+Vector3 endPoint    = Vector3(125, 326, 0);
+
+bool setStart = true;
+
+ClipTriangle* showTriangle = nullptr;
+int step = 0;
+bool CheckTriangleInfoMod = false;
 
 int main(int argc, char* argv[])
 {
@@ -43,69 +55,88 @@ int main(int argc, char* argv[])
     vector<vector<Vector3>> outputSubjectPaths;    // 外边框路径
     vector<vector<Vector3>> outputClipPaths;       // 裁剪用路径
     
+    // vector<Vector3> subjectPath = vector<Vector3>();
+    // subjectPath.push_back(Vector3(100, 100, 0));
+    // subjectPath.push_back(Vector3(100, 300, 0));
+    // subjectPath.push_back(Vector3(300, 300, 0));
+    // subjectPath.push_back(Vector3(300, 100, 0));
+    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    // outputSubjectPaths.push_back(subjectPath);
+    //
+    // subjectPath = vector<Vector3>();
+    // subjectPath.push_back(Vector3(240, 100, 0));
+    // subjectPath.push_back(Vector3(240, 300, 0));
+    // subjectPath.push_back(Vector3(600, 200, 0));
+    // subjectPath.push_back(Vector3(600, 100, 0));
+    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    // outputSubjectPaths.push_back(subjectPath);
+    //
+    // vector<Vector3> clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(258, 151, 0));
+    // clipPath.push_back(Vector3(281, 324, 0));
+    // clipPath.push_back(Vector3(324, 317, 0));
+    // clipPath.push_back(Vector3(297, 148, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(387, 158, 0));
+    // clipPath.push_back(Vector3(368, 190, 0));
+    // clipPath.push_back(Vector3(421, 208, 0));
+    // clipPath.push_back(Vector3(458, 161, 0));
+    // clipPath.push_back(Vector3(436, 142, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(489, 139, 0));
+    // clipPath.push_back(Vector3(478, 185, 0));
+    // clipPath.push_back(Vector3(508, 197, 0));
+    // clipPath.push_back(Vector3(528, 158, 0));
+    // clipPath.push_back(Vector3(516, 134, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(158, 174, 0));
+    // clipPath.push_back(Vector3(145, 230, 0));
+    // clipPath.push_back(Vector3(190, 241, 0));
+    // clipPath.push_back(Vector3(212, 200, 0));
+    // clipPath.push_back(Vector3(194, 173, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(288, 131, 0));
+    // clipPath.push_back(Vector3(402, 167, 0));
+    // clipPath.push_back(Vector3(372, 75,  0));
+    // clipPath.push_back(Vector3(302, 62, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+
     vector<Vector3> subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(100, 100, 0));
-    subjectPath.push_back(Vector3(100, 300, 0));
-    subjectPath.push_back(Vector3(300, 300, 0));
-    subjectPath.push_back(Vector3(300, 100, 0));
+    subjectPath.push_back(Vector3(88, 87, 0));
+    subjectPath.push_back(Vector3(90, 410, 0));
+    subjectPath.push_back(Vector3(583, 395, 0));
+    subjectPath.push_back(Vector3(544, 82, 0));
     polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
     outputSubjectPaths.push_back(subjectPath);
-    
-    subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(240, 100, 0));
-    subjectPath.push_back(Vector3(240, 300, 0));
-    subjectPath.push_back(Vector3(600, 200, 0));
-    subjectPath.push_back(Vector3(600, 100, 0));
-    polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
-    outputSubjectPaths.push_back(subjectPath);
-    
+
     vector<Vector3> clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(258, 151, 0));
-    clipPath.push_back(Vector3(281, 324, 0));
-    clipPath.push_back(Vector3(324, 317, 0));
-    clipPath.push_back(Vector3(297, 148, 0));
+    clipPath.push_back(Vector3(445, 216, 0));
+    clipPath.push_back(Vector3(409, 259, 0));
+    clipPath.push_back(Vector3(432, 320, 0));
+    clipPath.push_back(Vector3(487, 331, 0));
+    clipPath.push_back(Vector3(512, 273, 0));
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
     outputClipPaths.push_back(clipPath);
     
     clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(387, 158, 0));
-    clipPath.push_back(Vector3(368, 190, 0));
-    clipPath.push_back(Vector3(421, 208, 0));
-    clipPath.push_back(Vector3(458, 161, 0));
-    clipPath.push_back(Vector3(436, 142, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(489, 139, 0));
-    clipPath.push_back(Vector3(478, 185, 0));
-    clipPath.push_back(Vector3(508, 197, 0));
-    clipPath.push_back(Vector3(528, 158, 0));
-    clipPath.push_back(Vector3(516, 134, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(158, 174, 0));
-    clipPath.push_back(Vector3(145, 230, 0));
-    clipPath.push_back(Vector3(190, 241, 0));
-    clipPath.push_back(Vector3(212, 200, 0));
-    clipPath.push_back(Vector3(194, 173, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(288, 131, 0));
-    clipPath.push_back(Vector3(402, 167, 0));
-    clipPath.push_back(Vector3(372, 75,  0));
-    clipPath.push_back(Vector3(302, 62, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(190, 83,0));
-    clipPath.push_back(Vector3(174, 185, 0));
-    clipPath.push_back(Vector3(240, 67, 0));
+    clipPath.push_back(Vector3(194, 215, 0));
+    clipPath.push_back(Vector3(168, 274, 0));
+    clipPath.push_back(Vector3(241, 325, 0));
+    clipPath.push_back(Vector3(311, 272, 0));
+    clipPath.push_back(Vector3(293, 213, 0));
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
     outputClipPaths.push_back(clipPath);
     
@@ -117,6 +148,7 @@ int main(int argc, char* argv[])
     settextstyle(20, 0, L"微软雅黑");
 
     // 绘制当前调试用
+    ClearBoard();
     ReDrawBoard();
     int outputNum = 0;
     for (int i = 0; i < outputSubjectPaths.size(); i++)
@@ -133,7 +165,6 @@ int main(int argc, char* argv[])
         DrawPath(outputNum, path, RED);
     }
 
-    bool finishedFindPath = false;
     ExMessage m;		// Define a message variable
     while(true)
     {
@@ -143,54 +174,66 @@ int main(int argc, char* argv[])
         {
         case WM_LBUTTONDOWN:
             {
-                ReDrawBoard();
-                std::cout << "Left => (" << m.x << ", " << m.y << ")" << endl;
-                if (!finishedFindPath)
+                ClearBoard();
+                if (step == 0)
                 {
-                    finishedFindPath = true;
-                    std::vector<Path<double>> paths = polygonNavMeshTool.GenFinalTriangles();
-
-                    for (Path<double> path : paths)
+                    step++;
+                    // 1. 进行三角化
+                    vector<vector<ClipTriangle*>> triangleGroups = polygonNavMeshTool.GenerateFinalTriangles();
+                    
+                    // 绘制生成的三角形
+                    for (vector<ClipTriangle*> triangles : triangleGroups)
                     {
                         setcolor(BLACK);
-                        Point<double> preP = path.data[0];
-                        for (int j = 0; j < path.data.size(); j++)
+                        for (ClipTriangle* drawTriangle : triangles)
                         {
-                            auto point = path.data[j];
-                            line(preP.x, preP.y, point.x, point.y);
-                            preP = point;   
+                            auto A = drawTriangle->A->point, B = drawTriangle->B->point, C = drawTriangle->C->point;
+                            line(A.x, A.y, B.x, B.y);
+                            line(B.x, B.y, C.x, C.y);
+                            line(C.x, C.y, A.x, A.y);
                         }
-                        line(path.data[path.data.size() - 1].x, path.data[path.data.size() - 1].y,
-                            path.data[0].x, path.data[0].y);
                     }
+                } else if (step == 1)
+                {
+                    step++;
+                    // 2. 生成路径后，输入开始、结束点，生成路径
+                    finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
                 } else
                 {
-                    // 生成路径后，输入开始、结束点，生成路径
-                    Vector3 startPoint = Vector3(109, 249, 0);
-                    Vector3 endPoint = Vector3(512, 116, 0);
-                    vector<ClipTriangle*> pathTriangles = polygonNavMeshTool.FindPath(startPoint, endPoint);
-                    if (pathTriangles.size() > 0)
+                    step++;
+                    if (CheckTriangleInfoMod)
                     {
-                        setfillcolor(YELLOW);
-                        for (int i = 0; i < pathTriangles.size(); i++)
+                        // 输出当前点击三角形的信息
+                        showTriangle = nullptr;
+                        vector<vector<ClipTriangle*>> triangleGroups = polygonNavMeshTool.GetGenTriangles();
+                        for (auto triangle_group : triangleGroups)
                         {
-                            auto triangle = pathTriangles[i];
-                            Vector3 A = triangle->A->point;
-                            Vector3 B = triangle->B->point;
-                            Vector3 C = triangle->C->point;
-                            const int points[] = {A.x, A.y, B.x, B.y, C.x, C.y};
-                            fillpoly(3, points);
+                            for (auto triangle : triangle_group)
+                            {
+                                if (triangle->IsPointInTriangle(Vector3(m.x, m.y, 0)))
+                                {
+                                    showTriangle = triangle;
+                                    break;
+                                }
+                            }
                         }
+                    } else
+                    {
+                        const auto clickPos = Vector3(m.x, m.y, 0);
+                        startPoint = clickPos;
+                        finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
                     }
-                    setfillcolor(BLUE);
-                    fillcircle(startPoint.x, startPoint.y, 3);
-                    setfillcolor(RED);
-                    fillcircle(endPoint.x, endPoint.y, 3);
                 }
+                ReDrawBoard();
             }break;
         case WM_RBUTTONDOWN:
             {
-                std::cout << "Right => (" << m.x << ", " << m.y << ")" << endl;
+                ClearBoard();
+                std::cout << "(" << m.x << ", " << m.y << ")" << endl;
+                const auto clickPos = Vector3(m.x, m.y, 0);
+                endPoint = clickPos;
+                finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
+                ReDrawBoard();
             }
             break;
         case WM_KEYDOWN:
@@ -200,7 +243,7 @@ int main(int argc, char* argv[])
         }
     }
 #else
-    polygonNavMeshTool.GenFinalTriangles();
+    polygonNavMeshTool.GenerateFinalTriangles();
     int outTriangleNum = 1;
     for (OutsidePolygon* polygon : polygonNavMeshTool.GetOutsidePolygons())
     {
@@ -220,12 +263,15 @@ int main(int argc, char* argv[])
 
 #ifdef USE_EASYX_GRAPHICS
 
-void ReDrawBoard()
+void ClearBoard()
 {
     cleardevice();
     setfillcolor(WHITE);
     solidrectangle(0, 0, graphSize->x, graphSize->y); // 填充背景色
-    
+}
+
+void ReDrawBoard()
+{
     settextstyle(25, 0, L"微软雅黑");
     setcolor(BLACK);
     TCHAR str[25];
@@ -235,6 +281,44 @@ void ReDrawBoard()
     settextstyle(20, 0, L"微软雅黑");
     DrawTriangles();
     DrawPolygonsPoints();
+    
+    setfillcolor(BLUE);
+    fillcircle(startPoint.x, startPoint.y, 3);
+    setfillcolor(RED);
+    fillcircle(endPoint.x, endPoint.y, 3);
+
+    // 绘制最终生成的路线
+    setcolor(BLACK);
+    if (finalPathNodes.size() > 0)
+    {
+        for (int z = 0; z < finalPathNodes.size() - 1; z++)
+        {
+            const auto point = finalPathNodes[z];
+            const auto nextPoint = finalPathNodes[z + 1];
+            line(point.x, point.y, nextPoint.x, nextPoint.y);
+        }
+        
+        // 输出 Triangle Pos Path
+        setlinecolor(RED);
+        for (int z = 0; z < pathBeforeSmooth.size() - 1; z++)
+        {
+            const auto point = pathBeforeSmooth[z];
+            const auto nextPoint = pathBeforeSmooth[z + 1];
+            line(point.x, point.y, nextPoint.x, nextPoint.y);
+        }
+    }
+    
+    setcolor(BLACK);
+    // 绘制所选三角形信息
+    if (showTriangle != nullptr)
+    {
+        std::cout << "[" << showTriangle->num <<  "] 临近三角形: ";
+        for (const auto otherTriangle : showTriangle->GetLinkedClipTriangles())
+        {
+            std::cout << otherTriangle.first->num << " ";
+        }
+        std::cout << endl;
+    }
 }
 
 void DrawPath(int pathNum, vector<Vector3> points, COLORREF color)
@@ -259,7 +343,6 @@ void DrawPath(int pathNum, vector<Vector3> points, COLORREF color)
             _stprintf_s(str, _T("%d"), i + 1);
             outtextxy(point.x - 5, point.y - 20, str);
         }
-        
     }
 }
 
@@ -317,7 +400,11 @@ void DrawTriangles()
         for (ClipTriangle* triangle : triangles)
         {
             setlinecolor(GREEN);
-            setfillcolor(0xF0FFF0);
+            
+            if (triangle != showTriangle)
+                setfillcolor(0xF0FFF0); // 浅绿色
+            else
+                setfillcolor(0x00CED1); // 蓝色
             const Vector3 A = triangle->A->point;
             const Vector3 B = triangle->B->point;
             const Vector3 C = triangle->C->point;
@@ -335,12 +422,17 @@ void DrawTriangles()
             fillcircle(centerPos.x, centerPos.y, 2);
             
             setlinecolor(BLUE);
-            const auto firstPos = triangle->centerPos;
-            for (const ClipTriangle* otherTriangle : triangle->GetLinkedClipTriangles())
-            {
-                const auto secondPos = otherTriangle->centerPos;
-                line(firstPos.x, firstPos.y, secondPos.x, secondPos.y);
-            }
+        }
+        
+        for (ClipTriangle* triangle : triangles)
+        {
+            // 绘制内心
+            setlinecolor(0xF0FFF0);
+            setfillcolor(RED);
+            const auto centerPos = triangle->centerPos;
+            TCHAR str[25];
+            _stprintf_s(str, _T("%d"), triangle->num);
+            outtextxy(centerPos.x - 5, centerPos.y - 20, str);
         }
     }
 }

@@ -17,6 +17,7 @@ using namespace ZXNavMesh;
 namespace PolygonNavMesh
 {
     class PointLinkNode;
+    class ClipLine;
     class ClipTriangle;
     class OutsidePolygon;
 
@@ -147,7 +148,20 @@ namespace PolygonNavMesh
     };
 
     /**
+     * 耳切法中会使用的线
+     * 方向为 A -> B
+     * Line的方向来自 Polygon 中的逆时针路线
+     */
+    class ClipLine
+    {
+    public:
+        PointLinkNode* A = nullptr;
+        PointLinkNode* B = nullptr;
+    };
+
+    /**
      *  耳切法最终生成的三角形
+     *  顶点的存放数据为 (A->C->B->A 逆时针)
      */
     class ClipTriangle
     {
@@ -165,13 +179,14 @@ namespace PolygonNavMesh
         Vector3 centerPos;
 
         // 获取相连通的其他三角形
-        vector<ClipTriangle*> GetLinkedClipTriangles();
+        vector<pair<ClipTriangle*, ClipLine*>> GetLinkedClipTriangles();
 
         /**
          *  <summary>检查点是否为当前的轮廓点，包括轮廓点的影子点</summary>
          *  <param name="otherTriangle">检查的其他三角形</param>
+         *  <param name="outputLine">裁剪出的线</param>
          */
-        bool IsTriangleLink(const ClipTriangle* otherTriangle);
+        bool IsTriangleLink(const ClipTriangle* otherTriangle, ClipLine* outputLine);
 
         /**
          *  <summary>检查点是否在当前三角形内</summary>
@@ -182,9 +197,9 @@ namespace PolygonNavMesh
     private:
         static int triangleNum;
         bool InitLinkedTriangle = false;
-        vector<ClipTriangle*> linkedTriangles;
+        vector<pair<ClipTriangle*, ClipLine*>> linkedTriangles;
         // 获取相连通的其他三角形
-        void GetLinkedClipTrianglesByPoint(vector<ClipTriangle*> &result, PointLinkNode* point);
+        void GetLinkedClipTrianglesByPoint(PointLinkNode* point);
     };
     
     // 耳切法使用点链表节点
