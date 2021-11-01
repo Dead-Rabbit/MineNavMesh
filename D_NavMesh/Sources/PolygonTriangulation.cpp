@@ -263,8 +263,10 @@ namespace PolygonNavMesh{
         this->points.push_back(this->B);
 
         // 计算当前内心
-        centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
-
+        // centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
+        // 计算当前质心
+        centerPos = (this->A->point + this->B->point + this->C->point) / 3;
+        
         // 将三角形push到三个点中
         this->A->AddLinkTriangle(this);
         this->B->AddLinkTriangle(this);
@@ -316,54 +318,34 @@ namespace PolygonNavMesh{
     {
         // 两个三角形相连接的点的数量
         int connectPointNum = 0;
+        int preLinkIndex = 0;
         vector<PointLinkNode*> matchedPoints;
         for (PointLinkNode* otherEdgePoint : otherTriangle->points)
         {
-            int interval = 0;
             // otherPoint 为其他三角形的边框点
             for(int i = 0; i < points.size(); i++)
             {
                 PointLinkNode* edgePoint = points[i];
                 // 计算到“穿出边”时，需要判断两个三角形是怎么形成的临近
                 // 考虑一种情况为 另外一个三角形的两个点和当前三角形的两个点是通过拷贝形成的
-                if (edgePoint == otherEdgePoint)
+                if (edgePoint == otherEdgePoint || edgePoint == otherEdgePoint->linkNode)
                 {
                     // 按照三角形中
                     matchedPoints.push_back(edgePoint);
                     connectPointNum++;
-                    interval++;
                     if (outputLine->A == nullptr)
                     {
                         outputLine->A = edgePoint;
+                        preLinkIndex = i;
                     } else
                     {
-                        if (interval == 1)
+                        const int interval = i - preLinkIndex;
+                        if (interval == 1 || interval == -2)
                             outputLine->B = edgePoint;
-                        else if (interval == 2)
+                        else if (interval == 2 || interval == -1)
                         {
                             outputLine->B = outputLine->A;
                             outputLine->A = edgePoint;
-                        }
-                    }
-                    break;
-                }
-                if (edgePoint == otherEdgePoint->linkNode)
-                {
-                    // 按照三角形中
-                    matchedPoints.push_back(edgePoint);
-                    connectPointNum++;
-                    interval++;
-                    if (outputLine->B == nullptr)
-                    {
-                        outputLine->B = edgePoint;
-                    } else
-                    {
-                        if (interval == 1)
-                            outputLine->A = edgePoint;
-                        else if (interval == 2)
-                        {
-                            outputLine->A = outputLine->B;
-                            outputLine->B = edgePoint;
                         }
                     }
                     break;

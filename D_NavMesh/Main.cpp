@@ -39,14 +39,14 @@ PolygonNavMeshTool polygonNavMeshTool;
 vector<Vector3> finalPathNodes;
 vector<Vector3> pathBeforeSmooth;
 
-Vector3 startPoint  = Vector3(119, 304, 0);
-Vector3 endPoint    = Vector3(125, 326, 0);
+Vector3 startPoint  = Vector3(264, 204, 0);
+Vector3 endPoint    = Vector3(308, 291, 0);
 
 bool setStart = true;
 
 ClipTriangle* showTriangle = nullptr;
 int step = 0;
-bool CheckTriangleInfoMod = true;
+bool CheckTriangleInfoMod = false;
 
 int main(int argc, char* argv[])
 {
@@ -313,9 +313,18 @@ void ReDrawBoard()
     if (showTriangle != nullptr)
     {
         std::cout << "[" << showTriangle->num <<  "] 临近三角形: ";
+        int showRadius = 2;
         for (const auto otherTriangle : showTriangle->GetLinkedClipTriangles())
         {
             std::cout << otherTriangle.first->num << " ";
+            auto firstP = otherTriangle.second->A->point, secondP = otherTriangle.second->B->point;
+            // 显示链接的起始点和结束点
+            setlinecolor(GREEN);
+            showRadius += 1.5;
+            circle(firstP.x, firstP.y, showRadius);
+            setlinecolor(RED);
+            showRadius += 1.5;
+            circle(secondP.x, secondP.y, showRadius);
         }
         std::cout << endl;
     }
