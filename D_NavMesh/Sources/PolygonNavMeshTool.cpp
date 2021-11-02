@@ -104,8 +104,6 @@ namespace PolygonNavMesh
                 // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
                 // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
                 {
-                    cout << "-------------------->>>" << endl;
-                    
                     ClipTriangle* preTriangle = nullptr;
                     Vector3 leftPoint;                  // 当前记录的出口线的左点
                     Vector3 rightPoint;                 // 当前记录的出口线的右点
@@ -115,6 +113,8 @@ namespace PolygonNavMesh
                     pathBeforeSmooth.push_back(startPoint);
                     Vector3 curPoint = startPoint;  // 当前节点
                     vector<ClipLine*> pathLines;
+                    std::cout << "Vector3 startPoint  = Vector3(" << startPoint.x << ", " << startPoint.y << ", 0);" << endl;
+                    std::cout << "Vector3 endPoint    = Vector3(" << endPoint.x << ", " << endPoint.y << ", 0);" << endl;
                     // 获取所有路径穿出口
                     for (int i = 0; i < pathTriangles.size(); i++)
                     {
@@ -139,12 +139,16 @@ namespace PolygonNavMesh
                             {
                                 const auto clipLine = preLinkPair.second;
                                 pathLines.push_back(clipLine);
+                                std::cout << "pathLines.push_back(Line(Vector3" << clipLine->A->point
+                                << ",Vector3" << clipLine->B->point << "));" << endl;
                                 break;
                             }
                         }
                         preTriangle = curTriangle;
                     }
 
+                    cout << "-------------------->>>" << endl;
+                    
                     bool recordPoint = true;
                     // 遍历所有相交线，获得最终路径
                     for(int i = 0; i < pathLines.size(); i++)
@@ -173,16 +177,12 @@ namespace PolygonNavMesh
                             if (rightCrossLeftRes.z < 0)
                             {
                                 leftPoint = lineLeft;
-                                cout << "Left inside" << endl;
                             } else
                             {
                                 // 当前情况为，线的left节点在目前right节点的right或直线上
                                 // 则记录当前right点为节点，并将left 和 right 节点置为当前线上的节点
-                                cout << "Left outside Of Right" << endl;
                                 finalPath.push_back(rightPoint);
                                 curPoint = rightPoint;
-                                // leftPoint = lineLeft;
-                                // rightPoint = lineRight;
                                 recordPoint = true;
                             }
                         }
@@ -195,17 +195,12 @@ namespace PolygonNavMesh
                             if (leftCrossRightRes.z > 0)
                             {
                                 rightPoint = lineRight;
-                                cout << "Right inside" << endl;
                             } else
                             {
                                 // 当前情况为，线的Right节点在目前left节点的left或直线上
                                 // 则记录当前left点为节点，并将left 和 right 节点置为当前线上的节点
-                                cout << "Right outside" << endl;
-                                
                                 finalPath.push_back(leftPoint);
                                 curPoint = leftPoint;
-                                // leftPoint = lineLeft;
-                                // rightPoint = lineRight;
                                 recordPoint = true;
                             }
                         }
@@ -214,7 +209,6 @@ namespace PolygonNavMesh
                     // 判断左点的情况
                     Vector3 leftCrossEndRes = (leftPoint - curPoint).crossProduct(endPoint - curPoint);
                     Vector3 rightCrossEndRes = (rightPoint - curPoint).crossProduct(endPoint - curPoint);
-                    cout << leftCrossEndRes.z << " - " << rightCrossEndRes.z << endl;
                     if (rightCrossEndRes.z >= 0)
                     {
                         // 追加右侧侧的遗留内容

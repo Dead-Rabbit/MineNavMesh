@@ -62,25 +62,24 @@ void ClearBoard()
 void DoCheckOnStep();
 void ReDrawBoard();
 
-Vector3 startPoint  = Vector3(295,344, 0);
-Vector3 endPoint    = Vector3(266,195, 0);
 vector<Line> pathLines;
 int drawFromToNum = -1;
+Vector3 startPoint  = Vector3(204, 200, 0);
+Vector3 endPoint    = Vector3(179, 305, 0);
 
 int main(int argc, char* argv[])
 {
+    // 输入lines
+    pathLines.push_back(Line(Vector3(88,87),Vector3(194,215)));
+    pathLines.push_back(Line(Vector3(88,87),Vector3(168,274)));
+    pathLines.push_back(Line(Vector3(90,410),Vector3(168,274)));
+
     // 绘制裁剪前的图形
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
     settextstyle(20, 0, L"微软雅黑");
     ClearBoard();
     ReDrawBoard();
-
-    // 输入lines
-    pathLines.push_back(Line(Vector3(583,395), Vector3(512,273)));
-    pathLines.push_back(Line(Vector3(544,82), Vector3(512,273)));
-    pathLines.push_back(Line(Vector3(544,82), Vector3(445,216)));
-    pathLines.push_back(Line(Vector3(544,82), Vector3(409,259)));
 
     // 拿到起始点和结束点
     ExMessage m;		// Define a message variable
@@ -108,103 +107,39 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-Vector3 leftPoint = Vector3(0, 0);
-Vector3 rightPoint = Vector3(0, 0);
+Vector3 rightLeg;
+Vector3 leftLeg;
 Vector3 curPoint = Vector3(0, 0);
+int recordRightIndex = 0;
+int recordLeftIndex = 0;
 vector<Vector3> finalPath;
 bool recordPoint = true;
+// funnel-algorithm
+// https://github.com/TheGoozah/AIProgramming
 void DoCheckOnStep()
 {
-    leftPoint = Vector3(0, 0);
-    rightPoint = Vector3(0, 0);
-    curPoint = startPoint;
-    recordPoint = true;
+    // 准备
     finalPath.clear();
     finalPath.push_back(startPoint);
 
+    if (pathLines.size() == 0)
+        return;
+    
+    curPoint = startPoint;
+    rightLeg = pathLines[0].from - curPoint;
+    leftLeg = pathLines[0].end - curPoint;
+    
     // 执行至第几步
     for(int i = 0; i < pathLines.size(); i++)
     {
         if (i > drawFromToNum)
             return;
         
-        Line curLine = pathLines[i];
-        Vector3 lineRight = curLine.from;
-        Vector3 lineLeft = curLine.end;
+        auto curLine = pathLines[i];
         
-        if (recordPoint)
-        {
-            leftPoint = lineLeft;
-            rightPoint = lineRight;
-            recordPoint = false;
-            continue;
-        }
-
-        cout << "-----------------" << i << endl;
-
-        // 检查left 或 right 是否越界, z 表达为，负数在Left，正数在Right
-        Vector3 leftCrossEndRes = (lineLeft - curPoint).crossProduct(endPoint - curPoint);
-        Vector3 rightCrossEndRes = (lineRight - curPoint).crossProduct(endPoint - curPoint);
-        // 判断左点的情况
-        Vector3 leftCrossLeftRes = (leftPoint - curPoint).crossProduct(lineLeft - curPoint);
-        Vector3 rightCrossLeftRes = (rightPoint - curPoint).crossProduct(lineLeft - curPoint);
-        if (leftCrossLeftRes.z > 0)
-        {
-            if (rightCrossLeftRes.z < 0)
-            {
-                leftPoint = lineLeft;
-                cout << "Left inside" << endl;
-            } else
-            {
-                // 当前情况为，线的left节点在目前right节点的right或直线上
-                // 则记录当前right点为节点，并将left 和 right 节点置为当前线上的节点
-                cout << "Left outside Of Right" << endl;
-                finalPath.push_back(rightPoint);
-                curPoint = rightPoint;
-                // leftPoint = lineLeft;
-                // rightPoint = lineRight;
-                recordPoint = true;
-            }
-        }
+        auto newRightLeg = curLine.from - curPoint;
+        // auto cpTightenFunnel = 
         
-        // 判断右点情况
-        Vector3 leftCrossRightRes = (leftPoint - curPoint).crossProduct(lineRight - curPoint);
-        Vector3 rightCrossRightRes = (rightPoint - curPoint).crossProduct(lineRight - curPoint);
-        if (rightCrossRightRes.z < 0)
-        {
-            if (leftCrossRightRes.z > 0)
-            {
-                rightPoint = lineRight;
-                cout << "Right inside" << endl;
-            } else
-            {
-                // 当前情况为，线的Right节点在目前left节点的left或直线上
-                // 则记录当前left点为节点，并将left 和 right 节点置为当前线上的节点
-                cout << "Right outside" << endl;
-                
-                finalPath.push_back(leftPoint);
-                curPoint = leftPoint;
-                // leftPoint = lineLeft;
-                // rightPoint = lineRight;
-                recordPoint = true;
-            }
-        }
-    }
-    
-    // 判断左点的情况
-    Vector3 leftCrossEndRes = (leftPoint - curPoint).crossProduct(endPoint - curPoint);
-    Vector3 rightCrossEndRes = (rightPoint - curPoint).crossProduct(endPoint - curPoint);
-    cout << leftCrossEndRes.z << " - " << rightCrossEndRes.z << endl;
-    if (rightCrossEndRes.z >= 0)
-    {
-        // 追加右侧侧的遗留内容
-        finalPath.push_back(rightPoint);
-    }
-    
-    if (leftCrossEndRes.z <= 0)
-    {
-        // 追加左侧的遗留内容
-        finalPath.push_back(leftPoint);
     }
     
     finalPath.push_back(endPoint);
@@ -238,12 +173,6 @@ void ReDrawBoard()
         }
     }
 
-    // 绘制起始点
-    // setfillcolor(RED);
-    // fillcircle(startPoint.x, startPoint.y, 2);
-    // setfillcolor(GREEN);
-    // fillcircle(endPoint.x, endPoint.y, 2);
-
     // 绘制拐角法
     setfillcolor(BLACK);
     setlinecolor(BLACK);
@@ -261,10 +190,19 @@ void ReDrawBoard()
 
     // 绘制平滑后的内容
     Vector3 prePoint = startPoint;
-    setlinecolor(BROWN);
+    setlinecolor(RED);
+    auto preLineStyle = new LINESTYLE();
+    getlinestyle(preLineStyle);
+    auto newLineStyle = new LINESTYLE();
+    newLineStyle->style = preLineStyle->style;
+    newLineStyle->thickness = 2;
+    newLineStyle->puserstyle = preLineStyle->puserstyle;
+    newLineStyle->userstylecount = preLineStyle->userstylecount;
+    setlinestyle(newLineStyle);
     for (Vector3 pathPoint : finalPath)
     {
         line(prePoint.x, prePoint.y, pathPoint.x, pathPoint.y);
         prePoint = pathPoint;
     }
+    setlinestyle(preLineStyle);
 }
