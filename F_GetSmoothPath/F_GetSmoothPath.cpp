@@ -110,9 +110,9 @@ int main(int argc, char* argv[])
 Vector3 rightLeg;
 Vector3 leftLeg;
 Vector3 curPoint = Vector3(0, 0);
-int recordRightIndex = 0;
-int recordLeftIndex = 0;
+auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
 vector<Vector3> finalPath;
+int rightLegIndex = 0;
 bool recordPoint = true;
 // funnel-algorithm
 // https://github.com/TheGoozah/AIProgramming
@@ -121,6 +121,7 @@ void DoCheckOnStep()
     // 准备
     finalPath.clear();
     finalPath.push_back(startPoint);
+    rightLegIndex = 0;
 
     if (pathLines.size() == 0)
         return;
@@ -134,15 +135,79 @@ void DoCheckOnStep()
     {
         if (i > drawFromToNum)
             return;
-        
+
         auto curLine = pathLines[i];
-        
+
         auto newRightLeg = curLine.from - curPoint;
-        // auto cpTightenFunnel = 
-        
+        auto cpTightenFunnel = newRightLeg.crossProduct(rightLeg);
+        if (cpTightenFunnel <= 0.0f)
+        {
+            auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
+            if (cpDenegrateFunnel > 0.0f) //No overlap, tighten!
+            {
+                rightLeg = newRightLeg;
+                rightLegIndex = i;
+            }
+            else
+            {
+                //Leftleg becomes new apex point
+                curPoint += leftLeg;
+                curPointIndex = leftLegIndex;
+                unsigned int newIt = curPointIndex + 1;
+                leftLegIndex = newIt;
+                rightLegIndex = newIt;
+                i = newIt;
+
+                //Store point
+                finalPath.push_back(curPoint);
+
+                //Calculate new legs (if not the end)
+                if (newIt < pathLines.size())
+                {
+                    rightLeg = pathLines[rightLegIndex].from - curPoint;
+                    leftLeg = pathLines[leftLegIndex].end - curPoint;
+                    continue; //Restart
+                }
+            }
+        }
+
+        //--- LEFT CHECK ---
+        //1. See if moving funnel inwards - LEFT
+        auto newLeftLeg = curLine.end - curPoint;
+        cpTightenFunnel = Cross(newLeftLeg, leftLeg);
+        if (cpTightenFunnel >= 0.0f) //Move inwards
+        {
+            //2. See if new line degenerates a line segment - LEFT
+            auto cpDenegrateFunnel = Cross(newLeftLeg, rightLeg);
+            if (cpDenegrateFunnel < 0.0f) //No overlap, tighten!
+            {
+                leftLeg = newLeftLeg;
+                leftLegIndex = i;
+                leftChanged = true;
+            }
+            else
+            {
+                //Rightleg becomes new curPoint point
+                curPoint += rightLeg;
+                curPointIndex = rightLegIndex;
+                unsigned int newIt = curPointIndex + 1;
+                leftLegIndex = newIt;
+                rightLegIndex = newIt;
+                i = newIt;
+                //Store point
+                finalPath.push_back(curPoint);
+                //Calculate new legs (if not the end)
+                if (newIt < pathLines.size())
+                {
+                    //Calculate new legs (if not the end)
+                    rightLeg = pathLines[rightLegIndex].from - curPoint;
+                    leftLeg = pathLines[leftLegIndex].end - curPoint;
+                }
+            }
+        }
     }
     
-    finalPath.push_back(endPoint);
+//    finalPath.push_back(endPoint);
 }
 
 void ReDrawBoard()
