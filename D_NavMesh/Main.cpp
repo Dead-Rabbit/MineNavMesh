@@ -37,7 +37,6 @@ std::vector<Path<double>> resultPaths;
 
 PolygonNavMeshTool polygonNavMeshTool;
 vector<Vector3> finalPathNodes;
-vector<Vector3> pathBeforeSmooth;
 
 Vector3 startPoint  = Vector3(264, 204, 0);
 Vector3 endPoint    = Vector3(308, 291, 0);
@@ -197,7 +196,7 @@ int main(int argc, char* argv[])
                 {
                     step++;
                     // 2. 生成路径后，输入开始、结束点，生成路径
-                    finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
+                    finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                 } else
                 {
                     step++;
@@ -221,7 +220,7 @@ int main(int argc, char* argv[])
                     {
                         const auto clickPos = Vector3(m.x, m.y, 0);
                         startPoint = clickPos;
-                        finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
+                        finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                     }
                 }
                 ReDrawBoard();
@@ -232,7 +231,7 @@ int main(int argc, char* argv[])
                 std::cout << "(" << m.x << ", " << m.y << ")" << endl;
                 const auto clickPos = Vector3(m.x, m.y, 0);
                 endPoint = clickPos;
-                finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint, pathBeforeSmooth);
+                finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                 ReDrawBoard();
             }
             break;
@@ -297,15 +296,6 @@ void ReDrawBoard()
             const auto nextPoint = finalPathNodes[z + 1];
             line(point.x, point.y, nextPoint.x, nextPoint.y);
         }
-        
-        // 输出 Triangle Pos Path
-        // setlinecolor(RED);
-        // for (int z = 0; z < pathBeforeSmooth.size() - 1; z++)
-        // {
-        //     const auto point = pathBeforeSmooth[z];
-        //     const auto nextPoint = pathBeforeSmooth[z + 1];
-        //     line(point.x, point.y, nextPoint.x, nextPoint.y);
-        // }
     }
     
     setcolor(BLACK);

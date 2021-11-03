@@ -37,7 +37,7 @@ namespace PolygonNavMesh
          *  <param name="start">起始点</param>
          *  <param name="end">结束点</param>
          */
-        vector<Vector3> FindPath(Vector3 start, Vector3 end, vector<Vector3> &pathBeforeSmooth);
+        vector<Vector3> FindPath(Vector3 start, Vector3 end);
 
         vector<OutsidePolygon*> GetOutsidePolygons() const
         {

@@ -57,7 +57,7 @@ namespace PolygonNavMesh
         return triangulationTool.GetGenTriangles();
     }
 
-    vector<Vector3> PolygonNavMeshTool::FindPath(Vector3 startPoint, Vector3 endPoint, vector<Vector3> &pathBeforeSmooth)
+    vector<Vector3> PolygonNavMeshTool::FindPath(Vector3 startPoint, Vector3 endPoint)
     {
         vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
         
@@ -102,18 +102,15 @@ namespace PolygonNavMesh
                 pathTriangles = graph.find_path_triangles(endTriangle);
 
                 // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
-                // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
                 {
                     ClipTriangle* preTriangle = nullptr;
                     vector<ClipLine*> pathLines;
-                    std::cout << "Vector3 startPoint  = Vector3(" << startPoint.x << ", " << startPoint.y << ", 0);" << endl;
-                    std::cout << "Vector3 endPoint    = Vector3(" << endPoint.x << ", " << endPoint.y << ", 0);" << endl;
+                    // std::cout << "Vector3 startPoint  = Vector3(" << startPoint.x << ", " << startPoint.y << ", 0);" << endl;
+                    // std::cout << "Vector3 endPoint    = Vector3(" << endPoint.x << ", " << endPoint.y << ", 0);" << endl;
                     // 获取所有路径穿出口
                     for (int i = 0; i < pathTriangles.size(); i++)
                     {
                         const auto curTriangle = pathTriangles[i];
-                        
-                        pathBeforeSmooth.push_back(curTriangle->centerPos);
                         
                         if (preTriangle == nullptr)
                         {
@@ -132,8 +129,8 @@ namespace PolygonNavMesh
                             {
                                 const auto clipLine = preLinkPair.second;
                                 pathLines.push_back(clipLine);
-                                std::cout << "pathLines.push_back(Line(Vector3" << clipLine->A->point
-                                << ",Vector3" << clipLine->B->point << "));" << endl;
+                                // std::cout << "pathLines.push_back(Line(Vector3" << clipLine->A->point
+                                // << ",Vector3" << clipLine->B->point << "));" << endl;
                                 break;
                             }
                         }
@@ -146,17 +143,14 @@ namespace PolygonNavMesh
                     finalClipLine->B = endPointLinkNode;
                     pathLines.push_back(finalClipLine);
 
-                    cout << "-------------------->>>" << endl;
-                    
                     vector<Vector3> finalPath;          // 最终输出路径
                     finalPath.push_back(startPoint);
-                    pathBeforeSmooth.clear();
-                    pathBeforeSmooth.push_back(startPoint);
                     Vector3 curPoint = startPoint;  // 当前节点
                     Vector3 rightLeg = pathLines[0]->A->point - curPoint;
                     Vector3 leftLeg = pathLines[0]->B->point - curPoint;
                     auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
                     // 遍历所有相交线，获得最终路径
+                    // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
                     for(int i = 0; i < pathLines.size(); i++)
                     {
                         auto curLine = pathLines[i];
@@ -225,8 +219,6 @@ namespace PolygonNavMesh
                         }
                     }
 
-                    finalPath.push_back(endPoint);
-                    pathBeforeSmooth.push_back(endPoint);
                     return finalPath;
                 }
             }
