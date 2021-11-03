@@ -299,13 +299,13 @@ void ReDrawBoard()
         }
         
         // 输出 Triangle Pos Path
-        setlinecolor(RED);
-        for (int z = 0; z < pathBeforeSmooth.size() - 1; z++)
-        {
-            const auto point = pathBeforeSmooth[z];
-            const auto nextPoint = pathBeforeSmooth[z + 1];
-            line(point.x, point.y, nextPoint.x, nextPoint.y);
-        }
+        // setlinecolor(RED);
+        // for (int z = 0; z < pathBeforeSmooth.size() - 1; z++)
+        // {
+        //     const auto point = pathBeforeSmooth[z];
+        //     const auto nextPoint = pathBeforeSmooth[z + 1];
+        //     line(point.x, point.y, nextPoint.x, nextPoint.y);
+        // }
     }
     
     setcolor(BLACK);

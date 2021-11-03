@@ -64,15 +64,18 @@ void ReDrawBoard();
 
 vector<Line> pathLines;
 int drawFromToNum = -1;
-Vector3 startPoint  = Vector3(204, 200, 0);
-Vector3 endPoint    = Vector3(179, 305, 0);
+Vector3 startPoint  = Vector3(321, 183, 0);
+Vector3 endPoint    = Vector3(208, 353, 0);
 
 int main(int argc, char* argv[])
 {
     // 输入lines
-    pathLines.push_back(Line(Vector3(88,87),Vector3(194,215)));
-    pathLines.push_back(Line(Vector3(88,87),Vector3(168,274)));
-    pathLines.push_back(Line(Vector3(90,410),Vector3(168,274)));
+    pathLines.push_back(Line(Vector3(293,213),Vector3(544,82)));
+    pathLines.push_back(Line(Vector3(311,272),Vector3(544,82)));
+    pathLines.push_back(Line(Vector3(311,272),Vector3(409,259)));
+    pathLines.push_back(Line(Vector3(311,272),Vector3(432,320)));
+    pathLines.push_back(Line(Vector3(241,325),Vector3(432,320)));
+    pathLines.push_back(Line(endPoint, endPoint));
 
     // 绘制裁剪前的图形
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
@@ -107,13 +110,11 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+Vector3 curPoint = Vector3(0, 0);
 Vector3 rightLeg;
 Vector3 leftLeg;
-Vector3 curPoint = Vector3(0, 0);
 auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
 vector<Vector3> finalPath;
-int rightLegIndex = 0;
-bool recordPoint = true;
 // funnel-algorithm
 // https://github.com/TheGoozah/AIProgramming
 void DoCheckOnStep()
@@ -123,13 +124,11 @@ void DoCheckOnStep()
     finalPath.push_back(startPoint);
     rightLegIndex = 0;
 
-    if (pathLines.size() == 0)
-        return;
-    
     curPoint = startPoint;
     rightLeg = pathLines[0].from - curPoint;
     leftLeg = pathLines[0].end - curPoint;
-    
+    curPointIndex = 0; leftLegIndex = 0; rightLegIndex = 0;
+
     // 执行至第几步
     for(int i = 0; i < pathLines.size(); i++)
     {
@@ -140,18 +139,17 @@ void DoCheckOnStep()
 
         auto newRightLeg = curLine.from - curPoint;
         auto cpTightenFunnel = newRightLeg.crossProduct(rightLeg);
-        if (cpTightenFunnel <= 0.0f)
+        if (cpTightenFunnel.z >= 0.0f)
         {
             auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
-            if (cpDenegrateFunnel > 0.0f) //No overlap, tighten!
+            if (cpDenegrateFunnel.z < 0.0f) //No overlap, tighten!
             {
                 rightLeg = newRightLeg;
                 rightLegIndex = i;
             }
             else
             {
-                //Leftleg becomes new apex point
-                curPoint += leftLeg;
+                curPoint = curPoint + leftLeg;
                 curPointIndex = leftLegIndex;
                 unsigned int newIt = curPointIndex + 1;
                 leftLegIndex = newIt;
@@ -171,24 +169,20 @@ void DoCheckOnStep()
             }
         }
 
-        //--- LEFT CHECK ---
-        //1. See if moving funnel inwards - LEFT
         auto newLeftLeg = curLine.end - curPoint;
-        cpTightenFunnel = Cross(newLeftLeg, leftLeg);
-        if (cpTightenFunnel >= 0.0f) //Move inwards
+        cpTightenFunnel = newLeftLeg.crossProduct(leftLeg);
+        if (cpTightenFunnel.z <= 0.0f) //Move inwards
         {
-            //2. See if new line degenerates a line segment - LEFT
-            auto cpDenegrateFunnel = Cross(newLeftLeg, rightLeg);
-            if (cpDenegrateFunnel < 0.0f) //No overlap, tighten!
+            auto cpDenegrateFunnel = newLeftLeg.crossProduct(rightLeg);
+            if (cpDenegrateFunnel.z > 0.0f) //No overlap, tighten!
             {
                 leftLeg = newLeftLeg;
                 leftLegIndex = i;
-                leftChanged = true;
             }
             else
             {
                 //Rightleg becomes new curPoint point
-                curPoint += rightLeg;
+                curPoint = curPoint + rightLeg;
                 curPointIndex = rightLegIndex;
                 unsigned int newIt = curPointIndex + 1;
                 leftLegIndex = newIt;
@@ -207,7 +201,7 @@ void DoCheckOnStep()
         }
     }
     
-//    finalPath.push_back(endPoint);
+    finalPath.push_back(endPoint);
 }
 
 void ReDrawBoard()
@@ -238,6 +232,12 @@ void ReDrawBoard()
         }
     }
 
+    // 绘制起止点
+    setfillcolor(RED);
+    fillcircle(startPoint.x, startPoint.y, 5);
+    setfillcolor(GREEN);
+    fillcircle(endPoint.x, endPoint.y, 6);
+
     // 绘制拐角法
     setfillcolor(BLACK);
     setlinecolor(BLACK);
@@ -245,13 +245,13 @@ void ReDrawBoard()
     
     setfillcolor(GREEN);
     setlinecolor(GREEN);
-    fillcircle(leftPoint.x, leftPoint.y, 4);
-    line(curPoint.x, curPoint.y, leftPoint.x, leftPoint.y);
+    fillcircle(curPoint.x + leftLeg.x, curPoint.y + leftLeg.y, 4);
+    line(curPoint.x, curPoint.y, curPoint.x + leftLeg.x, curPoint.y + leftLeg.y);
     
     setfillcolor(RED);
     setlinecolor(RED);
-    fillcircle(rightPoint.x, rightPoint.y, 4);
-    line(curPoint.x, curPoint.y, rightPoint.x, rightPoint.y);
+    fillcircle(curPoint.x + rightLeg.x, curPoint.y + rightLeg.y, 4);
+    line(curPoint.x, curPoint.y, curPoint.x + rightLeg.x, curPoint.y + rightLeg.y);
 
     // 绘制平滑后的内容
     Vector3 prePoint = startPoint;

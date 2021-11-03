@@ -105,13 +105,6 @@ namespace PolygonNavMesh
                 // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
                 {
                     ClipTriangle* preTriangle = nullptr;
-                    Vector3 leftPoint;                  // 当前记录的出口线的左点
-                    Vector3 rightPoint;                 // 当前记录的出口线的右点
-                    vector<Vector3> finalPath;          // 最终输出路径
-                    finalPath.push_back(startPoint);
-                    pathBeforeSmooth.clear();
-                    pathBeforeSmooth.push_back(startPoint);
-                    Vector3 curPoint = startPoint;  // 当前节点
                     vector<ClipLine*> pathLines;
                     std::cout << "Vector3 startPoint  = Vector3(" << startPoint.x << ", " << startPoint.y << ", 0);" << endl;
                     std::cout << "Vector3 endPoint    = Vector3(" << endPoint.x << ", " << endPoint.y << ", 0);" << endl;
@@ -147,78 +140,89 @@ namespace PolygonNavMesh
                         preTriangle = curTriangle;
                     }
 
+                    ClipLine* finalClipLine = new ClipLine();
+                    PointLinkNode* endPointLinkNode = new PointLinkNode(endPoint.x, endPoint.y, endPoint.z);
+                    finalClipLine->A = endPointLinkNode;
+                    finalClipLine->B = endPointLinkNode;
+                    pathLines.push_back(finalClipLine);
+
                     cout << "-------------------->>>" << endl;
                     
-                    bool recordPoint = true;
+                    vector<Vector3> finalPath;          // 最终输出路径
+                    finalPath.push_back(startPoint);
+                    pathBeforeSmooth.clear();
+                    pathBeforeSmooth.push_back(startPoint);
+                    Vector3 curPoint = startPoint;  // 当前节点
+                    Vector3 rightLeg = pathLines[0]->A->point - curPoint;
+                    Vector3 leftLeg = pathLines[0]->B->point - curPoint;
+                    auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
                     // 遍历所有相交线，获得最终路径
                     for(int i = 0; i < pathLines.size(); i++)
                     {
-                        ClipLine* clipLine = pathLines[i];
-                        
-                        Vector3 lineRight = clipLine->A->point;
-                        Vector3 lineLeft = clipLine->B->point;
-                        
-                        if (recordPoint)
+                        auto curLine = pathLines[i];
+
+                        auto newRightLeg = curLine->A->point - curPoint;
+                        auto cpTightenFunnel = newRightLeg.crossProduct(rightLeg);
+                        if (cpTightenFunnel.z >= 0.0f)
                         {
-                            leftPoint = lineLeft;
-                            rightPoint = lineRight;
-                            recordPoint = false;
-                            continue;
+                            auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
+                            if (cpDenegrateFunnel.z < 0.0f) //No overlap, tighten!
+                            {
+                                rightLeg = newRightLeg;
+                                rightLegIndex = i;
+                            }
+                            else
+                            {
+                                curPoint = curPoint + leftLeg;
+                                curPointIndex = leftLegIndex;
+                                unsigned int newIt = curPointIndex + 1;
+                                leftLegIndex = newIt;
+                                rightLegIndex = newIt;
+                                i = newIt;
+
+                                //Store point
+                                finalPath.push_back(curPoint);
+
+                                //Calculate new legs (if not the end)
+                                if (newIt < pathLines.size())
+                                {
+                                    rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
+                                    leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
+                                    continue; //Restart
+                                }
+                            }
                         }
 
-                        // 检查left 或 right 是否越界, z 表达为，负数在Left，正数在Right
-                        Vector3 leftCrossEndRes = (lineLeft - curPoint).crossProduct(endPoint - curPoint);
-                        Vector3 rightCrossEndRes = (lineRight - curPoint).crossProduct(endPoint - curPoint);
-                        // 判断左点的情况
-                        Vector3 leftCrossLeftRes = (leftPoint - curPoint).crossProduct(lineLeft - curPoint);
-                        Vector3 rightCrossLeftRes = (rightPoint - curPoint).crossProduct(lineLeft - curPoint);
-                        if (leftCrossLeftRes.z > 0)
+                        auto newLeftLeg = curLine->B->point - curPoint;
+                        cpTightenFunnel = newLeftLeg.crossProduct(leftLeg);
+                        if (cpTightenFunnel.z <= 0.0f) //Move inwards
                         {
-                            if (rightCrossLeftRes.z < 0)
+                            auto cpDenegrateFunnel = newLeftLeg.crossProduct(rightLeg);
+                            if (cpDenegrateFunnel.z > 0.0f) //No overlap, tighten!
                             {
-                                leftPoint = lineLeft;
-                            } else
+                                leftLeg = newLeftLeg;
+                                leftLegIndex = i;
+                            }
+                            else
                             {
-                                // 当前情况为，线的left节点在目前right节点的right或直线上
-                                // 则记录当前right点为节点，并将left 和 right 节点置为当前线上的节点
-                                finalPath.push_back(rightPoint);
-                                curPoint = rightPoint;
-                                recordPoint = true;
+                                //Rightleg becomes new curPoint point
+                                curPoint = curPoint + rightLeg;
+                                curPointIndex = rightLegIndex;
+                                unsigned int newIt = curPointIndex + 1;
+                                leftLegIndex = newIt;
+                                rightLegIndex = newIt;
+                                i = newIt;
+                                //Store point
+                                finalPath.push_back(curPoint);
+                                //Calculate new legs (if not the end)
+                                if (newIt < pathLines.size())
+                                {
+                                    //Calculate new legs (if not the end)
+                                    rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
+                                    leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
+                                }
                             }
                         }
-                        
-                        // 判断右点情况
-                        Vector3 leftCrossRightRes = (leftPoint - curPoint).crossProduct(lineRight - curPoint);
-                        Vector3 rightCrossRightRes = (rightPoint - curPoint).crossProduct(lineRight - curPoint);
-                        if (rightCrossRightRes.z < 0)
-                        {
-                            if (leftCrossRightRes.z > 0)
-                            {
-                                rightPoint = lineRight;
-                            } else
-                            {
-                                // 当前情况为，线的Right节点在目前left节点的left或直线上
-                                // 则记录当前left点为节点，并将left 和 right 节点置为当前线上的节点
-                                finalPath.push_back(leftPoint);
-                                curPoint = leftPoint;
-                                recordPoint = true;
-                            }
-                        }
-                    }
-                    
-                    // 判断左点的情况
-                    Vector3 leftCrossEndRes = (leftPoint - curPoint).crossProduct(endPoint - curPoint);
-                    Vector3 rightCrossEndRes = (rightPoint - curPoint).crossProduct(endPoint - curPoint);
-                    if (rightCrossEndRes.z >= 0)
-                    {
-                        // 追加右侧侧的遗留内容
-                        finalPath.push_back(rightPoint);
-                    }
-    
-                    if (leftCrossEndRes.z <= 0)
-                    {
-                        // 追加左侧的遗留内容
-                        finalPath.push_back(leftPoint);
                     }
 
                     finalPath.push_back(endPoint);
