@@ -86,13 +86,10 @@ namespace PolygonNavMesh
             }
             
             // TODO 两个点都不在这个轮廓中
-            if (startTriangle == nullptr && endTriangle == nullptr)
+            if(startTriangle != nullptr && endTriangle == nullptr)
             {
+                // 当前起点在轮廓里，终点不在轮廓里，目标修改为当前轮廓的最靠近终点的点
                 
-            } else if(startTriangle != nullptr && endTriangle == nullptr)
-            {
-                // TODO 判断起点在轮廓里，终点不在轮廓里的情况
-            
             } else if (startTriangle != nullptr && endTriangle != nullptr)
             {
                 // Dijkstra 查找最短路径，构建三角形图
@@ -231,7 +228,7 @@ namespace PolygonNavMesh
                 auto pointIt = finalPath.begin() + 1;
                 while(pointIt != finalPath.end())
                 {
-                    if ((*pointIt - prePoint).squaredLength() < 0.01)
+                    if ((*pointIt - prePoint).squaredLength() < 0.001)
                     {
                         pointIt = finalPath.erase(pointIt);
                     }
