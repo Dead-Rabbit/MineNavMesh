@@ -218,7 +218,10 @@ namespace PolygonNavMesh
                             }
                         }
                     }
+                    finalPath.push_back(endPoint);
 
+                    // 优化 final path，将前后两个“相同”的点变为一个点
+                    
                     return finalPath;
                 }
             }

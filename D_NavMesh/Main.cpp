@@ -54,90 +54,90 @@ int main(int argc, char* argv[])
     vector<vector<Vector3>> outputSubjectPaths;    // 外边框路径
     vector<vector<Vector3>> outputClipPaths;       // 裁剪用路径
     
-    // vector<Vector3> subjectPath = vector<Vector3>();
-    // subjectPath.push_back(Vector3(100, 100, 0));
-    // subjectPath.push_back(Vector3(100, 300, 0));
-    // subjectPath.push_back(Vector3(300, 300, 0));
-    // subjectPath.push_back(Vector3(300, 100, 0));
-    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
-    // outputSubjectPaths.push_back(subjectPath);
-    //
-    // subjectPath = vector<Vector3>();
-    // subjectPath.push_back(Vector3(240, 100, 0));
-    // subjectPath.push_back(Vector3(240, 300, 0));
-    // subjectPath.push_back(Vector3(600, 200, 0));
-    // subjectPath.push_back(Vector3(600, 100, 0));
-    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
-    // outputSubjectPaths.push_back(subjectPath);
-    //
-    // vector<Vector3> clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(258, 151, 0));
-    // clipPath.push_back(Vector3(281, 324, 0));
-    // clipPath.push_back(Vector3(324, 317, 0));
-    // clipPath.push_back(Vector3(297, 148, 0));
-    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(387, 158, 0));
-    // clipPath.push_back(Vector3(368, 190, 0));
-    // clipPath.push_back(Vector3(421, 208, 0));
-    // clipPath.push_back(Vector3(458, 161, 0));
-    // clipPath.push_back(Vector3(436, 142, 0));
-    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(489, 139, 0));
-    // clipPath.push_back(Vector3(478, 185, 0));
-    // clipPath.push_back(Vector3(508, 197, 0));
-    // clipPath.push_back(Vector3(528, 158, 0));
-    // clipPath.push_back(Vector3(516, 134, 0));
-    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(158, 174, 0));
-    // clipPath.push_back(Vector3(145, 230, 0));
-    // clipPath.push_back(Vector3(190, 241, 0));
-    // clipPath.push_back(Vector3(212, 200, 0));
-    // clipPath.push_back(Vector3(194, 173, 0));
-    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(288, 131, 0));
-    // clipPath.push_back(Vector3(402, 167, 0));
-    // clipPath.push_back(Vector3(372, 75,  0));
-    // clipPath.push_back(Vector3(302, 62, 0));
-    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // outputClipPaths.push_back(clipPath);
-
     vector<Vector3> subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(88, 87, 0));
-    subjectPath.push_back(Vector3(90, 410, 0));
-    subjectPath.push_back(Vector3(583, 395, 0));
-    subjectPath.push_back(Vector3(544, 82, 0));
+    subjectPath.push_back(Vector3(100, 100, 0));
+    subjectPath.push_back(Vector3(100, 300, 0));
+    subjectPath.push_back(Vector3(300, 300, 0));
+    subjectPath.push_back(Vector3(300, 100, 0));
     polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
     outputSubjectPaths.push_back(subjectPath);
-
+    
+    subjectPath = vector<Vector3>();
+    subjectPath.push_back(Vector3(240, 100, 0));
+    subjectPath.push_back(Vector3(240, 300, 0));
+    subjectPath.push_back(Vector3(600, 200, 0));
+    subjectPath.push_back(Vector3(600, 100, 0));
+    polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    outputSubjectPaths.push_back(subjectPath);
+    
     vector<Vector3> clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(445, 216, 0));
-    clipPath.push_back(Vector3(409, 259, 0));
-    clipPath.push_back(Vector3(432, 320, 0));
-    clipPath.push_back(Vector3(487, 331, 0));
-    clipPath.push_back(Vector3(512, 273, 0));
+    clipPath.push_back(Vector3(258, 151, 0));
+    clipPath.push_back(Vector3(281, 324, 0));
+    clipPath.push_back(Vector3(324, 317, 0));
+    clipPath.push_back(Vector3(297, 148, 0));
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
     outputClipPaths.push_back(clipPath);
     
     clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(194, 215, 0));
-    clipPath.push_back(Vector3(168, 274, 0));
-    clipPath.push_back(Vector3(241, 325, 0));
-    clipPath.push_back(Vector3(311, 272, 0));
-    clipPath.push_back(Vector3(293, 213, 0));
+    clipPath.push_back(Vector3(387, 158, 0));
+    clipPath.push_back(Vector3(368, 190, 0));
+    clipPath.push_back(Vector3(421, 208, 0));
+    clipPath.push_back(Vector3(458, 161, 0));
+    clipPath.push_back(Vector3(436, 142, 0));
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
     outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(489, 139, 0));
+    clipPath.push_back(Vector3(478, 185, 0));
+    clipPath.push_back(Vector3(508, 197, 0));
+    clipPath.push_back(Vector3(528, 158, 0));
+    clipPath.push_back(Vector3(516, 134, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(158, 174, 0));
+    clipPath.push_back(Vector3(145, 230, 0));
+    clipPath.push_back(Vector3(190, 241, 0));
+    clipPath.push_back(Vector3(212, 200, 0));
+    clipPath.push_back(Vector3(194, 173, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(288, 131, 0));
+    clipPath.push_back(Vector3(402, 167, 0));
+    clipPath.push_back(Vector3(372, 75,  0));
+    clipPath.push_back(Vector3(302, 62, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+
+    // vector<Vector3> subjectPath = vector<Vector3>();
+    // subjectPath.push_back(Vector3(88, 87, 0));
+    // subjectPath.push_back(Vector3(90, 410, 0));
+    // subjectPath.push_back(Vector3(583, 395, 0));
+    // subjectPath.push_back(Vector3(544, 82, 0));
+    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    // outputSubjectPaths.push_back(subjectPath);
+    //
+    // vector<Vector3> clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(445, 216, 0));
+    // clipPath.push_back(Vector3(409, 259, 0));
+    // clipPath.push_back(Vector3(432, 320, 0));
+    // clipPath.push_back(Vector3(487, 331, 0));
+    // clipPath.push_back(Vector3(512, 273, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(194, 215, 0));
+    // clipPath.push_back(Vector3(168, 274, 0));
+    // clipPath.push_back(Vector3(241, 325, 0));
+    // clipPath.push_back(Vector3(311, 272, 0));
+    // clipPath.push_back(Vector3(293, 213, 0));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
     
 #ifdef USE_EASYX_GRAPHICS
     
@@ -287,7 +287,15 @@ void ReDrawBoard()
     fillcircle(endPoint.x, endPoint.y, 3);
 
     // 绘制最终生成的路线
-    setcolor(BLACK);
+    setcolor(RED);
+    auto preLineStyle = new LINESTYLE();
+    getlinestyle(preLineStyle);
+    auto newLineStyle = new LINESTYLE();
+    newLineStyle->style = preLineStyle->style;
+    newLineStyle->thickness = 2;
+    newLineStyle->puserstyle = preLineStyle->puserstyle;
+    newLineStyle->userstylecount = preLineStyle->userstylecount;
+    setlinestyle(newLineStyle);
     if (finalPathNodes.size() > 0)
     {
         for (int z = 0; z < finalPathNodes.size() - 1; z++)
@@ -297,6 +305,7 @@ void ReDrawBoard()
             line(point.x, point.y, nextPoint.x, nextPoint.y);
         }
     }
+    setlinestyle(preLineStyle);
     
     setcolor(BLACK);
     // 绘制所选三角形信息
