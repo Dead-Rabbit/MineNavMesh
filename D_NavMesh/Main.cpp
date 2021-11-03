@@ -113,6 +113,14 @@ int main(int argc, char* argv[])
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
     outputClipPaths.push_back(clipPath);
 
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(246, 65, 0));
+    clipPath.push_back(Vector3(247, 185, 0));
+    clipPath.push_back(Vector3(313, 188,  0));
+    clipPath.push_back(Vector3(324, 73, 0));
+    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    outputClipPaths.push_back(clipPath);
+
     // vector<Vector3> subjectPath = vector<Vector3>();
     // subjectPath.push_back(Vector3(88, 87, 0));
     // subjectPath.push_back(Vector3(90, 410, 0));

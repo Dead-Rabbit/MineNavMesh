@@ -64,11 +64,11 @@ namespace PolygonNavMesh
         // 获取生成的多个三角形组
         vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
 
-        ClipTriangle* startTriangle = nullptr;
-        ClipTriangle* endTriangle = nullptr;
         // 检查起始点和结束点所在的三角形
         for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
         {
+            ClipTriangle* startTriangle = nullptr;
+            ClipTriangle* endTriangle = nullptr;
             // 在一个三角形组合内搜寻
             for (ClipTriangle* triangle : triangleGroup)
             {
@@ -88,7 +88,7 @@ namespace PolygonNavMesh
             // TODO 两个点都不在这个轮廓中
             if (startTriangle == nullptr && endTriangle == nullptr)
             {
-            
+                
             } else if(startTriangle != nullptr && endTriangle == nullptr)
             {
                 // TODO 判断起点在轮廓里，终点不在轮廓里的情况
@@ -223,6 +223,7 @@ namespace PolygonNavMesh
                         }
                     }
                 }
+                
                 finalPath.push_back(endPoint);
 
                 // 优化 final path，将前后两个“相同”的点变为一个点
