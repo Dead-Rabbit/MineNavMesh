@@ -144,6 +144,17 @@ namespace ZXNavMesh
 			return P;
 		}
 
+		// 计算点到线段的距离
+		static float GetDisFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
+		{
+			const Vector3 lineVec = p2 - p1;
+			if (lineVec.squaredLength() == 0)
+				return (p - p1).length();
+			
+			Vector3 tp = (p - p1).absDotProduct(lineVec) / lineVec.length() * lineVec.normalisedCopy();
+			return (p - p1 - tp).length();
+		}
+
 	private:
 		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide)
 		{

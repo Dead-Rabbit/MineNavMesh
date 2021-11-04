@@ -36,7 +36,10 @@ namespace PolygonNavMesh
             for (const auto linkedTrianglePair : linkedTriangles)
             {
                 const ClipTriangle* linkedTriangle = linkedTrianglePair.first;
-                const int weight = (triangle->centerPos - linkedTriangle->centerPos).squaredLength();
+                const ClipLine* linkedLine = linkedTrianglePair.second;
+                // const int weight = (triangle->centerPos - linkedTriangle->centerPos).squaredLength();
+                const float weight = NavMath::GetDisFromPointToLine(triangle->centerPos,
+                    linkedLine->A->point, linkedLine->B->point);
                 //对邻接矩阵对应上的点赋值
                 arc[triangle->numInPolygon][linkedTriangle->numInPolygon] = weight;
                 //无向图添加上这行代码
