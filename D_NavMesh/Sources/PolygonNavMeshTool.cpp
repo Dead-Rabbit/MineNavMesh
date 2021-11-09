@@ -26,6 +26,9 @@ namespace PolygonNavMesh
 
     vector<vector<ClipTriangle*>> PolygonNavMeshTool::GenerateFinalTriangles()
     {
+        if (finishedTriangle)
+            return triangulationTool.GetGenTriangles();
+        
         // 裁剪后输出的Path数据
         PathsD pathsD = PathsD();
         // 获取最后输出path
@@ -51,16 +54,17 @@ namespace PolygonNavMesh
 
             // 三角化，并连接三角形之间的联系
             triangulationTool.EarClipping();
-
-            // TODO 考虑三角化后，生成搜索用 图 组
+            finishedTriangle = true;
         }
         return triangulationTool.GetGenTriangles();
     }
 
     vector<Vector3> PolygonNavMeshTool::FindPath(Vector3 startPoint, Vector3 endPoint)
     {
-        vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
+        // 寻路前，尝试根据边框进行三角化，如果之前操作过，则重新生成
+        GenerateFinalTriangles();
         
+        vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
         // 获取生成的多个三角形组
         vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
 
