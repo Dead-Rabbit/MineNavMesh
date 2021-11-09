@@ -89,7 +89,7 @@ namespace PolygonNavMesh
                 }
             }
             
-            // TODO 两个点都不在这个轮廓中
+            // TODO 两个点中起点在当前轮廓，终点不在当前轮廓
             if(startTriangle != nullptr && endTriangle == nullptr)
             {
                 // 当前起点在轮廓里，终点不在轮廓里，目标修改为当前轮廓的最靠近终点的点
@@ -105,8 +105,6 @@ namespace PolygonNavMesh
                 // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
                 ClipTriangle* preTriangle = nullptr;
                 vector<ClipLine*> pathLines;
-                // std::cout << "Vector3 startPoint  = Vector3(" << startPoint.x << ", " << startPoint.y << ", 0);" << endl;
-                // std::cout << "Vector3 endPoint    = Vector3(" << endPoint.x << ", " << endPoint.y << ", 0);" << endl;
                 // 获取所有路径穿出口
                 for (int i = 0; i < pathTriangles.size(); i++)
                 {
@@ -129,8 +127,6 @@ namespace PolygonNavMesh
                         {
                             const auto clipLine = preLinkPair.second;
                             pathLines.push_back(clipLine);
-                            // std::cout << "pathLines.push_back(Line(Vector3" << clipLine->A->point
-                            // << ",Vector3" << clipLine->B->point << "));" << endl;
                             break;
                         }
                     }

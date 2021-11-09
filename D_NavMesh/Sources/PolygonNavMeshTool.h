@@ -54,6 +54,12 @@ namespace PolygonNavMesh
         bool finishedTriangle = false;
         ClipperD clipperD = ClipperD();         // vatti 轮廓切割
         PolygonTriangulation triangulationTool; // 耳切法三角化工具
+
+        // TODO 当前Reset未使用
+        void Reset()
+        {
+            finishedTriangle = false;
+        }
     };
     
 }

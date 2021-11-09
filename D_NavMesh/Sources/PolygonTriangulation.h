@@ -3,9 +3,6 @@
 #include <vector>
 
 #include "PolygonTriangulation.h"
-#include "PolygonTriangulation.h"
-#include "PolygonTriangulation.h"
-#include "PolygonTriangulation.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 #include "../../Base/NavMeshHelper.h"
