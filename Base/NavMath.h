@@ -4,9 +4,7 @@
 
 #include "Vectors.h"
 
-using namespace NavMeshBase;
-
-namespace ZXNavMesh
+namespace NavMeshBase
 {
 	class NavMath
 	{

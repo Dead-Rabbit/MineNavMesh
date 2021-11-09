@@ -9,7 +9,6 @@
 
 using namespace std;
 using namespace NavMeshBase;
-using namespace ZXNavMesh;
 
 namespace PolygonNavMesh
 {
