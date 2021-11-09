@@ -162,7 +162,7 @@ namespace PolygonNavMesh
                     if (cpTightenFunnel.z >= 0.0f)
                     {
                         auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
-                        if (cpDenegrateFunnel.z < 0.0f) //No overlap, tighten!
+                        if (cpDenegrateFunnel.z <= 0.0f) //No overlap, tighten!
                         {
                             rightLeg = newRightLeg;
                             rightLegIndex = i;
@@ -194,7 +194,7 @@ namespace PolygonNavMesh
                     if (cpTightenFunnel.z <= 0.0f) //Move inwards
                     {
                         auto cpDenegrateFunnel = newLeftLeg.crossProduct(rightLeg);
-                        if (cpDenegrateFunnel.z > 0.0f) //No overlap, tighten!
+                        if (cpDenegrateFunnel.z >= 0.0f) //No overlap, tighten!
                         {
                             leftLeg = newLeftLeg;
                             leftLegIndex = i;
