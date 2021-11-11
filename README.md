@@ -10,7 +10,7 @@
 
 > 流程包含：通过外边框、阻碍边框生成路径并进行寻路，获取最终的路径点
 
-使用方法请看 D_NavMesh/Main.cpp ;Vector3 为当前项目自定义的
+使用方法请看 D_NavMesh/Main.cpp
 
 ```c++
 
