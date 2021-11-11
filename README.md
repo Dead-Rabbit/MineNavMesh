@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
 
     // 3. 寻找最终路径
-    vector<Vector3> finalPathNodes = polygonNavMeshTool.FindPath(Vector3(264, 204, 0), Vector3(308, 291, 0)s);
+    vector<Vector3> finalPathNodes = polygonNavMeshTool.FindPath(Vector3(264, 204, 0), Vector3(308, 291, 0));
 
     // 输出测试
     if (finalPathNodes.size() > 0)
