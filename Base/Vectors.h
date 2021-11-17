@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cassert>
-#include <easyx.h>
 
 namespace NavMeshBase
 {
