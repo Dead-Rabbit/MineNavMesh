@@ -8,6 +8,8 @@ namespace PolygonNavMesh
 {
     /**
      *  多边形寻路工具
+     *  使用方法:
+     *  
      */
     class PolygonNavMeshTool
     {

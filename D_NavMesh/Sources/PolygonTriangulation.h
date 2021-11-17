@@ -10,6 +10,9 @@
 using namespace std;
 using namespace NavMeshBase;
 
+/**
+ *  本类辅助于 PolygonNavMeshTool 用于针对轮廓进行三角化
+ */
 namespace PolygonNavMesh
 {
     class PointLinkNode;
