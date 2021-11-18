@@ -2,6 +2,8 @@
 
 #include "Dijkstra.h"
 
+#include <graphics.h>
+
 namespace PolygonNavMesh
 {
     void PolygonNavMeshTool::AddPolygonOutsideContour(vector<Vector3> contour)
@@ -69,177 +71,299 @@ namespace PolygonNavMesh
         vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
 
         // 检查起始点和结束点所在的三角形
+        ClipTriangle* startTriangle = nullptr;
+        ClipTriangle* endTriangle = nullptr;
+        bool findStartGroup = false;
+        vector<ClipTriangle*> startTriangleGroup;
+        vector<ClipTriangle*> endTriangleGroup;
+        // 查找起始点和结束点所在的三角组和三角形
         for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
         {
-            ClipTriangle* startTriangle = nullptr;
-            ClipTriangle* endTriangle = nullptr;
             // 在一个三角形组合内搜寻
             for (ClipTriangle* triangle : triangleGroup)
             {
                 if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint))
                 {
                     startTriangle = triangle;
-                    pathTriangles.push_back(triangle);
+                    startTriangleGroup = triangleGroup;
+                    findStartGroup = true;
                 }
                 
                 if (endTriangle == nullptr && triangle->IsPointInTriangle(endPoint))
                 {
                     endTriangle = triangle;
-                    pathTriangles.push_back(triangle);
+                    endTriangleGroup = triangleGroup;
+                }
+            }
+        }
+
+        // 如果当前起始点在外部，则起始点修改为当前距离最近的一个点
+        if (!findStartGroup)
+        {
+            Vector3 minPos;
+            double minDis = -1;
+            bool findMinPos = false;
+            // 查找最近的多边形
+            vector<OutsidePolygon*> outsidePolygons = triangulationTool.GetOutsidePolygons();
+            // 首先检查并排除岛洞的情况
+            for (auto polygon : outsidePolygons)
+            {
+                // 点在多边形外
+                if (polygon->IsPointInPolygon(startPoint))
+                {
+                    Vector3 nearPoint;
+                    if (polygon->GetNearCrossFromInsidePoint(startPoint, nearPoint))
+                    {
+                        auto tempDis = (nearPoint - startPoint).length();
+                        if (minDis < 0 || tempDis < minDis)
+                        {
+                            findMinPos = true;
+                            minDis = tempDis;
+                            minPos = nearPoint;
+                        }
+                    }
+                }
+            }
+
+            // 如果没有找到岛洞的，则检查外边框的
+            if (!findMinPos)
+            {
+                for (auto polygon : outsidePolygons)
+                {
+                    // 点在多边形外
+                    if (!polygon->IsPointInPolygon(startPoint))
+                    {
+                        Vector3 nearPoint;
+                        if (polygon->GetNearCrossFromOutsidePoint(startPoint, nearPoint))
+                        {
+                            auto tempDis = (nearPoint - startPoint).length();
+                            if (minDis < 0 || tempDis < minDis)
+                            {
+                                findMinPos = true;
+                                minDis = tempDis;
+                                minPos = nearPoint;
+                            }
+                        }
+                    }
                 }
             }
             
-            // TODO 两个点中起点在当前轮廓，终点不在当前轮廓
-            if(startTriangle != nullptr && endTriangle == nullptr)
+            // 找到了最近的点，给start赋值为该点
+            if (findMinPos)
             {
-                // 当前起点在轮廓里，终点不在轮廓里，目标修改为当前轮廓的最靠近终点的点
+                startPoint = minPos;
+                        
+                setfillcolor(RED);
+                fillcircle(startPoint.x, startPoint.y, 4);
                 
-            } else if (startTriangle != nullptr && endTriangle != nullptr)
-            {
-                // Dijkstra 查找最短路径，构建三角形图
-                Graph_DG graph = Graph_DG();
-                graph.createGraph(triangleGroup);
-                graph.Dijkstra(startTriangle);
-                pathTriangles = graph.find_path_triangles(endTriangle);
-
-                // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
-                ClipTriangle* preTriangle = nullptr;
-                vector<ClipLine*> pathLines;
-                // 获取所有路径穿出口
-                for (int i = 0; i < pathTriangles.size(); i++)
+                for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
                 {
-                    const auto curTriangle = pathTriangles[i];
-                    
-                    if (preTriangle == nullptr)
+                    // 在一个三角形组合内搜寻
+                    for (ClipTriangle* triangle : triangleGroup)
                     {
-                        preTriangle = curTriangle;
-                        continue;
-                    }
-
-                    // 查找两个三角形交线
-                    vector<pair<ClipTriangle*, ClipLine*>> preLinkTrianglePairs = preTriangle->GetLinkedClipTriangles();
-                    
-                    for (int j = 0; j < preLinkTrianglePairs.size(); j++)
-                    {
-                        pair<ClipTriangle*, ClipLine*> preLinkPair = preLinkTrianglePairs[j];
-                        // 是否为链接的当前位置
-                        if (preLinkPair.first == curTriangle)
+                        if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint))
                         {
-                            const auto clipLine = preLinkPair.second;
-                            pathLines.push_back(clipLine);
-                            break;
+                            startTriangle = triangle;
+                            startTriangleGroup = triangleGroup;
+                            findStartGroup = true;
                         }
                     }
+                }
+
+                if (!findStartGroup)
+                {
+                    std::cout << "Cannot find start group and triangle by GenPos" << std::endl;
+                }
+            }
+        }
+
+        // 找到了起始点和起始组，但是起始点和结束点不在一个组内，则找最靠近结束点的点
+        if(findStartGroup && startTriangleGroup != endTriangleGroup)
+        {
+            double crossDis = 0;
+            bool findCross = false;
+            Vector3 maxCross;
+            ClipTriangle* crossTriangle = nullptr;
+            // 当前起点在轮廓里，终点不在轮廓里，目标修改为当前轮廓的最靠近终点的点
+            for (ClipTriangle* triangle : startTriangleGroup)
+            {
+                // 检查起点与终点连线的最远点
+                auto pointSize = triangle->points.size();
+                for (int i = 0; i < pointSize; i++)
+                {
+                    auto curPoint = triangle->points[i];
+                    auto nextPoint = triangle->points[i + 1 < pointSize ? i + 1 : 0];
+                    Vector3 crossPoint;
+                    if (NavMath::GetSegmentLinesIntersection(startPoint, endPoint,
+                        curPoint->point, nextPoint->point, crossPoint))
+                    {
+                        auto tempLength = (crossPoint - startPoint).squaredLength();
+                        if (tempLength > crossDis)
+                        {
+                            // 对比最远的点
+                            crossDis = tempLength;
+                            findCross = true;
+                            maxCross = crossPoint;
+                            crossTriangle = triangle;
+                        }
+                    }
+                }
+            }
+            
+            // 赋值最终交点和三角形
+            if (findCross)
+            {
+                endPoint = maxCross;
+                endTriangle = crossTriangle;
+                endTriangleGroup = startTriangleGroup;
+            }
+        }
+        
+        if (startTriangle != nullptr && endTriangle != nullptr && startTriangleGroup == endTriangleGroup)
+        {
+            // Dijkstra 查找最短路径，构建三角形图
+            Graph_DG graph = Graph_DG();
+            graph.createGraph(startTriangleGroup);
+            graph.Dijkstra(startTriangle);
+            pathTriangles = graph.find_path_triangles(endTriangle);
+
+            // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
+            ClipTriangle* preTriangle = nullptr;
+            vector<ClipLine*> pathLines;
+            // 获取所有路径穿出口
+            for (int i = 0; i < pathTriangles.size(); i++)
+            {
+                const auto curTriangle = pathTriangles[i];
+                
+                if (preTriangle == nullptr)
+                {
                     preTriangle = curTriangle;
+                    continue;
                 }
 
-                vector<Vector3> finalPath;          // 最终输出路径
-                finalPath.push_back(startPoint);
-                if (pathLines.size() == 0)
-                {
-                    finalPath.push_back(endPoint);
-                    return finalPath;
-                }
-
-                ClipLine* finalClipLine = new ClipLine();
-                PointLinkNode* endPointLinkNode = new PointLinkNode(endPoint.x, endPoint.y, endPoint.z);
-                finalClipLine->A = endPointLinkNode;
-                finalClipLine->B = endPointLinkNode;
-                pathLines.push_back(finalClipLine);
-
-                // 遍历所有线，将寻路进行平滑操作，此处使用漏斗算法，获得最终路径
-                // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
-                Vector3 curPoint = startPoint;  // 当前节点
-                Vector3 rightLeg = pathLines[0]->A->point - curPoint;
-                Vector3 leftLeg = pathLines[0]->B->point - curPoint;
-                auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
-                for(int i = 0; i < pathLines.size(); i++)
-                {
-                    auto curLine = pathLines[i];
-
-                    auto newRightLeg = curLine->A->point - curPoint;
-                    auto cpTightenFunnel = newRightLeg.crossProduct(rightLeg);
-                    if (cpTightenFunnel.z >= 0.0f)
-                    {
-                        auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
-                        if (cpDenegrateFunnel.z <= 0.0f) //No overlap, tighten!
-                        {
-                            rightLeg = newRightLeg;
-                            rightLegIndex = i;
-                        }
-                        else
-                        {
-                            curPoint = curPoint + leftLeg;
-                            curPointIndex = leftLegIndex;
-                            unsigned int newIt = curPointIndex + 1;
-                            leftLegIndex = newIt;
-                            rightLegIndex = newIt;
-                            i = newIt;
-
-                            //Store point
-                            finalPath.push_back(curPoint);
-
-                            //Calculate new legs (if not the end)
-                            if (newIt < pathLines.size())
-                            {
-                                rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
-                                leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
-                                continue; //Restart
-                            }
-                        }
-                    }
-
-                    auto newLeftLeg = curLine->B->point - curPoint;
-                    cpTightenFunnel = newLeftLeg.crossProduct(leftLeg);
-                    if (cpTightenFunnel.z <= 0.0f) //Move inwards
-                    {
-                        auto cpDenegrateFunnel = newLeftLeg.crossProduct(rightLeg);
-                        if (cpDenegrateFunnel.z >= 0.0f) //No overlap, tighten!
-                        {
-                            leftLeg = newLeftLeg;
-                            leftLegIndex = i;
-                        }
-                        else
-                        {
-                            //Rightleg becomes new curPoint point
-                            curPoint = curPoint + rightLeg;
-                            curPointIndex = rightLegIndex;
-                            unsigned int newIt = curPointIndex + 1;
-                            leftLegIndex = newIt;
-                            rightLegIndex = newIt;
-                            i = newIt;
-                            //Store point
-                            finalPath.push_back(curPoint);
-                            //Calculate new legs (if not the end)
-                            if (newIt < pathLines.size())
-                            {
-                                //Calculate new legs (if not the end)
-                                rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
-                                leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
-                            }
-                        }
-                    }
-                }
+                // 查找两个三角形交线
+                vector<pair<ClipTriangle*, ClipLine*>> preLinkTrianglePairs = preTriangle->GetLinkedClipTriangles();
                 
-                finalPath.push_back(endPoint);
-
-                // 优化 final path，将前后两个“相同”的点变为一个点
-                Vector3 prePoint = finalPath[0];
-                auto pointIt = finalPath.begin() + 1;
-                while(pointIt != finalPath.end())
+                for (int j = 0; j < preLinkTrianglePairs.size(); j++)
                 {
-                    if ((*pointIt - prePoint).squaredLength() < 0.001)
+                    pair<ClipTriangle*, ClipLine*> preLinkPair = preLinkTrianglePairs[j];
+                    // 是否为链接的当前位置
+                    if (preLinkPair.first == curTriangle)
                     {
-                        pointIt = finalPath.erase(pointIt);
+                        const auto clipLine = preLinkPair.second;
+                        pathLines.push_back(clipLine);
+                        break;
+                    }
+                }
+                preTriangle = curTriangle;
+            }
+
+            vector<Vector3> finalPath;          // 最终输出路径
+            finalPath.push_back(startPoint);
+            if (pathLines.size() == 0)
+            {
+                finalPath.push_back(endPoint);
+                return finalPath;
+            }
+
+            ClipLine* finalClipLine = new ClipLine();
+            PointLinkNode* endPointLinkNode = new PointLinkNode(endPoint.x, endPoint.y, endPoint.z);
+            finalClipLine->A = endPointLinkNode;
+            finalClipLine->B = endPointLinkNode;
+            pathLines.push_back(finalClipLine);
+
+            // 遍历所有线，将寻路进行平滑操作，此处使用漏斗算法，获得最终路径
+            // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
+            Vector3 curPoint = startPoint;  // 当前节点
+            Vector3 rightLeg = pathLines[0]->A->point - curPoint;
+            Vector3 leftLeg = pathLines[0]->B->point - curPoint;
+            auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
+            for(int i = 0; i < pathLines.size(); i++)
+            {
+                auto curLine = pathLines[i];
+
+                auto newRightLeg = curLine->A->point - curPoint;
+                auto cpTightenFunnel = newRightLeg.crossProduct(rightLeg);
+                if (cpTightenFunnel.z >= 0.0f)
+                {
+                    auto cpDenegrateFunnel = newRightLeg.crossProduct(leftLeg);
+                    if (cpDenegrateFunnel.z <= 0.0f) //No overlap, tighten!
+                    {
+                        rightLeg = newRightLeg;
+                        rightLegIndex = i;
                     }
                     else
                     {
-                        prePoint = *pointIt;
-                        ++pointIt;
+                        curPoint = curPoint + leftLeg;
+                        curPointIndex = leftLegIndex;
+                        unsigned int newIt = curPointIndex + 1;
+                        leftLegIndex = newIt;
+                        rightLegIndex = newIt;
+                        i = newIt;
+
+                        //Store point
+                        finalPath.push_back(curPoint);
+
+                        //Calculate new legs (if not the end)
+                        if (newIt < pathLines.size())
+                        {
+                            rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
+                            leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
+                            continue; //Restart
+                        }
                     }
                 }
-                return finalPath;
+
+                auto newLeftLeg = curLine->B->point - curPoint;
+                cpTightenFunnel = newLeftLeg.crossProduct(leftLeg);
+                if (cpTightenFunnel.z <= 0.0f) //Move inwards
+                {
+                    auto cpDenegrateFunnel = newLeftLeg.crossProduct(rightLeg);
+                    if (cpDenegrateFunnel.z >= 0.0f) //No overlap, tighten!
+                    {
+                        leftLeg = newLeftLeg;
+                        leftLegIndex = i;
+                    }
+                    else
+                    {
+                        //Rightleg becomes new curPoint point
+                        curPoint = curPoint + rightLeg;
+                        curPointIndex = rightLegIndex;
+                        unsigned int newIt = curPointIndex + 1;
+                        leftLegIndex = newIt;
+                        rightLegIndex = newIt;
+                        i = newIt;
+                        //Store point
+                        finalPath.push_back(curPoint);
+                        //Calculate new legs (if not the end)
+                        if (newIt < pathLines.size())
+                        {
+                            //Calculate new legs (if not the end)
+                            rightLeg = pathLines[rightLegIndex]->A->point - curPoint;
+                            leftLeg = pathLines[leftLegIndex]->B->point - curPoint;
+                        }
+                    }
+                }
             }
+            
+            finalPath.push_back(endPoint);
+
+            // 优化 final path，将前后两个“相同”的点变为一个点
+            Vector3 prePoint = finalPath[0];
+            auto pointIt = finalPath.begin() + 1;
+            while(pointIt != finalPath.end())
+            {
+                if ((*pointIt - prePoint).squaredLength() < 0.001)
+                {
+                    pointIt = finalPath.erase(pointIt);
+                }
+                else
+                {
+                    prePoint = *pointIt;
+                    ++pointIt;
+                }
+            }
+            return finalPath;
         }
         return {};
     }

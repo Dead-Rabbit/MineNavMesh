@@ -120,6 +120,12 @@ namespace PolygonNavMesh
         // 检查点是否在当前轮廓内
         bool IsPointInPolygon(Vector3 point) const;
         
+        // 获取轮廓外部点到当前轮廓最近的点，返回两个对应的 LinkPoint
+        bool GetNearCrossFromOutsidePoint(Vector3 point, Vector3& nearPoint);
+        
+        // 获取轮廓内部点到当前轮廓中岛洞最近的点，返回两个对应的 LinkPoint
+        bool GetNearCrossFromInsidePoint(Vector3 point, Vector3& nearPoint);
+        
     private:
         static int polygonNum;
         // 记录原始点，逆时针顺序输入
@@ -130,6 +136,7 @@ namespace PolygonNavMesh
         PointLinkNode* rightEdgeNode = nullptr;
         // 此处为firstNode，存的值为当前岛洞的最右点
         vector<PointLinkNode*> insideFirstNodes = vector<PointLinkNode*>();
+        vector<vector<Vector3>> insidePointsList = vector<vector<Vector3>>();
         // 生效所有岛洞，目前在单步耳切中有执行
         void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
@@ -143,6 +150,7 @@ namespace PolygonNavMesh
             firstNode = nullptr;
             edgePoints.clear();
             insideFirstNodes.clear();
+            insidePointsList.clear();
         }
     };
 
@@ -217,7 +225,7 @@ namespace PolygonNavMesh
         // 当前点
         Vector3 point;
         
-        // 双向链
+        // 双向链 - 动态，不可用于后续判断
         PointLinkNode* preNode = nullptr;
         PointLinkNode* nextNode = nullptr;
 

@@ -13,7 +13,6 @@
 
 #define CLIPPER_VERSION "10.0.0"
 
-#include <float.h>
 #include <cmath>
 #include <cstdlib>
 #include <queue>

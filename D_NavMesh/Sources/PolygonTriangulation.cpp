@@ -86,8 +86,9 @@ namespace PolygonNavMesh{
                 curNode = firstNode;
                 continue;
             }
-            
-            curNode->nextNode = new PointLinkNode(point.x, point.y, point.z);
+
+            auto newPoint = new PointLinkNode(point.x, point.y, point.z);
+            curNode->nextNode = newPoint;
             PointLinkNode* preNode = curNode;
             curNode = curNode->nextNode;
             curNode->preNode = preNode;
@@ -112,6 +113,8 @@ namespace PolygonNavMesh{
     void OutsidePolygon::AddPolygonInsidePoints(vector<Vector3> innerPoints)
     {
         // 生成新的链表
+        insidePointsList.push_back(innerPoints);
+        
         const int pointSize = innerPoints.size();
         PointLinkNode* firstInsideNode = nullptr;
         PointLinkNode* curInsideNode = firstInsideNode;
@@ -447,5 +450,53 @@ namespace PolygonNavMesh{
     bool OutsidePolygon::IsPointInPolygon(Vector3 point) const
     {
         return NavMath::IsPointInPolygonByRayCast(edgePoints, point);
+    }
+
+    bool OutsidePolygon::GetNearCrossFromOutsidePoint(Vector3 point, Vector3& nearPoint)
+    {
+        bool findPoint = false;
+        double minDis = 0;
+        const int pointSize = edgePoints.size();
+        for (int i = 0; i < pointSize; i++)
+        {
+            const auto curPoint = edgePoints[i];
+            const auto nextPoint = edgePoints[i + 1 < pointSize ? i + 1 : 0];
+            Vector3 nearestPoint;
+            const double tempDis = NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
+            if (!findPoint || tempDis < minDis)
+            {
+                findPoint = true;
+                minDis = tempDis;
+                nearPoint = nearestPoint;
+            }
+        }
+
+        return findPoint;
+    }
+
+    bool OutsidePolygon::GetNearCrossFromInsidePoint(Vector3 point, Vector3& nearPoint)
+    {
+        bool findPoint = false;
+        double minDis = 0;
+        for (int j = 0; j < insidePointsList.size(); j++)
+        {
+            auto insidePoints = insidePointsList[j];
+            const int pointSize = insidePoints.size();
+            for (int i = 0; i < pointSize; i++)
+            {
+                auto curPoint = insidePoints[i];
+                auto nextPoint = insidePoints[i + 1 < pointSize ? i + 1 : 0];
+                Vector3 nearestPoint;
+                double tempDis = NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
+                if (!findPoint || tempDis < minDis)
+                {
+                    findPoint = true;
+                    minDis = tempDis;
+                    nearPoint = nearestPoint;
+                }
+            }
+        }
+        
+        return findPoint;
     }
 }

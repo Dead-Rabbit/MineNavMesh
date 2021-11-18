@@ -130,20 +130,20 @@ namespace NavMeshBase
 			Vector3 nBC = BC;
 			nBC.normalise();
 
-			const float radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
-			const float radABC = Acos(BA.dotProduct(BC) / (BA.length() * BC.length()));
+			const double radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
+			const double radABC = Acos(BA.dotProduct(BC) / (BA.length() * BC.length()));
  
-			const float halfRadBAC = radBAC / 2.0f;
-			const float halfRadABC = radABC / 2.0f;
+			const double halfRadBAC = radBAC / 2.0f;
+			const double halfRadABC = radABC / 2.0f;
  
-			const float r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
+			const double r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
  
 			Vector3 P = ((nBA + nBC) / 2.0f).normalized() * r2 + B;
 			return P;
 		}
 
-		// 计算点到线段的距离
-		static float GetDisFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
+		// 计算点到线段的垂直距离
+		static double GetDisFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
 		{
 			const Vector3 lineVec = p2 - p1;
 			if (lineVec.squaredLength() == 0)
@@ -151,6 +151,46 @@ namespace NavMeshBase
 			
 			Vector3 tp = (p - p1).absDotProduct(lineVec) / lineVec.length() * lineVec.normalisedCopy();
 			return (p - p1 - tp).length();
+		}
+
+		// 获取点到线段垂直的点
+		static Vector3 GetPosFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
+		{
+			const Vector3 lineVec = p2 - p1;
+			if (lineVec.squaredLength() == 0)
+				return p1;
+			
+			return p1 + (p - p1).absDotProduct(lineVec) / lineVec.length() * lineVec;
+		}
+
+		/**
+		 * 获取点到线段的最短距离
+		 * shortPoint: 最短距离的点
+		 */
+		static double PointToSegDist(Vector3 p, Vector3 p1, Vector3 p2, Vector3& shortPoint)
+		{
+			double x = p.x, y = p.y, x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
+			double cross = (x2 - x1) * (x - x1) + (y2 - y1) * (y - y1);
+			
+			if (cross <= 0)
+			{
+				shortPoint = p1;
+				return sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+			}
+  
+			double d2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+			if (cross >= d2)
+			{
+				shortPoint = p2;
+				return sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
+			}
+  
+			double r = cross / d2;
+			double px = x1 + (x2 - x1) * r;
+			double py = y1 + (y2 - y1) * r;
+			
+			shortPoint = Vector3(px, py, 0);
+			return sqrt((x - px) * (x - px) + (py - y) * (py - y));
 		}
 
 	private:

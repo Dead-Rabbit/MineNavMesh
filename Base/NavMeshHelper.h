@@ -13,7 +13,7 @@ namespace NavMeshBase
         {
             double S = 0;
             
-            int n = points.size();
+            size_t n = points.size();
             for (int i = 0; i < n - 1; i++) {
                 const Vector3 point = points[i];
                 const Vector3 nextPoint = points[i + 1];

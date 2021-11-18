@@ -15,16 +15,16 @@ class Vector3
 {
 public:
     Vector3(){};
-    Vector3(float x, float y, float z = 0)
+    Vector3(double x, double y, double z = 0)
     {
         this->x = x;
         this->y = y;
         this->z = z;
     }
     
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
     
     inline Vector3 crossProduct(const Vector3& rkVector) const { return Vector3(y * rkVector.z - z * rkVector.y, z * rkVector.x - x * rkVector.z, x * rkVector.y - y * rkVector.x); }
     inline bool operator == ( const Vector3& rkVector ) const { return ( x == rkVector.x && y == rkVector.y && z == rkVector.z ); }
