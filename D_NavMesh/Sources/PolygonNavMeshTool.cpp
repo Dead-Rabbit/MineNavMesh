@@ -1,5 +1,7 @@
 ﻿#include "PolygonNavMeshTool.h"
 
+#include <easyx.h>
+
 #include "Dijkstra.h"
 
 namespace PolygonNavMesh
@@ -114,7 +116,7 @@ namespace PolygonNavMesh
             // 首先检查并排除岛洞的情况
             for (auto polygon : outsidePolygons)
             {
-                // 点在多边形外
+                // 点在多边形内
                 if (polygon->IsPointInPolygon(startPoint))
                 {
                     Vector3 nearPoint;
@@ -159,6 +161,9 @@ namespace PolygonNavMesh
             {
                 startMiddlePoint = new Vector3(minPos.x, minPos.y, minPos.z);
                 startPoint = minPos;
+                
+                setfillcolor(BLUE);
+                fillcircle(minPos.x, minPos.y, 5);
                 
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
