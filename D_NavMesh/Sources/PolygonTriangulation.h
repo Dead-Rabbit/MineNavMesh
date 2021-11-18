@@ -199,7 +199,7 @@ namespace PolygonNavMesh
          *  <summary>检查点是否在当前三角形内</summary>
          *  <param name="point">其他点</param>
          */
-        bool IsPointInTriangle(Vector3 point);
+        bool IsPointInTriangle(Vector3 point, double diff = 0);
         
     private:
         static int triangleNum;

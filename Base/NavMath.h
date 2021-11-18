@@ -54,11 +54,11 @@ namespace NavMeshBase
 		/**
 		 * 判断点 P 是否在三角形ABC内
 		 */
-		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool pointInSide = true)
+		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool pointInSide = true, double diff = 0)
 		{
-			return SameSide(A, B, C, P, pointInSide) &&
-				SameSide(B, C, A, P, pointInSide) &&
-				SameSide(C, A, B, P, pointInSide) ;
+			return SameSide(A, B, C, P, pointInSide, diff) &&
+				SameSide(B, C, A, P, pointInSide, diff) &&
+				SameSide(C, A, B, P, pointInSide, diff) ;
 		}
 		
 		static bool GetSegmentLinesIntersection(const Vector3 p1, const Vector3 p2, const Vector3 p3, const Vector3 p4, Vector3& crossPoint)
@@ -194,7 +194,10 @@ namespace NavMeshBase
 		}
 
 	private:
-		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide)
+		/**
+		 *	different 检查误差
+		 */
+		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide, double diff = 0)
 		{
 			const Vector3 AB = B - A ;
 			const Vector3 AC = C - A ;
@@ -204,9 +207,9 @@ namespace NavMeshBase
 			const Vector3 v2 = AB.crossProduct(AP) ;
 
 			if (isPointOnSide)
-				return v1.dotProduct(v2) >= 0 ;
+				return v1.dotProduct(v2) >= diff;
 			else
-				return v1.dotProduct(v2) > 0 ;
+				return v1.dotProduct(v2) > diff;
 		}
 
 	};

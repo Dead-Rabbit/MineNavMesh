@@ -68,31 +68,39 @@ namespace PolygonNavMesh
         
         vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
         // 获取生成的多个三角形组
-        vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
+        // vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
+        vector<OutsidePolygon*> genTrianglePolygons = triangulationTool.GetOutsidePolygons();
 
+        Vector3 originStartPoint = startPoint;
+        Vector3 originEndPoint = endPoint;
+        vector<Vector3> finalPath;          // 最终输出路径
         // 检查起始点和结束点所在的三角形
         ClipTriangle* startTriangle = nullptr;
         ClipTriangle* endTriangle = nullptr;
         bool findStartGroup = false;
-        vector<ClipTriangle*> startTriangleGroup;
-        vector<ClipTriangle*> endTriangleGroup;
+        OutsidePolygon* startOutsidePolygon = nullptr;
+        OutsidePolygon* endOutsidePolygon = nullptr;
+        Vector3 * startMiddlePoint = nullptr;
         // 查找起始点和结束点所在的三角组和三角形
-        for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
+        for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
         {
+            vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
             // 在一个三角形组合内搜寻
             for (ClipTriangle* triangle : triangleGroup)
             {
                 if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint))
                 {
                     startTriangle = triangle;
-                    startTriangleGroup = triangleGroup;
+                    // startTriangleGroup = triangleGroup;
+                    startOutsidePolygon = outsidePolygon;
                     findStartGroup = true;
                 }
                 
                 if (endTriangle == nullptr && triangle->IsPointInTriangle(endPoint))
                 {
                     endTriangle = triangle;
-                    endTriangleGroup = triangleGroup;
+                    // endTriangleGroup = triangleGroup;
+                    endOutsidePolygon = outsidePolygon;
                 }
             }
         }
@@ -151,79 +159,75 @@ namespace PolygonNavMesh
             // 找到了最近的点，给start赋值为该点
             if (findMinPos)
             {
+                startMiddlePoint = new Vector3(minPos.x, minPos.y, minPos.z);
                 startPoint = minPos;
-                        
+
                 setfillcolor(RED);
                 fillcircle(startPoint.x, startPoint.y, 4);
                 
-                for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
+                for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
+                    vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
+                    // for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
                     // 在一个三角形组合内搜寻
                     for (ClipTriangle* triangle : triangleGroup)
                     {
-                        if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint))
+                        if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint, -0.01))
                         {
                             startTriangle = triangle;
-                            startTriangleGroup = triangleGroup;
+                            // startTriangleGroup = triangleGroup;
+                            startOutsidePolygon = outsidePolygon;
                             findStartGroup = true;
                         }
                     }
-                }
-
-                if (!findStartGroup)
-                {
-                    std::cout << "Cannot find start group and triangle by GenPos" << std::endl;
                 }
             }
         }
 
         // 找到了起始点和起始组，但是起始点和结束点不在一个组内，则找最靠近结束点的点
-        if(findStartGroup && startTriangleGroup != endTriangleGroup)
+        if(findStartGroup && startOutsidePolygon != endOutsidePolygon)
         {
-            double crossDis = 0;
-            bool findCross = false;
-            Vector3 maxCross;
-            ClipTriangle* crossTriangle = nullptr;
-            // 当前起点在轮廓里，终点不在轮廓里，目标修改为当前轮廓的最靠近终点的点
-            for (ClipTriangle* triangle : startTriangleGroup)
+            // 如果当前结束点在目标形状内，则说明在岛洞内
+            if (startOutsidePolygon->IsPointInPolygon(endPoint))
             {
-                // 检查起点与终点连线的最远点
-                auto pointSize = triangle->points.size();
-                for (int i = 0; i < pointSize; i++)
+                Vector3 nearPoint;
+                startOutsidePolygon->GetNearCrossFromInsidePoint(endPoint, nearPoint);
+                endPoint = nearPoint;
+                vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
+                // 在一个三角形组合内搜寻
+                for (ClipTriangle* triangle : triangleGroup)
                 {
-                    auto curPoint = triangle->points[i];
-                    auto nextPoint = triangle->points[i + 1 < pointSize ? i + 1 : 0];
-                    Vector3 crossPoint;
-                    if (NavMath::GetSegmentLinesIntersection(startPoint, endPoint,
-                        curPoint->point, nextPoint->point, crossPoint))
+                    if (triangle->IsPointInTriangle(endPoint, -0.01))
                     {
-                        auto tempLength = (crossPoint - startPoint).squaredLength();
-                        if (tempLength > crossDis)
-                        {
-                            // 对比最远的点
-                            crossDis = tempLength;
-                            findCross = true;
-                            maxCross = crossPoint;
-                            crossTriangle = triangle;
-                        }
+                        endTriangle = triangle;
+                        endOutsidePolygon = startOutsidePolygon;
+                    }
+                }
+            } else
+            {
+                Vector3 nearPoint;
+                startOutsidePolygon->GetNearCrossFromOutsidePoint(endPoint, nearPoint);
+                endPoint = nearPoint;
+                vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
+                // 在一个三角形组合内搜寻
+                for (ClipTriangle* triangle : triangleGroup)
+                {
+                    if (triangle->IsPointInTriangle(endPoint, -0.01))
+                    {
+                        endTriangle = triangle;
+                        endOutsidePolygon = startOutsidePolygon;
                     }
                 }
             }
-            
-            // 赋值最终交点和三角形
-            if (findCross)
-            {
-                endPoint = maxCross;
-                endTriangle = crossTriangle;
-                endTriangleGroup = startTriangleGroup;
-            }
         }
-        
-        if (startTriangle != nullptr && endTriangle != nullptr && startTriangleGroup == endTriangleGroup)
+
+        // 在同一个组内寻路
+        if (startTriangle != nullptr && endTriangle != nullptr && startOutsidePolygon != nullptr
+            && endOutsidePolygon != nullptr && startOutsidePolygon == endOutsidePolygon)
         {
             // Dijkstra 查找最短路径，构建三角形图
             Graph_DG graph = Graph_DG();
-            graph.createGraph(startTriangleGroup);
+            graph.createGraph(startOutsidePolygon->GetGenTriangles());
             graph.Dijkstra(startTriangle);
             pathTriangles = graph.find_path_triangles(endTriangle);
 
@@ -258,8 +262,11 @@ namespace PolygonNavMesh
                 preTriangle = curTriangle;
             }
 
-            vector<Vector3> finalPath;          // 最终输出路径
-            finalPath.push_back(startPoint);
+            finalPath.push_back(originStartPoint);
+            if (startMiddlePoint != nullptr)
+            {
+                finalPath.push_back(*startMiddlePoint);
+            }
             if (pathLines.size() == 0)
             {
                 finalPath.push_back(endPoint);
@@ -365,6 +372,6 @@ namespace PolygonNavMesh
             }
             return finalPath;
         }
-        return {};
+        return finalPath;
     }
 }

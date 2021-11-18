@@ -359,9 +359,9 @@ namespace PolygonNavMesh{
         return connectPointNum == 2;
     }
 
-    bool ClipTriangle::IsPointInTriangle(Vector3 point)
+    bool ClipTriangle::IsPointInTriangle(Vector3 point, double diff)
     {
-        return NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true);
+        return NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true, diff);
     }
 
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
