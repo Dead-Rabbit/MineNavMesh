@@ -2,8 +2,6 @@
 
 #include "Dijkstra.h"
 
-#include <graphics.h>
-
 namespace PolygonNavMesh
 {
     void PolygonNavMeshTool::AddPolygonOutsideContour(vector<Vector3> contour)
@@ -161,9 +159,6 @@ namespace PolygonNavMesh
             {
                 startMiddlePoint = new Vector3(minPos.x, minPos.y, minPos.z);
                 startPoint = minPos;
-
-                setfillcolor(RED);
-                fillcircle(startPoint.x, startPoint.y, 4);
                 
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
