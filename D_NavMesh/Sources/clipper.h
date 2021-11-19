@@ -23,7 +23,7 @@
 
 namespace clipperlib {
 
-static double const PI = 3.141592653589793238;
+static double const CLIP_PI = 3.141592653589793238;
 
 struct Scanline;
 struct IntersectNode;

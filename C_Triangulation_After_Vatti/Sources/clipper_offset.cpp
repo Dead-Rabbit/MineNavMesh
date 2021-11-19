@@ -118,8 +118,8 @@ void ClipperOffset::DoOffset(PathGroup& pathGroup, double delta_)
 	else
 		arc_tol = std::log10(2 + abs_delta) * 0.25; //empirically derived
 
-	steps = PI / acos(1.0 - arc_tol / abs_delta); //steps per 360 degrees
-	//if(steps > abs_delta*PI) steps = abs_delta * PI; //ie excessive precision check
+	steps = CLIP_PI / acos(1.0 - arc_tol / abs_delta); //steps per 360 degrees
+	//if(steps > abs_delta*CLIP_PI) steps = abs_delta * CLIP_PI; //ie excessive precision check
 	steps_per_rad = steps / two_pi;
 
 	paths_out.clear();
@@ -229,7 +229,7 @@ void ClipperOffset::OffsetOpenLine(EndType et) {
 	}
 	else
 	{
-		DoRound(j, k, PI);
+		DoRound(j, k, CLIP_PI);
 	}
 
 	//reverse normals ...
@@ -254,7 +254,7 @@ void ClipperOffset::OffsetOpenLine(EndType et) {
 	}
 	else
 	{
-		DoRound(0, 1, PI);
+		DoRound(0, 1, CLIP_PI);
 	}
 	paths_out.push_back(path_out);
 }

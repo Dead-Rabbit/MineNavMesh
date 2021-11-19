@@ -96,8 +96,8 @@ PathsI InflatePaths(const PathsI &paths, double delta, JoinType jt, EndType et);
 PathsD InflatePaths(const PathsD &paths, double delta, JoinType jt, EndType et);
 
 const double default_arc_frac = 0.025;
-const double two_pi = 2.0 * PI;
-const double quarter_pi = 0.25 * PI;
+const double two_pi = 2.0 * CLIP_PI;
+const double quarter_pi = 0.25 * CLIP_PI;
 
 }
 #endif /* CLIPPER_OFFSET_H_ */
