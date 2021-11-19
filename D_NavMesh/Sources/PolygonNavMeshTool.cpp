@@ -66,11 +66,9 @@ namespace PolygonNavMesh
         
         vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
         // 获取生成的多个三角形组
-        // vector<vector<ClipTriangle*>> genTriangleGroups = triangulationTool.GetGenTriangles();
         vector<OutsidePolygon*> genTrianglePolygons = triangulationTool.GetOutsidePolygons();
 
         Vector3 originStartPoint = startPoint;
-        Vector3 originEndPoint = endPoint;
         vector<Vector3> finalPath;          // 最终输出路径
         // 检查起始点和结束点所在的三角形
         ClipTriangle* startTriangle = nullptr;
@@ -89,7 +87,6 @@ namespace PolygonNavMesh
                 if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint))
                 {
                     startTriangle = triangle;
-                    // startTriangleGroup = triangleGroup;
                     startOutsidePolygon = outsidePolygon;
                     findStartGroup = true;
                 }
@@ -97,7 +94,6 @@ namespace PolygonNavMesh
                 if (endTriangle == nullptr && triangle->IsPointInTriangle(endPoint))
                 {
                     endTriangle = triangle;
-                    // endTriangleGroup = triangleGroup;
                     endOutsidePolygon = outsidePolygon;
                 }
             }
@@ -163,14 +159,12 @@ namespace PolygonNavMesh
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
                     vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
-                    // for (vector<ClipTriangle*> triangleGroup : genTriangleGroups)
                     // 在一个三角形组合内搜寻
                     for (ClipTriangle* triangle : triangleGroup)
                     {
                         if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint, -0.01))
                         {
                             startTriangle = triangle;
-                            // startTriangleGroup = triangleGroup;
                             startOutsidePolygon = outsidePolygon;
                             findStartGroup = true;
                         }
