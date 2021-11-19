@@ -2,7 +2,7 @@
 #include "Sources/PolygonNavMeshTool.h"
 #include "Sources/PolygonTriangulation.h"
 
-#define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
+// #define USE_EASYX_GRAPHICS  // 是否使用 EasyX 进行输出，目前EasyX仅支持Windows平台
 
 #ifdef USE_EASYX_GRAPHICS
 #include <graphics.h>
@@ -18,6 +18,7 @@ using namespace NavMeshBase;
 
 // 屏幕大小
 Vector2* graphSize = new Vector2(640, 480);
+float scale = 0.001;
 
 // 绘制
 void ClearBoard();
@@ -38,8 +39,8 @@ std::vector<Path<double>> resultPaths;
 PolygonNavMeshTool polygonNavMeshTool;
 vector<Vector3> finalPathNodes;
 
-Vector3 startPoint  = Vector3(264, 204, 0);
-Vector3 endPoint    = Vector3(308, 291, 0);
+Vector3 startPoint  = Vector3(264, 204, 10);
+Vector3 endPoint    = Vector3(308, 291, 10);
 
 bool setStart = true;
 
@@ -53,73 +54,80 @@ int main(int argc, char* argv[])
     
     vector<vector<Vector3>> outputSubjectPaths;    // 外边框路径
     vector<vector<Vector3>> outputClipPaths;       // 裁剪用路径
-    
     vector<Vector3> subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(100, 100, 0));
-    subjectPath.push_back(Vector3(100, 300, 0));
-    subjectPath.push_back(Vector3(300, 300, 0));
-    subjectPath.push_back(Vector3(300, 100, 0));
+    subjectPath.push_back(Vector3(190762, 13992.9, 205920));
+    subjectPath.push_back(Vector3(196140, 20616.9, 205920));
+    subjectPath.push_back(Vector3(190296, 14371.1, 205920));
+    subjectPath.push_back(Vector3(195674, 20995.1, 205920));
     polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
     outputSubjectPaths.push_back(subjectPath);
     
-    subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(240, 100, 0));
-    subjectPath.push_back(Vector3(240, 300, 0));
-    subjectPath.push_back(Vector3(600, 200, 0));
-    subjectPath.push_back(Vector3(600, 100, 0));
-    polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
-    outputSubjectPaths.push_back(subjectPath);
-    
-    vector<Vector3> clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(258, 151, 0));
-    clipPath.push_back(Vector3(281, 324, 0));
-    clipPath.push_back(Vector3(324, 317, 0));
-    clipPath.push_back(Vector3(297, 148, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(387, 158, 0));
-    clipPath.push_back(Vector3(368, 190, 0));
-    clipPath.push_back(Vector3(421, 208, 0));
-    clipPath.push_back(Vector3(458, 161, 0));
-    clipPath.push_back(Vector3(436, 142, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(489, 139, 0));
-    clipPath.push_back(Vector3(478, 185, 0));
-    clipPath.push_back(Vector3(508, 197, 0));
-    clipPath.push_back(Vector3(528, 158, 0));
-    clipPath.push_back(Vector3(516, 134, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(158, 174, 0));
-    clipPath.push_back(Vector3(145, 230, 0));
-    clipPath.push_back(Vector3(190, 241, 0));
-    clipPath.push_back(Vector3(212, 200, 0));
-    clipPath.push_back(Vector3(194, 173, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-    
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(288, 131, 0));
-    clipPath.push_back(Vector3(402, 167, 0));
-    clipPath.push_back(Vector3(372, 75,  0));
-    clipPath.push_back(Vector3(302, 62, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
-
-    clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(246, 65, 0));
-    clipPath.push_back(Vector3(247, 185, 0));
-    clipPath.push_back(Vector3(313, 188,  0));
-    clipPath.push_back(Vector3(324, 73, 0));
-    polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    outputClipPaths.push_back(clipPath);
+    // vector<Vector3> subjectPath = vector<Vector3>();
+    // subjectPath.push_back(Vector3(100, 100, 10));
+    // subjectPath.push_back(Vector3(100, 300, 10));
+    // subjectPath.push_back(Vector3(300, 300, 10));
+    // subjectPath.push_back(Vector3(300, 100, 10));
+    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    // outputSubjectPaths.push_back(subjectPath);
+    //
+    // subjectPath = vector<Vector3>();
+    // subjectPath.push_back(Vector3(240, 100, 10));
+    // subjectPath.push_back(Vector3(240, 300, 10));
+    // subjectPath.push_back(Vector3(600, 200, 10));
+    // subjectPath.push_back(Vector3(600, 100, 10));
+    // polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
+    // outputSubjectPaths.push_back(subjectPath);
+    //
+    // vector<Vector3> clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(258, 151, 10));
+    // clipPath.push_back(Vector3(281, 324, 10));
+    // clipPath.push_back(Vector3(324, 317, 10));
+    // clipPath.push_back(Vector3(297, 148, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(387, 158, 10));
+    // clipPath.push_back(Vector3(368, 190, 10));
+    // clipPath.push_back(Vector3(421, 208, 10));
+    // clipPath.push_back(Vector3(458, 161, 10));
+    // clipPath.push_back(Vector3(436, 142, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(489, 139, 10));
+    // clipPath.push_back(Vector3(478, 185, 10));
+    // clipPath.push_back(Vector3(508, 197, 10));
+    // clipPath.push_back(Vector3(528, 158, 10));
+    // clipPath.push_back(Vector3(516, 134, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(158, 174, 10));
+    // clipPath.push_back(Vector3(145, 230, 10));
+    // clipPath.push_back(Vector3(190, 241, 10));
+    // clipPath.push_back(Vector3(212, 200, 10));
+    // clipPath.push_back(Vector3(194, 173, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(288, 131, 10));
+    // clipPath.push_back(Vector3(402, 167, 10));
+    // clipPath.push_back(Vector3(372, 75,  10));
+    // clipPath.push_back(Vector3(302, 62, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
+    //
+    // clipPath = vector<Vector3>();
+    // clipPath.push_back(Vector3(246, 65, 10));
+    // clipPath.push_back(Vector3(247, 185, 10));
+    // clipPath.push_back(Vector3(313, 188,  10));
+    // clipPath.push_back(Vector3(324, 73, 10));
+    // polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    // outputClipPaths.push_back(clipPath);
 
     // vector<Vector3> subjectPath = vector<Vector3>();
     // subjectPath.push_back(Vector3(88, 87, 0));
@@ -153,7 +161,7 @@ int main(int argc, char* argv[])
     initgraph(graphSize->x, graphSize->y);    // 创建绘图窗口，大小为 640x480 像素
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
     settextstyle(20, 0, L"微软雅黑");
-
+    
     // 绘制当前调试用
     ClearBoard();
     ReDrawBoard();
@@ -256,11 +264,11 @@ int main(int argc, char* argv[])
     {
         const auto triangles = polygon->GetGenTriangles();
         if (triangles.size() != 0)
-            for (ClipTriangle* triangle : triangles)
+            for (const ClipTriangle* triangle : triangles)
             {
-                std::cout << "三角形"<< ++outTriangleNum << ": A(" << triangle->A->point.x << ", " << triangle->A->point.y
+                std::cout << outTriangleNum++ << ": A(" << triangle->A->point.x << ", " << triangle->A->point.y
                     << ") - B(" << triangle->B->point.x << ", " << triangle->B->point.y
-                    << ") - C(" << triangle->C->point.x << ", " << triangle->C->point.y << ")" << endl;
+                    << ") - C(" << triangle->C->point.x << ", " << triangle->C->point.y << ")" << std::endl;
             }
     }
 #endif
