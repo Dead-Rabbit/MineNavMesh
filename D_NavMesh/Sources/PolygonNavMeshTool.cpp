@@ -1,7 +1,5 @@
 ﻿#include "PolygonNavMeshTool.h"
 
-#include <easyx.h>
-
 #include "Dijkstra.h"
 
 namespace PolygonNavMesh
@@ -161,9 +159,6 @@ namespace PolygonNavMesh
             {
                 startMiddlePoint = new Vector3(minPos.x, minPos.y, minPos.z);
                 startPoint = minPos;
-                
-                setfillcolor(BLUE);
-                fillcircle(minPos.x, minPos.y, 5);
                 
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
