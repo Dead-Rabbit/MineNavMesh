@@ -169,6 +169,9 @@
     <ClInclude Include="Sources\PolygonNavMeshTool.h" />
     <ClInclude Include="Sources\PolygonTriangulation.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sources\NavMeshREADME.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
