@@ -8,6 +8,8 @@
 * License   :  http://www.boost.org/LICENSE_1_0.txt                            *
 *******************************************************************************/
 
+#include "clipper.h"
+
 #include <stdlib.h>
 #include <algorithm>
 #include <cmath>
@@ -19,7 +21,6 @@
 #include <stdexcept>
 #include <vector>
 #include <list>
-#include "clipper.h"
 
 namespace clipperlib {
 	//------------------------------------------------------------------------------
