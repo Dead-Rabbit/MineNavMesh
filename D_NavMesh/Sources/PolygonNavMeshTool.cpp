@@ -11,23 +11,64 @@ namespace PolygonNavMesh
         {
             subjectPath.push_back(Point<double>(contourPoint.x, contourPoint.y));
         }
-        clipperD.AddPath(subjectPath, PathType::Subject, false);
+        subjectPaths.push_back(subjectPath);
+        genTriangleDirty = true;
     }
 
-    void PolygonNavMeshTool::AddPolygonInsideContour(vector<Vector3> contour)
+    int PolygonNavMeshTool::AddPolygonInsideContour(vector<Vector3> contour)
     {
         Path<double> clipPath = Path<double>();
         for (const Vector3 contourPoint : contour)
         {
             clipPath.push_back(Point<double>(contourPoint.x, contourPoint.y));
         }
-        clipperD.AddPath(clipPath, PathType::Clip, false);
+        
+        // 追加到工具记录的孔洞轮廓中
+        size_t newIndex = clipPathMap.size();
+        const size_t _removedPathNum = _RemovedClipPathIndex.size();
+        if (_removedPathNum > 0)
+        {
+            newIndex = _RemovedClipPathIndex[_removedPathNum - 1];
+            _RemovedClipPathIndex.pop_back();
+        }
+        clipPathMap[newIndex] = clipPath;
+        genTriangleDirty = true;
+        
+        return newIndex;
+    }
+
+    bool PolygonNavMeshTool::RemovePolygonInsideContour(int contourIndex)
+    {
+        const auto find_it = clipPathMap.find(contourIndex);
+        if (find_it == clipPathMap.end())
+            return false;
+
+        clipPathMap.erase(find_it);
+        
+        // 检查在删除列表中是否存在，如果存在则不录入
+        const auto add_it = std::find(_RemovedClipPathIndex.begin(), _RemovedClipPathIndex.end(), contourIndex);
+        if (add_it == _RemovedClipPathIndex.end())
+            _RemovedClipPathIndex.push_back(contourIndex);
+
+        genTriangleDirty = true;
+        return true;
     }
 
     vector<vector<ClipTriangle*>> PolygonNavMeshTool::GenerateFinalTriangles()
     {
-        if (finishedTriangle)
+        if (!genTriangleDirty)
             return triangulationTool.GetGenTriangles();
+
+        triangulationTool.Reset();
+        ClipperD clipperD = ClipperD();         // vatti 轮廓切割
+        for (auto subjectPath : subjectPaths)
+        {
+            clipperD.AddPath(subjectPath, PathType::Subject, false);
+        }
+        for (auto clip_it = clipPathMap.begin(); clip_it != clipPathMap.end(); ++clip_it)
+        {
+            clipperD.AddPath(clip_it->second, PathType::Clip, false);
+        }
         
         // 裁剪后输出的Path数据
         PathsD pathsD = PathsD();
@@ -54,7 +95,7 @@ namespace PolygonNavMesh
 
             // 三角化，并连接三角形之间的联系
             triangulationTool.EarClipping();
-            finishedTriangle = true;
+            genTriangleDirty = false;
         }
         return triangulationTool.GetGenTriangles();
     }
@@ -81,6 +122,7 @@ namespace PolygonNavMesh
         for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
         {
             vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
+            
             // 在一个三角形组合内搜寻
             for (ClipTriangle* triangle : triangleGroup)
             {

@@ -361,6 +361,10 @@ namespace PolygonNavMesh{
 
     bool ClipTriangle::IsPointInTriangle(Vector3 point, double diff)
     {
+        if (A->point.x == B->point.x && A->point.x == C->point.x ||
+            A->point.y == B->point.y && A->point.y == C->point.y)
+            return false;
+        
         return NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true, diff);
     }
 
@@ -414,6 +418,7 @@ namespace PolygonNavMesh{
         // 收入最后一个三角形
         if (firstNode->nextNode->nextNode->nextNode == firstNode)
         {
+            // 排除三个点的x或y相通的情况
             triangles.push_back(new ClipTriangle(firstNode, firstNode->preNode, firstNode->nextNode, triangles.size()));
             firstNode = nullptr;
             return false;

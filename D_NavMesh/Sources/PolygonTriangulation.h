@@ -59,6 +59,12 @@ namespace PolygonNavMesh
         // 获取所有生成三角形列表
         vector<vector<ClipTriangle*>> GetGenTriangles() const;
 
+        void Reset()
+        {
+            polygons.clear();
+            insidePolygons.clear();
+        }
+
     private:
         bool contourClockwise = false;  // 外边框是否为顺时针；默认为逆时针
         // 记录当前所有轮廓列表

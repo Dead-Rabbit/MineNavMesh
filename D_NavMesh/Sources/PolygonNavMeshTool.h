@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include <list>
+#include <map>
+
 #include "clipper.h"
 #include "PolygonTriangulation.h"
 
@@ -27,8 +30,16 @@ namespace PolygonNavMesh
         /**
          *  <summary>追加岛洞轮廓，轮廓按照逆时针输入</summary>
          *  <param name="contour">轮廓</param>
+         *  <returns>内边框的编号</returns>
          */
-        void AddPolygonInsideContour(vector<Vector3> contour);
+        int AddPolygonInsideContour(vector<Vector3> contour);
+
+        /**
+         *  <summary>删除追加的岛洞轮廓</summary>
+         *  <param name="contourIndex">岛洞轮廓的编号</param>
+         *  <returns>是否成功删除</returns>
+         */
+        bool RemovePolygonInsideContour(int contourIndex);
 
         // 进行 vatti 切割 + 三角化
         vector<vector<ClipTriangle*>> GenerateFinalTriangles();
@@ -52,15 +63,13 @@ namespace PolygonNavMesh
         }
         
     private:
-        bool finishedTriangle = false;
-        ClipperD clipperD = ClipperD();         // vatti 轮廓切割
+        bool genTriangleDirty = false;
         PolygonTriangulation triangulationTool; // 耳切法三角化工具
 
-        // TODO 当前Reset未使用
-        void Reset()
-        {
-            finishedTriangle = false;
-        }
+        // 记录的轮廓
+        vector<Path<double>> subjectPaths;
+        map<size_t, Path<double>> clipPathMap;
+        vector<size_t> _RemovedClipPathIndex;
     };
     
 }
