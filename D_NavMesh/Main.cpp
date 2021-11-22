@@ -101,43 +101,43 @@ int main(int argc, char* argv[])
     innerPathIndexs.push_back(pathIndex);
     outputClipPaths.push_back(clipPath);
     
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(489, 139, 10));
-    // clipPath.push_back(Vector3(478, 185, 10));
-    // clipPath.push_back(Vector3(508, 197, 10));
-    // clipPath.push_back(Vector3(528, 158, 10));
-    // clipPath.push_back(Vector3(516, 134, 10));
-    // pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // innerPathIndexs.push_back(pathIndex);
-    // outputClipPaths.push_back(clipPath);
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(489, 139, 10));
+    clipPath.push_back(Vector3(478, 185, 10));
+    clipPath.push_back(Vector3(508, 197, 10));
+    clipPath.push_back(Vector3(528, 158, 10));
+    clipPath.push_back(Vector3(516, 134, 10));
+    pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    innerPathIndexs.push_back(pathIndex);
+    outputClipPaths.push_back(clipPath);
     //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(158, 174, 10));
-    // clipPath.push_back(Vector3(145, 230, 10));
-    // clipPath.push_back(Vector3(190, 241, 10));
-    // clipPath.push_back(Vector3(212, 200, 10));
-    // clipPath.push_back(Vector3(194, 173, 10));
-    // pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // innerPathIndexs.push_back(pathIndex);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(288, 131, 10));
-    // clipPath.push_back(Vector3(402, 167, 10));
-    // clipPath.push_back(Vector3(372, 75,  10));
-    // clipPath.push_back(Vector3(302, 62, 10));
-    // pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // innerPathIndexs.push_back(pathIndex);
-    // outputClipPaths.push_back(clipPath);
-    //
-    // clipPath = vector<Vector3>();
-    // clipPath.push_back(Vector3(246, 65, 10));
-    // clipPath.push_back(Vector3(247, 185, 10));
-    // clipPath.push_back(Vector3(313, 188,  10));
-    // clipPath.push_back(Vector3(324, 73, 10));
-    // pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
-    // innerPathIndexs.push_back(pathIndex);
-    // outputClipPaths.push_back(clipPath);
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(158, 174, 10));
+    clipPath.push_back(Vector3(145, 230, 10));
+    clipPath.push_back(Vector3(190, 241, 10));
+    clipPath.push_back(Vector3(212, 200, 10));
+    clipPath.push_back(Vector3(194, 173, 10));
+    pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    innerPathIndexs.push_back(pathIndex);
+    outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(288, 131, 10));
+    clipPath.push_back(Vector3(402, 167, 10));
+    clipPath.push_back(Vector3(372, 75,  10));
+    clipPath.push_back(Vector3(302, 62, 10));
+    pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    innerPathIndexs.push_back(pathIndex);
+    outputClipPaths.push_back(clipPath);
+    
+    clipPath = vector<Vector3>();
+    clipPath.push_back(Vector3(246, 65, 10));
+    clipPath.push_back(Vector3(247, 185, 10));
+    clipPath.push_back(Vector3(313, 188,  10));
+    clipPath.push_back(Vector3(324, 73, 10));
+    pathIndex = polygonNavMeshTool.AddPolygonInsideContour(clipPath);
+    innerPathIndexs.push_back(pathIndex);
+    outputClipPaths.push_back(clipPath);
 
     // vector<Vector3> subjectPath = vector<Vector3>();
     // subjectPath.push_back(Vector3(88, 87, 0));
