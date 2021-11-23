@@ -368,7 +368,7 @@ struct Path {
 	}
 	//void Trim(bool is_closed_path, T min_length);
 
-	template<typename T2>		
+	template<typename T2>
 	void AppendPointsScale(const Path<T2> & other, double scale)
 	{
 		data.reserve(data.size() + other.size());
