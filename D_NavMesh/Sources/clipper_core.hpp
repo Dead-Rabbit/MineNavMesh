@@ -13,8 +13,8 @@
 #ifndef CLIPPER_CORE_H
 #define CLIPPER_CORE_H
 
-//#include "stdint.h"
-//#include <stdlib.h>
+#include "stdint.h"
+#include <stdlib.h>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
