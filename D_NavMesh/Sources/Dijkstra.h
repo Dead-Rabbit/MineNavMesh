@@ -12,14 +12,14 @@ namespace PolygonNavMesh
     */
     //记录起点到每个顶点的最短路径的信息
     struct Dis {
-        string path;
+        // string path;
         vector<ClipTriangle*> pathTriangle;
         int value;
         bool visit;
         Dis() {
             visit = false;
             value = 0;
-            path = "";
+            // path = "";
         }
     };
 

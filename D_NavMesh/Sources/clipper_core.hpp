@@ -15,6 +15,7 @@
 
 #include "stdint.h"
 #include <stdlib.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -25,6 +26,8 @@
 #include <stdexcept>
 #include <vector>
 #include <type_traits>
+
+using namespace std;
 
 namespace clipperlib {
 
@@ -62,8 +65,8 @@ struct Point {
 	    double sin_a = sin(angle_rad);
 
 	    if  (std::numeric_limits<T>::is_integer) {
-	        x = static_cast<T>(std::round(tmp_x * cos_a - tmp_y * sin_a + center.x));
-	        y = static_cast<T>(std::round(tmp_x * sin_a - tmp_y * cos_a + center.y));
+	        x = static_cast<T>(round(tmp_x * cos_a - tmp_y * sin_a + center.x));
+	        y = static_cast<T>(round(tmp_x * sin_a - tmp_y * cos_a + center.y));
 	    }
 	    else {
 	        x = static_cast<T>(tmp_x * cos_a - tmp_y * sin_a + center.x);
@@ -77,8 +80,8 @@ struct Point {
 		double tmp_y = y - center.y;
 
 		if  (std::numeric_limits<T>::is_integer) {
-			x = static_cast<T>(std::round(tmp_x * cos_a - tmp_y * sin_a + center.x));
-			y = static_cast<T>(std::round(tmp_x * sin_a - tmp_y * cos_a + center.y));
+			x = static_cast<T>(round(tmp_x * cos_a - tmp_y * sin_a + center.x));
+			y = static_cast<T>(round(tmp_x * sin_a - tmp_y * cos_a + center.y));
 		}
 		else {
 			x = static_cast<T>(tmp_x * cos_a - tmp_y * sin_a + center.x);
@@ -124,7 +127,7 @@ struct Point {
 template <typename T>
 PointI Round(Point<T> p)
 {
-	return PointI(static_cast<int64_t>(std::round(p.x)), static_cast<int64_t>(std::round(p.y)));
+	return PointI(static_cast<int64_t>(round(p.x)), static_cast<int64_t>(round(p.y)));
 }
 
 template <typename T>
@@ -332,8 +335,8 @@ struct Path {
 		if  (std::numeric_limits<T>::is_integer)
 		{
 			for (auto& point : data) {
-				point.x = static_cast<T>(std::round(point.x * sx));
-				point.y = static_cast<T>(std::round(point.y * sy));
+				point.x = static_cast<T>(round(point.x * sx));
+				point.y = static_cast<T>(round(point.y * sy));
 			}
 		}
 		else
@@ -368,7 +371,7 @@ struct Path {
 	}
 	//void Trim(bool is_closed_path, T min_length);
 
-	template<typename T2>
+	template<typename T2>		
 	void AppendPointsScale(const Path<T2> & other, double scale)
 	{
 		data.reserve(data.size() + other.size());

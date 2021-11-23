@@ -166,17 +166,12 @@ public:
 	virtual RectI GetBounds();
 
 	//ADDPATH & ADDPATHS METHODS ...
-	virtual void AddPath(const PathI &path, 
-    PathType polytype = PathType::Subject, bool is_open = false);
-	virtual void AddPaths(const PathsI &paths, 
-    PathType polytype = PathType::Subject, bool is_open = false);
+	void AddPath(const PathI &path, PathType polytype = PathType::Subject, bool is_open = false);
+	void AddPaths(const PathsI &paths, PathType polytype = PathType::Subject, bool is_open = false);
 	//EXECUTE METHODS ...
-	virtual bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PathsI &closed_paths);
-	virtual bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PathsI &closed_paths, PathsI &open_paths);
-	virtual bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PolyTreeI &poly_tree, PathsI &open_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PathsI &closed_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PathsI &closed_paths, PathsI &open_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PolyTreeI &poly_tree, PathsI &open_paths);
 };
 
 // Note: ClipperD: is a wrapper for ClipperI.
@@ -195,17 +190,12 @@ protected:
 public:
 	explicit ClipperD(double scale = 100);
 	//ADDPATH & ADDPATHS METHODS ...
-	virtual void AddPath(const PathD &path,
-    PathType polytype = PathType::Subject, bool is_open = false);
-	virtual void AddPaths(const PathsD &paths,
-    PathType polytype = PathType::Subject, bool is_open = false);
+	void AddPath(const PathD &path, PathType polytype = PathType::Subject, bool is_open = false);
+	void AddPaths(const PathsD &paths, PathType polytype = PathType::Subject, bool is_open = false);
 	//EXECUTE METHODS ...
-	bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PathsD &closed_paths);
-	bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PathsD &closed_paths, PathsD &open_paths);
-	bool Execute(ClipType clip_type, 
-    FillRule fill_rule, PolyTreeD &poly_tree, PathsD &open_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PathsD &closed_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PathsD &closed_paths, PathsD &open_paths);
+	bool Execute(ClipType clip_type, FillRule fill_rule, PolyTreeD &poly_tree, PathsD &open_paths);
 };
 
 // PolyTree --------------------------------------------------------------------

@@ -10,8 +10,8 @@
 
 #include "clipper.h"
 
-#include <stdlib.h>
-#include <algorithm>
+// #include <stdlib.h>
+// #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <functional>
@@ -181,7 +181,7 @@ inline int64_t TopX(const Active &e, const int64_t currentY) {
 	if ((currentY == e.top.y) || (e.top.x == e.bot.x))
 		return e.top.x;
 	else
-		return e.bot.x + (int64_t)std::round(e.dx * (currentY - e.bot.y));
+		return e.bot.x + (int64_t)round(e.dx * (currentY - e.bot.y));
 }
 //------------------------------------------------------------------------------
 
@@ -194,7 +194,7 @@ inline int64_t TopX(const PointI pt1, const PointI pt2, const int64_t y) {
 		return pt2.x;
 	else {
 		double dx = GetDx(pt1, pt2);
-		return pt1.x + (int64_t)std::round(dx * (y - pt1.y));
+		return pt1.x + (int64_t)round(dx * (y - pt1.y));
 	}
 }
 //------------------------------------------------------------------------------
@@ -238,18 +238,18 @@ PointI GetIntersectPoint(const Active &e1, const Active &e2) {
 	if (e1.dx == 0) {
 		if (IsHorizontal(e2)) return PointI(e1.bot.x, e2.bot.y);
 		b2 = e2.bot.y - (e2.bot.x / e2.dx);
-		return PointI(e1.bot.x, (int64_t)std::round(e1.bot.x / e2.dx + b2));
+		return PointI(e1.bot.x, (int64_t)round(e1.bot.x / e2.dx + b2));
 	} else if (e2.dx == 0) {
 		if (IsHorizontal(e1)) return PointI(e2.bot.x, e1.bot.y);
 		b1 = e1.bot.y - (e1.bot.x / e1.dx);
-		return PointI(e2.bot.x, (int64_t)std::round(e2.bot.x / e1.dx + b1));
+		return PointI(e2.bot.x, (int64_t)round(e2.bot.x / e1.dx + b1));
 	} else {
 		b1 = e1.bot.x - e1.bot.y * e1.dx;
 		b2 = e2.bot.x - e2.bot.y * e2.dx;
 		double q = (b2 - b1) / (e1.dx - e2.dx);
 		return (abs(e1.dx) < abs(e2.dx)) ?
-			PointI((int64_t)std::round(e1.dx * q + b1), (int64_t)std::round(q)) :
-			PointI((int64_t)std::round(e2.dx * q + b2), (int64_t)std::round(q));
+			PointI((int64_t)round(e1.dx * q + b1), (int64_t)round(q)) :
+			PointI((int64_t)round(e2.dx * q + b2), (int64_t)round(q));
 	}
 }
 //------------------------------------------------------------------------------
@@ -1957,8 +1957,8 @@ bool Clipper::BuildResultI(PathsI &solution_closed, PathsI *solution_open) {
       p.reserve(cnt);
       if (scale_ != 1.0) {
         for (int i = 0; i < cnt; i++) {
-          p.push_back(PointI((int64_t)std::round(op->pt.x * inv_scale),
-            (int64_t)std::round(op->pt.y * inv_scale)));
+          p.push_back(PointI((int64_t)round(op->pt.x * inv_scale),
+            (int64_t)round(op->pt.y * inv_scale)));
           op = op->next;
         }
       }
@@ -2011,8 +2011,8 @@ bool Clipper::BuildResultTreeI(PolyTreeI &pt, PathsI *solution_open) {
       p.reserve(cnt);
       if (scale_ != 1.0) {
         for (int i = 0; i < cnt; i++) {
-          p.push_back(PointI((int64_t)std::round(op->pt.x * inv_scale),
-            (int64_t)std::round(op->pt.y * inv_scale)));
+          p.push_back(PointI((int64_t)round(op->pt.x * inv_scale),
+            (int64_t)round(op->pt.y * inv_scale)));
           op = op->next;
         }
       }
@@ -2061,10 +2061,10 @@ RectI Clipper::GetBounds() {
 	}
   if (scale_ != 1.0) {
     double inv_scale = 1 / scale_;
-    bounds.left = (int64_t)std::round(bounds.left * inv_scale);
-    bounds.top = (int64_t)std::round(bounds.top * inv_scale);
-    bounds.right = (int64_t)std::round(bounds.right * inv_scale);
-    bounds.bottom = (int64_t)std::round(bounds.bottom * inv_scale);
+    bounds.left = (int64_t)round(bounds.left * inv_scale);
+    bounds.top = (int64_t)round(bounds.top * inv_scale);
+    bounds.right = (int64_t)round(bounds.right * inv_scale);
+    bounds.bottom = (int64_t)round(bounds.bottom * inv_scale);
   }
 	return bounds;
 }

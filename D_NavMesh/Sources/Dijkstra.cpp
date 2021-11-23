@@ -56,7 +56,7 @@ namespace PolygonNavMesh
         int i;
         for (i = 0; i < this->vexnum; i++) {
             //设置当前的路径
-            dis[i].path = "v" + to_string(begin) + "-->v" + to_string(i);
+            // dis[i].path = "v" + to_string(begin) + "-->v" + to_string(i);
             dis[i].value = arc[begin][i];
             dis[i].pathTriangle.push_back(triangles_[i]);
         }
@@ -87,7 +87,7 @@ namespace PolygonNavMesh
                 if (!dis[i].visit && arc[temp][i]!=INT_MAX && (dis[temp].value + arc[temp][i]) < dis[i].value) {
                     //如果新得到的边可以影响其他为访问的顶点，那就就更新它的最短路径和长度
                     dis[i].value = dis[temp].value + arc[temp][i];
-                    dis[i].path = dis[temp].path + "-->v" + to_string(i);
+                    // dis[i].path = dis[temp].path + "-->v" + to_string(i);
                     
                     dis[i].pathTriangle.clear();
                     dis[i].pathTriangle.insert(dis[i].pathTriangle.begin(), dis[temp].pathTriangle.begin(), dis[temp].pathTriangle.end());
