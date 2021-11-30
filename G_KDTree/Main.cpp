@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     // Use the time function to get a "seed” value for srand
     const unsigned seed = time(0);
     srand(seed);
-    const int genPointN = 200;
+    const int genPointN = 2000;
     points.clear();
     for (int i = 0; i < genPointN; i++)
     {
