@@ -294,8 +294,6 @@ int main(int argc, char* argv[])
             }
     }
 #endif
-
-    return 0;
 }
 
 #ifdef USE_EASYX_GRAPHICS

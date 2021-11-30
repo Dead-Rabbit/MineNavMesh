@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E_Dijkstra", "E_Dijkstra\E_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "F_GetSmoothPath", "F_GetSmoothPath\F_GetSmoothPath.vcxproj", "{217DB107-5E5B-48F1-BF06-B3CB158A5B60}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "G_KDTree", "G_KDTree\G_KDTree.vcxproj", "{772892C4-2E39-4B9E-AE14-BA38175B7A64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -88,5 +90,13 @@ Global
 		{217DB107-5E5B-48F1-BF06-B3CB158A5B60}.Release|Win32.Build.0 = Release|Win32
 		{217DB107-5E5B-48F1-BF06-B3CB158A5B60}.Release|x64.ActiveCfg = Release|x64
 		{217DB107-5E5B-48F1-BF06-B3CB158A5B60}.Release|x64.Build.0 = Release|x64
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Debug|Win32.ActiveCfg = Debug|Win32
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Debug|Win32.Build.0 = Debug|Win32
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Debug|x64.ActiveCfg = Debug|x64
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Debug|x64.Build.0 = Debug|x64
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Release|Win32.ActiveCfg = Release|Win32
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Release|Win32.Build.0 = Release|Win32
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Release|x64.ActiveCfg = Release|x64
+		{772892C4-2E39-4B9E-AE14-BA38175B7A64}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal
