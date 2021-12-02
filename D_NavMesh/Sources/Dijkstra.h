@@ -1,8 +1,6 @@
 ﻿#pragma once
-#include<string>
 
 #include "PolygonTriangulation.h"
-using namespace std;
 
 namespace PolygonNavMesh
 {
@@ -13,7 +11,7 @@ namespace PolygonNavMesh
     //记录起点到每个顶点的最短路径的信息
     struct Dis {
         // string path;
-        vector<ClipTriangle*> pathTriangle;
+        std::vector<ClipTriangle*> pathTriangle;
         int value;
         bool visit;
         Dis() {
@@ -35,9 +33,9 @@ namespace PolygonNavMesh
         ~Graph_DG();
         
         //创建图
-        void createGraph(vector<ClipTriangle*> inputTriangles);
+        void createGraph(std::vector<ClipTriangle*> inputTriangles);
         // 输入起始、结束点进行搜索 所有路过的三角形
-        vector<ClipTriangle*> find_path_triangles(const ClipTriangle* endTriangle) const;
+        std::vector<ClipTriangle*> find_path_triangles(const ClipTriangle* endTriangle) const;
         
         //求最短路径
         void Dijkstra(ClipTriangle* beginTriangle);

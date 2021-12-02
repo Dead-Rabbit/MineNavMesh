@@ -11,7 +11,7 @@ namespace PolygonNavMesh
         delete arc;
     }
 
-    void Graph_DG::createGraph(vector<ClipTriangle*> inputTriangles) {
+    void Graph_DG::createGraph(std::vector<ClipTriangle*> inputTriangles) {
         //初始化顶点数
         this->vexnum = inputTriangles.size();
         //为邻接矩阵开辟空间和赋初值
@@ -38,7 +38,7 @@ namespace PolygonNavMesh
                 const ClipTriangle* linkedTriangle = linkedTrianglePair.first;
                 const ClipLine* linkedLine = linkedTrianglePair.second;
                 // const int weight = (triangle->centerPos - linkedTriangle->centerPos).squaredLength();
-                const double weight = NavMath::GetDisFromPointToLine(triangle->centerPos,
+                const double weight = NavMeshBase::NavMath::GetDisFromPointToLine(triangle->centerPos,
                     linkedLine->A->point, linkedLine->B->point);
                 //对邻接矩阵对应上的点赋值
                 arc[triangle->numInPolygon][linkedTriangle->numInPolygon] = weight;
@@ -97,9 +97,9 @@ namespace PolygonNavMesh
         }
     }
     
-    vector<ClipTriangle*> Graph_DG::find_path_triangles(const ClipTriangle* endTriangle) const
+    std::vector<ClipTriangle*> Graph_DG::find_path_triangles(const ClipTriangle* endTriangle) const
     {
-        vector<ClipTriangle*> pathTriangles;
+        std::vector<ClipTriangle*> pathTriangles;
         pathTriangles.push_back(startClipTriangle);
         for (ClipTriangle* pathTriangle : dis[endTriangle->numInPolygon].pathTriangle)
         {

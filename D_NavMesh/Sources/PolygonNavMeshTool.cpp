@@ -4,23 +4,23 @@
 
 namespace PolygonNavMesh
 {
-    void PolygonNavMeshTool::AddPolygonOutsideContour(vector<Vector3> contour)
+    void PolygonNavMeshTool::AddPolygonOutsideContour(std::vector<NavMeshBase::Vector3> contour)
     {
-        Path<double> subjectPath = Path<double>();
-        for (const Vector3 contourPoint : contour)
+        clipperlib::Path<double> subjectPath = clipperlib::Path<double>();
+        for (const NavMeshBase::Vector3 contourPoint : contour)
         {
-            subjectPath.push_back(Point<double>(contourPoint.x, contourPoint.y));
+            subjectPath.push_back(clipperlib::Point<double>(contourPoint.x, contourPoint.y));
         }
         subjectPaths.push_back(subjectPath);
         genTriangleDirty = true;
     }
 
-    int PolygonNavMeshTool::AddPolygonInsideContour(vector<Vector3> contour)
+    int PolygonNavMeshTool::AddPolygonInsideContour(std::vector<NavMeshBase::Vector3> contour)
     {
-        Path<double> clipPath = Path<double>();
-        for (const Vector3 contourPoint : contour)
+        clipperlib::Path<double> clipPath = clipperlib::Path<double>();
+        for (const NavMeshBase::Vector3 contourPoint : contour)
         {
-            clipPath.push_back(Point<double>(contourPoint.x, contourPoint.y));
+            clipPath.push_back(clipperlib::Point<double>(contourPoint.x, contourPoint.y));
         }
         
         // 追加到工具记录的孔洞轮廓中
@@ -54,28 +54,28 @@ namespace PolygonNavMesh
         return true;
     }
 
-    vector<vector<ClipTriangle*>> PolygonNavMeshTool::GenerateFinalTriangles()
+    std::vector<std::vector<ClipTriangle*>> PolygonNavMeshTool::GenerateFinalTriangles()
     {
         if (!genTriangleDirty)
             return triangulationTool.GetGenTriangles();
 
         triangulationTool.Reset();
-        ClipperD clipperD = ClipperD();         // vatti 轮廓切割
+        clipperlib::ClipperD clipperD = clipperlib::ClipperD();         // vatti 轮廓切割
         for (auto subjectPath : subjectPaths)
         {
-            clipperD.AddPath(subjectPath, PathType::Subject, false);
+            clipperD.AddPath(subjectPath, clipperlib::PathType::Subject, false);
         }
         for (auto clip_it = clipPathMap.begin(); clip_it != clipPathMap.end(); ++clip_it)
         {
-            clipperD.AddPath(clip_it->second, PathType::Clip, false);
+            clipperD.AddPath(clip_it->second, clipperlib::PathType::Clip, false);
         }
         
         // 裁剪后输出的Path数据
-        PathsD pathsD = PathsD();
+        clipperlib::PathsD pathsD = clipperlib::PathsD();
         // 获取最后输出path
-        if (clipperD.Execute(ClipType::Difference, FillRule::Negative, pathsD))
+        if (clipperD.Execute(clipperlib::ClipType::Difference, clipperlib::FillRule::Negative, pathsD))
         {
-            std::vector<Path<double>> resultPaths = pathsD.data;
+            std::vector<clipperlib::Path<double>> resultPaths = pathsD.data;
 
             // 将resultPaths 加入到三角化程序中
             // 获取所有路径点和对应的岛洞
@@ -84,10 +84,10 @@ namespace PolygonNavMesh
                 auto path = resultPaths[i];
                 path.Reverse();
             
-                vector<Vector3> pathNodes;
+                std::vector<NavMeshBase::Vector3> pathNodes;
                 for (auto pathNode : path.data)
                 {
-                    pathNodes.push_back(Vector3(pathNode.x, pathNode.y, 0));
+                    pathNodes.push_back(NavMeshBase::Vector3(pathNode.x, pathNode.y, 0));
                 }
                 // 判断当前线段是否为外边框和岛洞
                 triangulationTool.AddPolygonPoints(pathNodes);
@@ -100,28 +100,28 @@ namespace PolygonNavMesh
         return triangulationTool.GetGenTriangles();
     }
 
-    vector<Vector3> PolygonNavMeshTool::FindPath(Vector3 startPoint, Vector3 endPoint)
+    std::vector<NavMeshBase::Vector3> PolygonNavMeshTool::FindPath(NavMeshBase::Vector3 startPoint, NavMeshBase::Vector3 endPoint)
     {
         // 寻路前，尝试根据边框进行三角化，如果之前操作过，则重新生成
         GenerateFinalTriangles();
         
-        vector<ClipTriangle*> pathTriangles = vector<ClipTriangle*>();
+        std::vector<ClipTriangle*> pathTriangles = std::vector<ClipTriangle*>();
         // 获取生成的多个三角形组
-        vector<OutsidePolygon*> genTrianglePolygons = triangulationTool.GetOutsidePolygons();
+        std::vector<OutsidePolygon*> genTrianglePolygons = triangulationTool.GetOutsidePolygons();
 
-        Vector3 originStartPoint = startPoint;
-        vector<Vector3> finalPath;          // 最终输出路径
+        NavMeshBase::Vector3 originStartPoint = startPoint;
+        std::vector<NavMeshBase::Vector3> finalPath;          // 最终输出路径
         // 检查起始点和结束点所在的三角形
         ClipTriangle* startTriangle = nullptr;
         ClipTriangle* endTriangle = nullptr;
         bool findStartGroup = false;
         OutsidePolygon* startOutsidePolygon = nullptr;
         OutsidePolygon* endOutsidePolygon = nullptr;
-        Vector3 * startMiddlePoint = nullptr;
+        NavMeshBase::Vector3 * startMiddlePoint = nullptr;
         // 查找起始点和结束点所在的三角组和三角形
         for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
         {
-            vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
+            std::vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
             
             // 在一个三角形组合内搜寻
             for (ClipTriangle* triangle : triangleGroup)
@@ -144,17 +144,17 @@ namespace PolygonNavMesh
         // 如果当前起始点在外部，则起始点修改为当前距离最近的一个点
         if (!findStartGroup)
         {
-            Vector3 minPos;
+            NavMeshBase::Vector3 minPos;
             double minDis = -1;
             bool findMinPos = false;
-            vector<OutsidePolygon*> outsidePolygons = triangulationTool.GetOutsidePolygons();
+            std::vector<OutsidePolygon*> outsidePolygons = triangulationTool.GetOutsidePolygons();
             // 首先检查并排除岛洞的情况
             for (auto polygon : outsidePolygons)
             {
                 // 点在多边形内
                 if (polygon->IsPointInPolygon(startPoint))
                 {
-                    Vector3 nearPoint;
+                    NavMeshBase::Vector3 nearPoint;
                     if (polygon->GetNearCrossFromInsidePoint(startPoint, nearPoint))
                     {
                         auto tempDis = (nearPoint - startPoint).length();
@@ -176,7 +176,7 @@ namespace PolygonNavMesh
                     // 点在多边形外
                     if (!polygon->IsPointInPolygon(startPoint))
                     {
-                        Vector3 nearPoint;
+                        NavMeshBase::Vector3 nearPoint;
                         if (polygon->GetNearCrossFromOutsidePoint(startPoint, nearPoint))
                         {
                             auto tempDis = (nearPoint - startPoint).length();
@@ -194,12 +194,12 @@ namespace PolygonNavMesh
             // 找到了最近的点，给start赋值为该点
             if (findMinPos)
             {
-                startMiddlePoint = new Vector3(minPos.x, minPos.y, minPos.z);
+                startMiddlePoint = new NavMeshBase::Vector3(minPos.x, minPos.y, minPos.z);
                 startPoint = minPos;
                 
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
-                    vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
+                    std::vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
                     // 在一个三角形组合内搜寻
                     for (ClipTriangle* triangle : triangleGroup)
                     {
@@ -220,10 +220,10 @@ namespace PolygonNavMesh
             // 如果当前结束点在目标形状内，则说明在岛洞内
             if (startOutsidePolygon->IsPointInPolygon(endPoint))
             {
-                Vector3 nearPoint;
+                NavMeshBase::Vector3 nearPoint;
                 startOutsidePolygon->GetNearCrossFromInsidePoint(endPoint, nearPoint);
                 endPoint = nearPoint;
-                vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
+                std::vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
                 for (ClipTriangle* triangle : triangleGroup)
                 {
                     if (triangle->IsPointInTriangle(endPoint, -0.01))
@@ -234,10 +234,10 @@ namespace PolygonNavMesh
                 }
             } else
             {
-                Vector3 nearPoint;
+                NavMeshBase::Vector3 nearPoint;
                 startOutsidePolygon->GetNearCrossFromOutsidePoint(endPoint, nearPoint);
                 endPoint = nearPoint;
-                vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
+                std::vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
                 for (ClipTriangle* triangle : triangleGroup)
                 {
                     if (triangle->IsPointInTriangle(endPoint, -0.01))
@@ -261,7 +261,7 @@ namespace PolygonNavMesh
 
             // 获得最终路径三角形，进行路径平滑，此处使用拐角点法
             ClipTriangle* preTriangle = nullptr;
-            vector<ClipLine*> pathLines;
+            std::vector<ClipLine*> pathLines;
             // 获取所有路径穿出口
             for (int i = 0; i < pathTriangles.size(); i++)
             {
@@ -274,11 +274,11 @@ namespace PolygonNavMesh
                 }
 
                 // 查找两个三角形交线
-                vector<pair<ClipTriangle*, ClipLine*>> preLinkTrianglePairs = preTriangle->GetLinkedClipTriangles();
+                std::vector<std::pair<ClipTriangle*, ClipLine*>> preLinkTrianglePairs = preTriangle->GetLinkedClipTriangles();
                 
                 for (int j = 0; j < preLinkTrianglePairs.size(); j++)
                 {
-                    pair<ClipTriangle*, ClipLine*> preLinkPair = preLinkTrianglePairs[j];
+                    std::pair<ClipTriangle*, ClipLine*> preLinkPair = preLinkTrianglePairs[j];
                     // 是否为链接的当前位置
                     if (preLinkPair.first == curTriangle)
                     {
@@ -309,9 +309,9 @@ namespace PolygonNavMesh
 
             // 遍历所有线，将寻路进行平滑操作，此处使用漏斗算法，获得最终路径
             // 参考 https://blog.csdn.net/liqiang981/article/details/70207912
-            Vector3 curPoint = startPoint;  // 当前节点
-            Vector3 rightLeg = pathLines[0]->A->point - curPoint;
-            Vector3 leftLeg = pathLines[0]->B->point - curPoint;
+            NavMeshBase::Vector3 curPoint = startPoint;  // 当前节点
+            NavMeshBase::Vector3 rightLeg = pathLines[0]->A->point - curPoint;
+            NavMeshBase::Vector3 leftLeg = pathLines[0]->B->point - curPoint;
             auto curPointIndex = 0, leftLegIndex = 0, rightLegIndex = 0;
             for(int i = 0; i < pathLines.size(); i++)
             {
@@ -384,7 +384,7 @@ namespace PolygonNavMesh
             finalPath.push_back(endPoint);
 
             // 优化 final path，将前后两个“相同”的点变为一个点
-            Vector3 prePoint = finalPath[0];
+            NavMeshBase::Vector3 prePoint = finalPath[0];
             auto pointIt = finalPath.begin() + 1;
             while(pointIt != finalPath.end())
             {

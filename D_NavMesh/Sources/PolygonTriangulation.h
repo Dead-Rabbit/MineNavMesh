@@ -1,14 +1,8 @@
 ﻿#pragma once
 
-#include <vector>
-
-#include "PolygonTriangulation.h"
 #include "../../Base/Vectors.h"
 #include "../../Base/NavMath.h"
 #include "../../Base/NavMeshHelper.h"
-
-using namespace std;
-using namespace NavMeshBase;
 
 /**
  *  本类辅助于 PolygonNavMeshTool 用于针对轮廓进行三角化
@@ -26,20 +20,20 @@ namespace PolygonNavMesh
     class PolygonTriangulation
     {
     public:
-        void AddPolygonPoints(vector<Vector3> points)
+        void AddPolygonPoints(std::vector<NavMeshBase::Vector3> points)
         {
             // 判断当前线段是否为外边框和岛洞
-            if (!contourClockwise && NavMeshHelper::IsTriangleOutside(points))
+            if (!contourClockwise && NavMeshBase::NavMeshHelper::IsTriangleOutside(points))
                 AddPolygonOutPoints(points);
             else
                 AddPolygonInsidePoints(points);
         }
         
         // 设置需要进行计算的外部节点
-        void AddPolygonOutPoints(vector<Vector3> edgePoints);
+        void AddPolygonOutPoints(std::vector<NavMeshBase::Vector3> edgePoints);
 
         // 设置外部节点下的内部空洞节点
-        void AddPolygonInsidePoints(vector<Vector3> innerPoints);
+        void AddPolygonInsidePoints(std::vector<NavMeshBase::Vector3> innerPoints);
         
         // 执行单步耳切法
         bool OneStepEarClipping();
@@ -51,13 +45,13 @@ namespace PolygonNavMesh
         }
 
         // 获取所有外边框形状
-        vector<OutsidePolygon*> GetOutsidePolygons() const
+        std::vector<OutsidePolygon*> GetOutsidePolygons() const
         {
             return polygons;
         }
 
         // 获取所有生成三角形列表
-        vector<vector<ClipTriangle*>> GetGenTriangles() const;
+        std::vector<std::vector<ClipTriangle*>> GetGenTriangles() const;
 
         void Reset()
         {
@@ -68,9 +62,9 @@ namespace PolygonNavMesh
     private:
         bool contourClockwise = false;  // 外边框是否为顺时针；默认为逆时针
         // 记录当前所有轮廓列表
-        vector<OutsidePolygon*> polygons;
+        std::vector<OutsidePolygon*> polygons;
         // 记录当前未被分配的岛洞列表，每个岛洞必然在一个轮廓里
-        vector<vector<Vector3>> insidePolygons;
+        std::vector<std::vector<NavMeshBase::Vector3>> insidePolygons;
     };
 
     class OutsidePolygon
@@ -81,10 +75,10 @@ namespace PolygonNavMesh
         /** <summary></summary>
          *  <param name="edgePoints">每一个轮廓所需要的点，当前必须为逆时针输入</param>
          */
-        OutsidePolygon(vector<Vector3> edgePoints);
+        OutsidePolygon(std::vector<NavMeshBase::Vector3> edgePoints);
         
         // 设置外部节点下的内部空洞节点
-        void AddPolygonInsidePoints(vector<Vector3> innerPoints);
+        void AddPolygonInsidePoints(std::vector<NavMeshBase::Vector3> innerPoints);
         
         // 判断当前点是否为耳尖
         bool IsPointEar(PointLinkNode* checkNode) const;
@@ -93,14 +87,14 @@ namespace PolygonNavMesh
         bool OneStepEarClipping();
         
         // 执行耳切法
-        vector<ClipTriangle*> EarClipping()
+        std::vector<ClipTriangle*> EarClipping()
         {
             while(OneStepEarClipping()){}
             return GetGenTriangles();
         }
 
         // 获取当前所有生成的三角形
-        vector<ClipTriangle*> GetGenTriangles() const
+        std::vector<ClipTriangle*> GetGenTriangles() const
         {
             return triangles;
         }
@@ -110,35 +104,38 @@ namespace PolygonNavMesh
             return firstNode;
         }
 
-        vector<PointLinkNode*> GetInsideFirstNodes() const
+        std::vector<PointLinkNode*> GetInsideFirstNodes() const
         {
             return insideFirstNodes;
         }
 
         // 检查点是否在当前轮廓内
-        bool IsPointInPolygon(Vector3 point) const;
+        bool IsPointInPolygon(NavMeshBase::Vector3 point) const;
         
         // 获取轮廓外部点到当前轮廓最近的点，返回两个对应的 LinkPoint
-        bool GetNearCrossFromOutsidePoint(Vector3 point, Vector3& nearPoint);
+        bool GetNearCrossFromOutsidePoint(NavMeshBase::Vector3 point, NavMeshBase::Vector3& nearPoint);
         
         // 获取轮廓内部点到当前轮廓中岛洞最近的点，返回两个对应的 LinkPoint
-        bool GetNearCrossFromInsidePoint(Vector3 point, Vector3& nearPoint);
+        bool GetNearCrossFromInsidePoint(NavMeshBase::Vector3 point, NavMeshBase::Vector3& nearPoint);
+
+        // 获取轮廓点
+        std::vector<NavMeshBase::Vector3> GetEdgePoints() const {return edgePoints;}
         
     private:
         static int polygonNum;
         // 记录原始点，逆时针顺序输入
-        vector<Vector3> edgePoints = vector<Vector3>();
+        std::vector<NavMeshBase::Vector3> edgePoints = std::vector<NavMeshBase::Vector3>();
         // 外节点链表的起点
         PointLinkNode* firstNode = nullptr;
         // 记录所有输入点中的最右点
         PointLinkNode* rightEdgeNode = nullptr;
         // 此处为firstNode，存的值为当前岛洞的最右点
-        vector<PointLinkNode*> insideFirstNodes = vector<PointLinkNode*>();
-        vector<vector<Vector3>> insidePointsList = vector<vector<Vector3>>();
+        std::vector<PointLinkNode*> insideFirstNodes = std::vector<PointLinkNode*>();
+        std::vector<std::vector<NavMeshBase::Vector3>> insidePointsList = std::vector<std::vector<NavMeshBase::Vector3>>();
         // 生效所有岛洞，目前在单步耳切中有执行
         void ApplyInsidePolygonPoints();
         // 分割形成的三角形集合
-        vector<ClipTriangle*> triangles;
+        std::vector<ClipTriangle*> triangles;
         // 标记是否可以开始进行剪裁了
         bool _beginEarClipping = false;
         // 重置所有内容
@@ -177,14 +174,14 @@ namespace PolygonNavMesh
         PointLinkNode* B = nullptr;
         PointLinkNode* C = nullptr;
 
-        vector<PointLinkNode*> points;  // 记录A B C；方便后续遍历用
+        std::vector<PointLinkNode*> points;  // 记录A B C；方便后续遍历用
 
         int num;
         int numInPolygon = 0;   // 当前三角形在一个轮廓中的编号，从0开始，方便后面使用Dijkstra搜索
-        Vector3 centerPos;
+        NavMeshBase::Vector3 centerPos;
 
         // 获取相连通的其他三角形
-        vector<pair<ClipTriangle*, ClipLine*>> GetLinkedClipTriangles();
+        std::vector<std::pair<ClipTriangle*, ClipLine*>> GetLinkedClipTriangles();
 
         /**
          *  <summary>检查点是否为当前的轮廓点，包括轮廓点的影子点</summary>
@@ -196,13 +193,14 @@ namespace PolygonNavMesh
         /**
          *  <summary>检查点是否在当前三角形内</summary>
          *  <param name="point">其他点</param>
+         *  <param name="diff">误差</param>
          */
-        bool IsPointInTriangle(Vector3 point, double diff = 0);
+        bool IsPointInTriangle(NavMeshBase::Vector3 point, double diff = 0);
         
     private:
         static int triangleNum;
         bool InitLinkedTriangle = false;
-        vector<pair<ClipTriangle*, ClipLine*>> linkedTriangles;
+        std::vector<std::pair<ClipTriangle*, ClipLine*>> linkedTriangles;
         // 获取相连通的其他三角形
         void GetLinkedClipTrianglesByPoint(PointLinkNode* point);
     };
@@ -213,7 +211,7 @@ namespace PolygonNavMesh
     public:
         PointLinkNode(double x, double y, double z)
         {
-            this->point = Vector3(x, y, z);
+            this->point = NavMeshBase::Vector3(x, y, z);
             this->num = ++pointNum;
         }
 
@@ -221,7 +219,7 @@ namespace PolygonNavMesh
         int num;
 	
         // 当前点
-        Vector3 point;
+        NavMeshBase::Vector3 point;
         
         // 双向链 - 动态，不可用于后续判断
         PointLinkNode* preNode = nullptr;
@@ -241,13 +239,13 @@ namespace PolygonNavMesh
         // 计算当前角是否为凸角
         bool IsPointConvex() const
         {
-            return NavMath::Cross(
-                Vector3(point - preNode->point), Vector3(point - nextNode->point)
+            return NavMeshBase::NavMath::Cross(
+                NavMeshBase::Vector3(point - preNode->point), NavMeshBase::Vector3(point - nextNode->point)
             ).z > 0;
         };
 
         // 相连接的三角形
-        vector<ClipTriangle*> linkTriangles;
+        std::vector<ClipTriangle*> linkTriangles;
         
         // 将三角形插入到当前点的链接记录中
         void AddLinkTriangle(ClipTriangle* triangle)
@@ -256,9 +254,9 @@ namespace PolygonNavMesh
         }
 
         // 获取所有点相连接的三角形，包括影子点的链接三角形
-        vector<ClipTriangle*> GetLinkTriangles()
+        std::vector<ClipTriangle*> GetLinkTriangles()
         {
-            vector<ClipTriangle*> result;
+            std::vector<ClipTriangle*> result;
             if (linkNode != nullptr)
             {
                 auto linkNodeTriangles = linkNode->linkTriangles;

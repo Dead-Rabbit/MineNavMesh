@@ -36,15 +36,15 @@ namespace NavMeshBase
 		}
 		
 		// 点乘
-		static double Dot(Vector3 line1, Vector3 line2)
+		static double Dot(NavMeshBase::Vector3 line1, NavMeshBase::Vector3 line2)
 		{
 			return line1.x * line2.x + line1.y * line2.y;
 		}
 
 		// 叉乘
-		static Vector3 Cross(Vector3 line1, Vector3 line2)
+		static NavMeshBase::Vector3 Cross(NavMeshBase::Vector3 line1, NavMeshBase::Vector3 line2)
 		{
-			return Vector3(
+			return NavMeshBase::Vector3(
 				line1.y * line2.z - line1.z * line2.y,
 				line1.z * line2.x - line1.x * line2.z,
 				line1.x * line2.y - line1.y * line2.x
@@ -54,14 +54,14 @@ namespace NavMeshBase
 		/**
 		 * 判断点 P 是否在三角形ABC内
 		 */
-		static bool IsPointInTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool pointInSide = true, double diff = 0)
+		static bool IsPointInTriangle(NavMeshBase::Vector3 A, NavMeshBase::Vector3 B, NavMeshBase::Vector3 C, NavMeshBase::Vector3 P, bool pointInSide = true, double diff = 0)
 		{
 			return SameSide(A, B, C, P, pointInSide, diff) &&
 				SameSide(B, C, A, P, pointInSide, diff) &&
 				SameSide(C, A, B, P, pointInSide, diff) ;
 		}
 		
-		static bool GetSegmentLinesIntersection(const Vector3 p1, const Vector3 p2, const Vector3 p3, const Vector3 p4, Vector3& crossPoint)
+		static bool GetSegmentLinesIntersection(const NavMeshBase::Vector3 p1, const NavMeshBase::Vector3 p2, const NavMeshBase::Vector3 p3, const NavMeshBase::Vector3 p4, NavMeshBase::Vector3& crossPoint)
 		{
 			const double z = p1.z;
 			const auto denominator = (p2.y - p1.y) * (p4.x - p3.x) - (p1.x - p2.x) * (p3.y - p4.y);
@@ -87,7 +87,7 @@ namespace NavMeshBase
 			  && (x - p3.x) * (x - p4.x) <= 0 && (y - p3.y) * (y - p4.y) <= 0
 			) {
 				// 返回交点p
-				crossPoint = Vector3(x, y, z);
+				crossPoint = NavMeshBase::Vector3(x, y, z);
 				return true;
 			}
 
@@ -95,14 +95,14 @@ namespace NavMeshBase
 		}
 
 		// 检查点是否在多边形内
-		static bool IsPointInPolygonByRayCast(const std::vector<Vector3> quadPoints, const Vector3 p0)
+		static bool IsPointInPolygonByRayCast(const std::vector<NavMeshBase::Vector3> quadPoints, const NavMeshBase::Vector3 p0)
 		{
 			const size_t pNum = quadPoints.size();
 			int itJunctionCount = 0;
 			for (int i = 0; i < pNum; i++) {
 				const int ni = (i + 1) % pNum;
-				const Vector3 pt_1 = quadPoints[i];
-				const Vector3 pt_2 = quadPoints[ni];
+				const NavMeshBase::Vector3 pt_1 = quadPoints[i];
+				const NavMeshBase::Vector3 pt_2 = quadPoints[ni];
 				if (p0.y >= pt_1.y && p0.y <= pt_2.y || p0.y >= pt_2.y && p0.y <= pt_1.y) {
 					const double duT = (p0.y - pt_1.y) / (pt_2.y - pt_1.y);
 					const double duXT = pt_1.x + duT * (pt_2.x - pt_1.x);
@@ -118,16 +118,16 @@ namespace NavMeshBase
 		}
 
 		// 获取三角形的内心
-		static Vector3 CalculateInsideCenter(Vector3 A, Vector3 B, Vector3 C)
+		static NavMeshBase::Vector3 CalculateInsideCenter(NavMeshBase::Vector3 A, NavMeshBase::Vector3 B, NavMeshBase::Vector3 C)
 		{
-			const Vector3 AB = B - A;
-			const Vector3 AC = C - A;
-			const Vector3 BA = A - B;
-			const Vector3 BC = C - B;
+			const NavMeshBase::Vector3 AB = B - A;
+			const NavMeshBase::Vector3 AC = C - A;
+			const NavMeshBase::Vector3 BA = A - B;
+			const NavMeshBase::Vector3 BC = C - B;
  
-			Vector3 nBA = BA;
+			NavMeshBase::Vector3 nBA = BA;
 			nBA.normalise();
-			Vector3 nBC = BC;
+			NavMeshBase::Vector3 nBC = BC;
 			nBC.normalise();
 
 			const double radBAC = Acos(AB.dotProduct(AC) / (AB.length() * AC.length()));
@@ -138,25 +138,25 @@ namespace NavMeshBase
  
 			const double r2 = AB.length() / (Cos(halfRadBAC) * Sin(halfRadABC) / Sin(halfRadBAC) + Cos(halfRadABC));
  
-			Vector3 P = ((nBA + nBC) / 2.0f).normalized() * r2 + B;
+			NavMeshBase::Vector3 P = ((nBA + nBC) / 2.0f).normalized() * r2 + B;
 			return P;
 		}
 
 		// 计算点到线段的垂直距离
-		static double GetDisFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
+		static double GetDisFromPointToLine(NavMeshBase::Vector3 p, NavMeshBase::Vector3 p1, NavMeshBase::Vector3 p2)
 		{
-			const Vector3 lineVec = p2 - p1;
+			const NavMeshBase::Vector3 lineVec = p2 - p1;
 			if (lineVec.squaredLength() == 0)
 				return (p - p1).length();
 			
-			Vector3 tp = (p - p1).absDotProduct(lineVec) / lineVec.length() * lineVec.normalisedCopy();
+			NavMeshBase::Vector3 tp = (p - p1).absDotProduct(lineVec) / lineVec.length() * lineVec.normalisedCopy();
 			return (p - p1 - tp).length();
 		}
 
 		// 获取点到线段垂直的点
-		static Vector3 GetPosFromPointToLine(Vector3 p, Vector3 p1, Vector3 p2)
+		static NavMeshBase::Vector3 GetPosFromPointToLine(NavMeshBase::Vector3 p, NavMeshBase::Vector3 p1, NavMeshBase::Vector3 p2)
 		{
-			const Vector3 lineVec = p2 - p1;
+			const NavMeshBase::Vector3 lineVec = p2 - p1;
 			if (lineVec.squaredLength() == 0)
 				return p1;
 			
@@ -167,7 +167,7 @@ namespace NavMeshBase
 		 * 获取点到线段的最短距离
 		 * shortPoint: 最短距离的点
 		 */
-		static double PointToSegDist(Vector3 p, Vector3 p1, Vector3 p2, Vector3& shortPoint)
+		static double PointToSegDist(NavMeshBase::Vector3 p, NavMeshBase::Vector3 p1, NavMeshBase::Vector3 p2, NavMeshBase::Vector3& shortPoint)
 		{
 			double x = p.x, y = p.y, x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
 			double cross = (x2 - x1) * (x - x1) + (y2 - y1) * (y - y1);
@@ -189,7 +189,7 @@ namespace NavMeshBase
 			double px = x1 + (x2 - x1) * r;
 			double py = y1 + (y2 - y1) * r;
 			
-			shortPoint = Vector3(px, py, 0);
+			shortPoint = NavMeshBase::Vector3(px, py, 0);
 			return sqrt((x - px) * (x - px) + (py - y) * (py - y));
 		}
 
@@ -197,14 +197,14 @@ namespace NavMeshBase
 		/**
 		 *	different 检查误差
 		 */
-		static bool SameSide(Vector3 A, Vector3 B, Vector3 C, Vector3 P, bool isPointOnSide, double diff = 0)
+		static bool SameSide(NavMeshBase::Vector3 A, NavMeshBase::Vector3 B, NavMeshBase::Vector3 C, NavMeshBase::Vector3 P, bool isPointOnSide, double diff = 0)
 		{
-			const Vector3 AB = B - A ;
-			const Vector3 AC = C - A ;
-			const Vector3 AP = P - A ;
+			const NavMeshBase::Vector3 AB = B - A ;
+			const NavMeshBase::Vector3 AC = C - A ;
+			const NavMeshBase::Vector3 AP = P - A ;
 
-			const Vector3 v1 = AB.crossProduct(AC) ;
-			const Vector3 v2 = AB.crossProduct(AP) ;
+			const NavMeshBase::Vector3 v1 = AB.crossProduct(AC) ;
+			const NavMeshBase::Vector3 v2 = AB.crossProduct(AP) ;
 
 			if (isPointOnSide)
 				return v1.dotProduct(v2) >= diff;

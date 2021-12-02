@@ -247,7 +247,7 @@ PointI GetIntersectPoint(const Active &e1, const Active &e2) {
 		b1 = e1.bot.x - e1.bot.y * e1.dx;
 		b2 = e2.bot.x - e2.bot.y * e2.dx;
 		double q = (b2 - b1) / (e1.dx - e2.dx);
-		return (abs(e1.dx) < abs(e2.dx)) ?
+		return std::abs(e1.dx) < std::abs(e2.dx) ?
 			PointI((int64_t)round(e1.dx * q + b1), (int64_t)round(q)) :
 			PointI((int64_t)round(e2.dx * q + b2), (int64_t)round(q));
 	}
@@ -732,7 +732,7 @@ void Clipper::AddPaths(const PathsI &paths, PathType polytype, bool is_open) {
 bool Clipper::IsContributingClosed(const Active &e) const {
 	switch (fillrule_) {
 		case FillRule::NonZero :
-			if (abs(e.wind_cnt) != 1) return false;
+			if (std::abs(e.wind_cnt) != 1) return false;
 			break;
 		case FillRule::Positive:
 			if (e.wind_cnt != 1) return false;
@@ -824,7 +824,7 @@ void Clipper::SetWindCountForClosedPathEdge(Active &e) {
 		//nb: neither e2.WindCnt nor e2.WindDx should ever be 0.
 		if (e2->wind_cnt * e2->wind_dx < 0) {
 			//opposite directions so 'e' is outside 'e2' ...
-			if (abs(e2->wind_cnt) > 1) {
+			if (std::abs(e2->wind_cnt) > 1) {
 				//outside prev poly but still inside another.
 				if (e2->wind_dx * e.wind_dx < 0)
 					//reversing direction so use the same WC
@@ -1303,14 +1303,14 @@ void Clipper::IntersectEdges(Active &e1, Active &e2, const PointI pt, bool orien
 		switch (cliptype_) {
 			case ClipType::Intersection:
 			case ClipType::Difference:
-				if (IsSamePolyType(*edge_o, *edge_c) || (abs(edge_c->wind_cnt) != 1)) return;
+				if (IsSamePolyType(*edge_o, *edge_c) || (std::abs(edge_c->wind_cnt) != 1)) return;
 				break;
 			case ClipType::Union:
-				if (IsHotEdge(*edge_o) != ((abs(edge_c->wind_cnt) != 1) ||
+				if (IsHotEdge(*edge_o) != ((std::abs(edge_c->wind_cnt) != 1) ||
 												  (IsHotEdge(*edge_o) != (edge_c->wind_cnt != 0)))) return;  //just works!
 				break;
 			case ClipType::Xor:
-				if (abs(edge_c->wind_cnt) != 1) return;
+				if (std::abs(edge_c->wind_cnt) != 1) return;
 				break;
 			case ClipType::None:
 				throw new ClipperLibException("Error in IntersectEdges - ClipType is None!");
@@ -1364,8 +1364,8 @@ void Clipper::IntersectEdges(Active &e1, Active &e2, const PointI pt, bool orien
 			old_e2_windcnt = -e2.wind_cnt;
 			break;
 		default:
-			old_e1_windcnt = abs(e1.wind_cnt);
-			old_e2_windcnt = abs(e2.wind_cnt);
+			old_e1_windcnt = std::abs(e1.wind_cnt);
+			old_e2_windcnt = std::abs(e2.wind_cnt);
 			break;
 	}
 
@@ -1411,8 +1411,8 @@ void Clipper::IntersectEdges(Active &e1, Active &e2, const PointI pt, bool orien
 				e2Wc2 = -e2.wind_cnt2;
 				break;
 			default:
-				e1Wc2 = abs(e1.wind_cnt2);
-				e2Wc2 = abs(e2.wind_cnt2);
+				e1Wc2 = std::abs(e1.wind_cnt2);
+				e2Wc2 = std::abs(e2.wind_cnt2);
 				break;
 		}
 
@@ -1558,7 +1558,7 @@ void Clipper::AddNewIntersectNode(Active &e1, Active &e2, int64_t top_y) {
 		//e.curr.y is still the bottom of scanbeam
 		pt.y = bot_y_;
 		//use the more vertical of the 2 edges to derive pt.x ...
-		if (abs(e1.dx) < abs(e2.dx))
+		if (std::abs(e1.dx) < std::abs(e2.dx))
 			pt.x = TopX(e1, bot_y_);
 		else
 			pt.x = TopX(e2, bot_y_);
@@ -1569,7 +1569,7 @@ void Clipper::AddNewIntersectNode(Active &e1, Active &e2, int64_t top_y) {
 			pt.x = e1.top.x;
 		else if (e2.top.y == top_y)
 			pt.x = e2.top.x;
-		else if (abs(e1.dx) < abs(e2.dx))
+		else if (std::abs(e1.dx) < std::abs(e2.dx))
 			pt.x = e1.curr_x;
 		else
 			pt.x = e2.curr_x;

@@ -1,6 +1,6 @@
 ﻿#include "PolygonTriangulation.h"
 
-using namespace NavMeshBase;
+#include <algorithm>
 
 namespace PolygonNavMesh{
 
@@ -8,7 +8,7 @@ namespace PolygonNavMesh{
     int PointLinkNode::pointNum = 0;
     int OutsidePolygon::polygonNum = 0;
 
-    void PolygonTriangulation::AddPolygonOutPoints(vector<Vector3> edgePoints)
+    void PolygonTriangulation::AddPolygonOutPoints(std::vector<NavMeshBase::Vector3> edgePoints)
     {
         // 检查当前是否为轮廓
         OutsidePolygon* newPolygon = new OutsidePolygon(edgePoints);
@@ -29,9 +29,9 @@ namespace PolygonNavMesh{
         polygons.push_back(newPolygon);
     }
 
-    vector<vector<ClipTriangle*>> PolygonTriangulation::GetGenTriangles() const
+    std::vector<std::vector<ClipTriangle*>> PolygonTriangulation::GetGenTriangles() const
     {
-        vector<vector<ClipTriangle*>> triangleGroups;
+        std::vector<std::vector<ClipTriangle*>> triangleGroups;
         for (const auto polygon : polygons)
         {
             triangleGroups.push_back(polygon->GetGenTriangles());
@@ -39,7 +39,7 @@ namespace PolygonNavMesh{
         return triangleGroups;
     }
 
-    void PolygonTriangulation::AddPolygonInsidePoints(vector<Vector3> insidePoints)
+    void PolygonTriangulation::AddPolygonInsidePoints(std::vector<NavMeshBase::Vector3> insidePoints)
     {
         // 检查当前轮廓是否有包含当前岛洞的
         for (int i = 0; i < polygons.size(); ++i)
@@ -65,7 +65,7 @@ namespace PolygonNavMesh{
         return ifExist;
     }
 
-    OutsidePolygon::OutsidePolygon(vector<Vector3> edgePoints)
+    OutsidePolygon::OutsidePolygon(std::vector<NavMeshBase::Vector3> edgePoints)
     {
         // 设置边框时，重置所有内容
         Reset();
@@ -110,7 +110,7 @@ namespace PolygonNavMesh{
         while (curNode != firstNode);
     }
 
-    void OutsidePolygon::AddPolygonInsidePoints(vector<Vector3> innerPoints)
+    void OutsidePolygon::AddPolygonInsidePoints(std::vector<NavMeshBase::Vector3> innerPoints)
     {
         // 生成新的链表
         insidePointsList.push_back(innerPoints);
@@ -177,19 +177,19 @@ namespace PolygonNavMesh{
             PointLinkNode* rightInsideNode = insideFirstNodes[nodePairIndex];
             
             // 获取从inner右点触发向x轴正方向走的最大线段
-            const Vector3 compareLineStart = rightInsideNode->point;
-            const Vector3 compareLineEnd = Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0);
+            const NavMeshBase::Vector3 compareLineStart = rightInsideNode->point;
+            const NavMeshBase::Vector3 compareLineEnd = NavMeshBase::Vector3(rightEdgeNode->point.x + 10, rightInsideNode->point.y, 0);
 
             PointLinkNode* suitNode = nullptr;
-            Vector3 suitCrossPoint;
+            NavMeshBase::Vector3 suitCrossPoint;
             // 判断靠右内部节点与哪个线段的相交点最靠近y轴
             PointLinkNode* curNode = firstNode;
             if (curNode == nullptr)
                 return ;
             do
             {
-                Vector3 crossPoint;
-                if (NavMath::GetSegmentLinesIntersection(compareLineStart, compareLineEnd,
+                NavMeshBase::Vector3 crossPoint;
+                if (NavMeshBase::NavMath::GetSegmentLinesIntersection(compareLineStart, compareLineEnd,
                     curNode->point, curNode->nextNode->point, crossPoint))
                 {
                     if (suitNode == nullptr)
@@ -212,7 +212,7 @@ namespace PolygonNavMesh{
             
             // 找到最近的线段，检查 形成的三角形内是否有其他点
             curNode = firstNode;
-            const Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
+            const NavMeshBase::Vector3 A = rightInsideNode->point, B = suitCrossPoint, C = suitNode->point;
             PointLinkNode* cutNode = nullptr;  // 裁剪位置
             do
             {
@@ -220,12 +220,12 @@ namespace PolygonNavMesh{
                 if (curNode != suitNode)
                 {
                     // 判断当前点是否在形成的三角形中，如果在，则取出一个最靠近x轴，即y最小的
-                    if (NavMath::IsPointInTriangle(A, B, C, curNode->point, false))
+                    if (NavMeshBase::NavMath::IsPointInTriangle(A, B, C, curNode->point, false))
                     {
                         if (cutNode == nullptr)
                             cutNode = curNode;
-                        else if (NavMath::Abs(curNode->point.y - rightInsideNode->point.y)
-                            < NavMath::Abs(cutNode->point.y - rightInsideNode->point.y))
+                        else if (NavMeshBase::NavMath::Abs(curNode->point.y - rightInsideNode->point.y)
+                            < NavMeshBase::NavMath::Abs(cutNode->point.y - rightInsideNode->point.y))
                             cutNode = curNode;
                     }
                 }
@@ -266,7 +266,7 @@ namespace PolygonNavMesh{
         this->points.push_back(this->B);
 
         // 计算当前内心
-        // centerPos = NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
+        // centerPos = NavMeshBase::NavMath::CalculateInsideCenter(this->A->point, this->B->point, this->C->point);
         // 计算当前质心
         centerPos = (this->A->point + this->B->point + this->C->point) / 3;
         
@@ -276,7 +276,7 @@ namespace PolygonNavMesh{
         this->C->AddLinkTriangle(this);
     }
 
-    vector<pair<ClipTriangle*, ClipLine*>> ClipTriangle::GetLinkedClipTriangles()
+    std::vector<std::pair<ClipTriangle*, ClipLine*>> ClipTriangle::GetLinkedClipTriangles()
     {
         if (!InitLinkedTriangle)
         {
@@ -305,13 +305,13 @@ namespace PolygonNavMesh{
             {
                 // 将三角形push到结果中，检查当前三角形是否已放入
                 auto it = std::find_if(linkedTriangles.begin(), linkedTriangles.end(),
-                    [otherTriangle](pair<ClipTriangle*, ClipLine*> contentTriPair)
+                    [otherTriangle](std::pair<ClipTriangle*, ClipLine*> contentTriPair)
                     {
                         return contentTriPair.first == otherTriangle;
                     });
                 if (it == linkedTriangles.end())
                 {
-                    linkedTriangles.push_back(pair<ClipTriangle*, ClipLine*>(otherTriangle, clipLine));
+                    linkedTriangles.push_back(std::pair<ClipTriangle*, ClipLine*>(otherTriangle, clipLine));
                 }
             }
         }
@@ -322,7 +322,7 @@ namespace PolygonNavMesh{
         // 两个三角形相连接的点的数量
         int connectPointNum = 0;
         int preLinkIndex = 0;
-        vector<PointLinkNode*> matchedPoints;
+        std::vector<PointLinkNode*> matchedPoints;
         for (PointLinkNode* otherEdgePoint : otherTriangle->points)
         {
             // otherPoint 为其他三角形的边框点
@@ -359,13 +359,13 @@ namespace PolygonNavMesh{
         return connectPointNum == 2;
     }
 
-    bool ClipTriangle::IsPointInTriangle(Vector3 point, double diff)
+    bool ClipTriangle::IsPointInTriangle(NavMeshBase::Vector3 point, double diff)
     {
         if (A->point.x == B->point.x && A->point.x == C->point.x ||
             A->point.y == B->point.y && A->point.y == C->point.y)
             return false;
         
-        return NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true, diff);
+        return NavMeshBase::NavMath::IsPointInTriangle(A->point, B->point, C->point, point, true, diff);
     }
 
     bool OutsidePolygon::IsPointEar(PointLinkNode* checkNode) const
@@ -386,7 +386,7 @@ namespace PolygonNavMesh{
             if (checkNode != curNode && checkNode->preNode != curNode && checkNode->nextNode != curNode)
             {
                 // 存在点在当前三角形内，当前不是耳尖
-                if (NavMath::IsPointInTriangle(
+                if (NavMeshBase::NavMath::IsPointInTriangle(
                      checkNode->point,
                      checkNode->nextNode->point,
                      checkNode->preNode->point,
@@ -452,12 +452,12 @@ namespace PolygonNavMesh{
         return false;
     }
 
-    bool OutsidePolygon::IsPointInPolygon(Vector3 point) const
+    bool OutsidePolygon::IsPointInPolygon(NavMeshBase::Vector3 point) const
     {
-        return NavMath::IsPointInPolygonByRayCast(edgePoints, point);
+        return NavMeshBase::NavMath::IsPointInPolygonByRayCast(edgePoints, point);
     }
 
-    bool OutsidePolygon::GetNearCrossFromOutsidePoint(Vector3 point, Vector3& nearPoint)
+    bool OutsidePolygon::GetNearCrossFromOutsidePoint(NavMeshBase::Vector3 point, NavMeshBase::Vector3& nearPoint)
     {
         bool findPoint = false;
         double minDis = 0;
@@ -466,8 +466,8 @@ namespace PolygonNavMesh{
         {
             const auto curPoint = edgePoints[i];
             const auto nextPoint = edgePoints[i + 1 < pointSize ? i + 1 : 0];
-            Vector3 nearestPoint;
-            const double tempDis = NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
+            NavMeshBase::Vector3 nearestPoint;
+            const double tempDis = NavMeshBase::NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
             if (!findPoint || tempDis < minDis)
             {
                 findPoint = true;
@@ -479,7 +479,7 @@ namespace PolygonNavMesh{
         return findPoint;
     }
 
-    bool OutsidePolygon::GetNearCrossFromInsidePoint(Vector3 point, Vector3& nearPoint)
+    bool OutsidePolygon::GetNearCrossFromInsidePoint(NavMeshBase::Vector3 point, NavMeshBase::Vector3& nearPoint)
     {
         bool findPoint = false;
         double minDis = 0;
@@ -491,8 +491,8 @@ namespace PolygonNavMesh{
             {
                 auto curPoint = insidePoints[i];
                 auto nextPoint = insidePoints[i + 1 < pointSize ? i + 1 : 0];
-                Vector3 nearestPoint;
-                double tempDis = NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
+                NavMeshBase::Vector3 nearestPoint;
+                double tempDis = NavMeshBase::NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
                 if (!findPoint || tempDis < minDis)
                 {
                     findPoint = true;

@@ -27,8 +27,6 @@
 #include <vector>
 #include <type_traits>
 
-using namespace std;
-
 namespace clipperlib {
 
 const double floating_point_tolerance = 1E-15;           //floating point tolerance for equality
@@ -555,11 +553,10 @@ struct Paths {
 
 template<>
 inline void PathsI::Assign(const PathsI &other, double scale) {
-	using namespace std;
 	data.clear();
 	data.resize(other.data.size());
-	typename vector<PathI>::iterator it1;
-	typename vector<PathI>::const_iterator it2;
+	typename std::vector<PathI>::iterator it1;
+	typename std::vector<PathI>::const_iterator it2;
 	for (it1 = data.begin(), it2 = other.data.begin(); it1 != data.end(); ++it1, ++it2)
 		it1->Assign(*it2, scale);
 }
@@ -567,22 +564,20 @@ inline void PathsI::Assign(const PathsI &other, double scale) {
 
 template<>
 inline void PathsD::Assign(const PathsI &other, double scale) {
-	using namespace std;
 	data.clear();
 	data.resize(other.data.size());
-	typename vector<PathD>::iterator it1;
-	typename vector<PathI>::const_iterator it2;
+	typename std::vector<PathD>::iterator it1;
+	typename std::vector<PathI>::const_iterator it2;
 	for (it1 = data.begin(), it2 = other.data.begin(); it1 != data.end(); ++it1, ++it2)
 		it1->Assign(*it2, scale);
 }
 //------------------------------------------------------------------------------
 template<>
 inline void PathsI::Assign(const PathsD &other, double scale) {
-	using namespace std;
 	data.clear();
 	data.resize(other.data.size());
-	typename vector<PathI>::iterator it1;
-	typename vector<PathD>::const_iterator it2;
+	typename std::vector<PathI>::iterator it1;
+	typename std::vector<PathD>::const_iterator it2;
 	for (it1 = data.begin(), it2 = other.data.begin(); it1 != data.end(); ++it1, ++it2)
 		it1->Assign(*it2, scale);
 }
@@ -590,11 +585,10 @@ inline void PathsI::Assign(const PathsD &other, double scale) {
 
 template <>
 inline void PathsD::Assign(const PathsD &other, double scale) {
-	using namespace std;
 	data.clear();
 	data.resize(other.data.size());
-	typename vector<PathD>::iterator it1;
-	typename vector<PathD>::const_iterator it2;
+	typename std::vector<PathD>::iterator it1;
+	typename std::vector<PathD>::const_iterator it2;
 	for (it1 = data.begin(), it2 = other.data.begin(); it1 != data.end(); ++it1, ++it2)
 		it1->Assign(*it2, scale);
 }

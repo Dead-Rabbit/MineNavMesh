@@ -12,23 +12,23 @@ int main(int argc, char* argv[])
     
     // 2. Ìí¼ÓÍâ±ß¿òºÍ×è°­±ß¿ò
     // Ìí¼ÓÍâ±ß¿ò
-    vector<Vector3> subjectPath = vector<Vector3>();
-    subjectPath.push_back(Vector3(100, 100, 0));
-    subjectPath.push_back(Vector3(100, 300, 0));
-    subjectPath.push_back(Vector3(300, 300, 0));
-    subjectPath.push_back(Vector3(300, 100, 0));
+    vector<NavMeshBase::Vector3> subjectPath = vector<NavMeshBase::Vector3>();
+    subjectPath.push_back(NavMeshBase::Vector3(100, 100, 0));
+    subjectPath.push_back(NavMeshBase::Vector3(100, 300, 0));
+    subjectPath.push_back(NavMeshBase::Vector3(300, 300, 0));
+    subjectPath.push_back(NavMeshBase::Vector3(300, 100, 0));
     polygonNavMeshTool.AddPolygonOutsideContour(subjectPath);
     
     // Ìí¼Ó×è°­¿ò
-    vector<Vector3> clipPath = vector<Vector3>();
-    clipPath.push_back(Vector3(258, 151, 0));
-    clipPath.push_back(Vector3(281, 324, 0));
-    clipPath.push_back(Vector3(324, 317, 0));
-    clipPath.push_back(Vector3(297, 148, 0));
+    vector<NavMeshBase::Vector3> clipPath = vector<NavMeshBase::Vector3>();
+    clipPath.push_back(NavMeshBase::Vector3(258, 151, 0));
+    clipPath.push_back(NavMeshBase::Vector3(281, 324, 0));
+    clipPath.push_back(NavMeshBase::Vector3(324, 317, 0));
+    clipPath.push_back(NavMeshBase::Vector3(297, 148, 0));
     polygonNavMeshTool.AddPolygonInsideContour(clipPath);
 
     // 3. Ñ°ÕÒ×îÖÕÂ·¾¶
-    vector<Vector3> finalPathNodes = polygonNavMeshTool.FindPath(Vector3(264, 204, 0), Vector3(308, 291, 0));
+    vector<NavMeshBase::Vector3> finalPathNodes = polygonNavMeshTool.FindPath(NavMeshBase::Vector3(264, 204, 0), NavMeshBase::Vector3(308, 291, 0));
 
     // Êä³ö²âÊÔ
     if (finalPathNodes.size() > 0)
