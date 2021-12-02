@@ -174,6 +174,7 @@ int main(int argc, char* argv[])
     setbkmode(TRANSPARENT);     // 去掉文字背景颜色
     settextstyle(20, 0, L"微软雅黑");
     
+    BeginBatchDraw();
     // 绘制当前调试用
     ClearBoard();
     ReDrawBoard();
@@ -278,7 +279,9 @@ int main(int argc, char* argv[])
                 return 0;	// Press ESC key to exit
         default: break;
         }
+        FlushBatchDraw();
     }
+    EndBatchDraw();
 #else
     polygonNavMeshTool.GenerateFinalTriangles();
     int outTriangleNum = 1;
