@@ -292,17 +292,20 @@ int main(int argc, char* argv[])
             break;
         case WM_MOUSEMOVE:
             {
-                ClearBoard();
-                const auto pos = Vector3(m.x, m.y, 0);
-                if (dragSetLeft)
+                if (step > 1)
                 {
-                    startPoint = pos;
-                } else if (dragSetRight)
-                {
-                    endPoint = pos;
+                    ClearBoard();
+                    const auto pos = Vector3(m.x, m.y, 0);
+                    if (dragSetLeft)
+                    {
+                        startPoint = pos;
+                    } else if (dragSetRight)
+                    {
+                        endPoint = pos;
+                    }
+                    finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
+                    ReDrawBoard();
                 }
-                finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
-                ReDrawBoard();
             }
             break;
         case WM_KEYDOWN:
