@@ -147,7 +147,6 @@ namespace PolygonNavMesh
             Vector3 minPos;
             double minDis = -1;
             bool findMinPos = false;
-            // 查找最近的多边形
             vector<OutsidePolygon*> outsidePolygons = triangulationTool.GetOutsidePolygons();
             // 首先检查并排除岛洞的情况
             for (auto polygon : outsidePolygons)
@@ -225,7 +224,6 @@ namespace PolygonNavMesh
                 startOutsidePolygon->GetNearCrossFromInsidePoint(endPoint, nearPoint);
                 endPoint = nearPoint;
                 vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
-                // 在一个三角形组合内搜寻
                 for (ClipTriangle* triangle : triangleGroup)
                 {
                     if (triangle->IsPointInTriangle(endPoint, -0.01))
@@ -240,7 +238,6 @@ namespace PolygonNavMesh
                 startOutsidePolygon->GetNearCrossFromOutsidePoint(endPoint, nearPoint);
                 endPoint = nearPoint;
                 vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
-                // 在一个三角形组合内搜寻
                 for (ClipTriangle* triangle : triangleGroup)
                 {
                     if (triangle->IsPointInTriangle(endPoint, -0.01))
