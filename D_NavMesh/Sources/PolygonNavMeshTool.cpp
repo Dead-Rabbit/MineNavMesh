@@ -212,9 +212,6 @@ namespace PolygonNavMesh
                     }
                 }
             }
-        } else
-        {
-            std::cout << "find inside polygon" << std::endl;
         }
 
         // 找到了起始点和起始组，但是起始点和结束点不在一个组内，则找最靠近结束点的点
