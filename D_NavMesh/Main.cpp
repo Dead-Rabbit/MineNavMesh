@@ -344,12 +344,7 @@ void ClearBoard()
 
 void ReDrawBoard()
 {
-    settextstyle(25, 0, L"微软雅黑");
     setcolor(BLACK);
-    TCHAR str[25];
-    _stprintf_s(str, _T("Click Left"));
-    outtextxy(0, 0, str);
-    
     settextstyle(20, 0, L"微软雅黑");
     DrawTriangles();
     DrawPolygonsPoints();
