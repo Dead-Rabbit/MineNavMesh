@@ -95,26 +95,30 @@ namespace NavMeshBase
 		}
 
 		// 检查点是否在多边形内
-		static bool IsPointInPolygonByRayCast(const std::vector<NavMeshBase::Vector3> quadPoints, const NavMeshBase::Vector3 p0)
+		static bool IsPointInPolygonByRayCast(const std::vector<NavMeshBase::Vector3> quadPoints, const NavMeshBase::Vector3 p)
 		{
-			const size_t pNum = quadPoints.size();
-			int itJunctionCount = 0;
-			for (int i = 0; i < pNum; i++) {
-				const int ni = (i + 1) % pNum;
-				const NavMeshBase::Vector3 pt_1 = quadPoints[i];
-				const NavMeshBase::Vector3 pt_2 = quadPoints[ni];
-				if (p0.y >= pt_1.y && p0.y <= pt_2.y || p0.y >= pt_2.y && p0.y <= pt_1.y) {
-					const double duT = (p0.y - pt_1.y) / (pt_2.y - pt_1.y);
-					const double duXT = pt_1.x + duT * (pt_2.x - pt_1.x);
+			// 交点个数  
+			int nCross = 0;
+			const int nCount = quadPoints.size();
+			for (int i = 0; i < nCount; i++)
+			{
+				Vector3 p1 = quadPoints[i];
+				Vector3 p2 = quadPoints[(i + 1) % nCount];
+ 
+				if (p1.y == p2.y)
+					continue;
+				if (p.y < std::min<double>(p1.y, p2.y))
+					continue;
+				if (p.y >= std::max<double>(p1.y, p2.y))
+					continue;
 				
-					if (p0.x == duXT)
-						return true;		// 在线段上表明为True
-				
-					if (p0.x > duXT)
-						itJunctionCount++;
-				}
+				const double x = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+				if (x > p.x)
+					nCross++;
 			}
-			return itJunctionCount % 2 == 1;
+			
+			// 交点为偶数，点在多边形之外  
+			return nCross % 2 == 1;
 		}
 
 		// 获取三角形的内心

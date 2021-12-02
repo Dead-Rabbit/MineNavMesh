@@ -489,10 +489,10 @@ namespace PolygonNavMesh{
             const int pointSize = insidePoints.size();
             for (int i = 0; i < pointSize; i++)
             {
-                auto curPoint = insidePoints[i];
-                auto nextPoint = insidePoints[i + 1 < pointSize ? i + 1 : 0];
+                const auto curPoint = insidePoints[i];
+                const auto nextPoint = insidePoints[i + 1 < pointSize ? i + 1 : 0];
                 NavMeshBase::Vector3 nearestPoint;
-                double tempDis = NavMeshBase::NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
+                const double tempDis = NavMeshBase::NavMath::PointToSegDist(point, curPoint, nextPoint, nearestPoint);
                 if (!findPoint || tempDis < minDis)
                 {
                     findPoint = true;

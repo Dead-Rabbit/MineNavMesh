@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
             break;
         case WM_MOUSEMOVE:
             {
-                if (step > 1)
+                if (step > 1 && (dragSetLeft || dragSetRight))
                 {
                     ClearBoard();
                     const auto pos = Vector3(m.x, m.y, 0);
@@ -347,7 +347,7 @@ void ReDrawBoard()
     settextstyle(25, 0, L"微软雅黑");
     setcolor(BLACK);
     TCHAR str[25];
-    _stprintf_s(str, _T("点击左键继续"));
+    _stprintf_s(str, _T("Click Left"));
     outtextxy(0, 0, str);
     
     settextstyle(20, 0, L"微软雅黑");
@@ -384,7 +384,7 @@ void ReDrawBoard()
     // 绘制所选三角形信息
     if (showTriangle != nullptr)
     {
-        std::cout << "[" << showTriangle->num <<  "] 临近三角形: ";
+        std::cout << "[" << showTriangle->num <<  "] near Triangles: ";
         int showRadius = 2;
         for (const auto otherTriangle : showTriangle->GetLinkedClipTriangles())
         {

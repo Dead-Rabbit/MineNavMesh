@@ -60,7 +60,8 @@ namespace PolygonNavMesh
             return triangulationTool.GetGenTriangles();
 
         triangulationTool.Reset();
-        clipperlib::ClipperD clipperD = clipperlib::ClipperD();         // vatti 轮廓切割
+        // Vattis 轮廓切割
+        clipperlib::ClipperD clipperD = clipperlib::ClipperD();
         for (auto subjectPath : subjectPaths)
         {
             clipperD.AddPath(subjectPath, clipperlib::PathType::Subject, false);
@@ -148,6 +149,7 @@ namespace PolygonNavMesh
             double minDis = -1;
             bool findMinPos = false;
             std::vector<OutsidePolygon*> outsidePolygons = triangulationTool.GetOutsidePolygons();
+            
             // 首先检查并排除岛洞的情况
             for (auto polygon : outsidePolygons)
             {
@@ -167,13 +169,12 @@ namespace PolygonNavMesh
                     }
                 }
             }
-
+            
             // 如果没有找到岛洞的，则检查外边框的
             if (!findMinPos)
             {
                 for (auto polygon : outsidePolygons)
                 {
-                    // 点在多边形外
                     if (!polygon->IsPointInPolygon(startPoint))
                     {
                         NavMeshBase::Vector3 nearPoint;
@@ -200,10 +201,9 @@ namespace PolygonNavMesh
                 for (OutsidePolygon* outsidePolygon : genTrianglePolygons)
                 {
                     std::vector<ClipTriangle*> triangleGroup = outsidePolygon->GetGenTriangles();
-                    // 在一个三角形组合内搜寻
                     for (ClipTriangle* triangle : triangleGroup)
                     {
-                        if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint, -0.01))
+                        if (startTriangle == nullptr && triangle->IsPointInTriangle(startPoint, -0.1))
                         {
                             startTriangle = triangle;
                             startOutsidePolygon = outsidePolygon;
@@ -212,6 +212,9 @@ namespace PolygonNavMesh
                     }
                 }
             }
+        } else
+        {
+            std::cout << "find inside polygon" << std::endl;
         }
 
         // 找到了起始点和起始组，但是起始点和结束点不在一个组内，则找最靠近结束点的点
@@ -361,7 +364,7 @@ namespace PolygonNavMesh
                     }
                     else
                     {
-                        //Rightleg becomes new curPoint point
+                        //Right Leg becomes new curPoint point
                         curPoint = curPoint + rightLeg;
                         curPointIndex = rightLegIndex;
                         unsigned int newIt = curPointIndex + 1;
