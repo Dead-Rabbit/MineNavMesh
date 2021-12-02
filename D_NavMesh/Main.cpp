@@ -45,6 +45,9 @@ vector<int> innerPathIndexs;
 
 bool setStart = true;
 
+bool dragSetLeft = false;
+bool dragSetRight = false;
+
 ClipTriangle* showTriangle = nullptr;
 int step = 0;
 bool CheckTriangleInfoMod = false;
@@ -250,10 +253,16 @@ int main(int argc, char* argv[])
                         const auto clickPos = Vector3(m.x, m.y, 0);
                         startPoint = clickPos;
                         finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
+                        dragSetLeft = true;
                     }
                 }
                 ReDrawBoard();
             }break;
+        case WM_LBUTTONUP:
+            {
+                dragSetLeft = false;
+            }
+            break;
         case WM_RBUTTONDOWN:
             {
                 ClearBoard();
@@ -262,6 +271,13 @@ int main(int argc, char* argv[])
                 endPoint = clickPos;
                 finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                 ReDrawBoard();
+                dragSetLeft = false;
+                dragSetRight = true;
+            }
+            break;
+        case WM_RBUTTONUP:
+            {
+                dragSetRight = false;
             }
             break;
         case WM_MBUTTONDOWN:
@@ -271,6 +287,21 @@ int main(int argc, char* argv[])
                 {
                     finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                 }
+                ReDrawBoard();
+            }
+            break;
+        case WM_MOUSEMOVE:
+            {
+                ClearBoard();
+                const auto pos = Vector3(m.x, m.y, 0);
+                if (dragSetLeft)
+                {
+                    startPoint = pos;
+                } else if (dragSetRight)
+                {
+                    endPoint = pos;
+                }
+                finalPathNodes = polygonNavMeshTool.FindPath(startPoint, endPoint);
                 ReDrawBoard();
             }
             break;
