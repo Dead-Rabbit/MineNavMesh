@@ -226,7 +226,7 @@ namespace PolygonNavMesh
                 std::vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
                 for (ClipTriangle* triangle : triangleGroup)
                 {
-                    if (triangle->IsPointInTriangle(endPoint, -0.01))
+                    if (triangle->IsPointInTriangle(endPoint, -0.1))
                     {
                         endTriangle = triangle;
                         endOutsidePolygon = startOutsidePolygon;
@@ -240,7 +240,7 @@ namespace PolygonNavMesh
                 std::vector<ClipTriangle*> triangleGroup = startOutsidePolygon->GetGenTriangles();
                 for (ClipTriangle* triangle : triangleGroup)
                 {
-                    if (triangle->IsPointInTriangle(endPoint, -0.01))
+                    if (triangle->IsPointInTriangle(endPoint, -0.1))
                     {
                         endTriangle = triangle;
                         endOutsidePolygon = startOutsidePolygon;
