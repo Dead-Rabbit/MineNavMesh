@@ -356,9 +356,9 @@ void ReDrawBoard()
 
     // 绘制最终生成的路线
     setcolor(RED);
-    auto preLineStyle = new LINESTYLE();
+    const auto preLineStyle = new LINESTYLE();
     getlinestyle(preLineStyle);
-    auto newLineStyle = new LINESTYLE();
+    const auto newLineStyle = new LINESTYLE();
     newLineStyle->style = preLineStyle->style;
     newLineStyle->thickness = 2;
     newLineStyle->puserstyle = preLineStyle->puserstyle;
